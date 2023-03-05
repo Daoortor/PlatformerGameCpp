@@ -2,7 +2,7 @@
 #define PLATFORMERGAMECPP_PLAYER_FWD_HPP
 
 namespace Platformer {
-    class Player;
+class Player;
 }
 
-#endif //PLATFORMERGAMECPP_PLAYER_FWD_HPP
+#endif  // PLATFORMERGAMECPP_PLAYER_FWD_HPP
