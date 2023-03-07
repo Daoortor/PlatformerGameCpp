@@ -3,6 +3,6 @@
 
 namespace Platformer {
 class Player;
-}
+}  // namespace Platformer
 
 #endif  // PLATFORMERGAMECPP_PLAYER_FWD_HPP

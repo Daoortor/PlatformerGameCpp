@@ -2,49 +2,51 @@
 #include <cmath>
 
 namespace Platformer {
-Vector::Vector(int x_, int y_) : x(x_), y(y_) {
+
+namespace observers {
+PhysicsObserver::PhysicsObserver(Player *player_) : player(player_) {
 }
 
-Vector Vector::operator+(Vector other) const {
-    return {x + other.x, y + other.y};
+void PhysicsObserver::updateCollision() {
+    if (player->blockAbove().isSolid() && player->speed.get_y() < 0 ||
+        player->blockBelow().isSolid() &&
+            player->speed.get_y() > 0) {  // Hitting ceiling or ground
+        player->speed = {player->speed.get_x(), 0};
+    }
+    if (player->blockLeft().isSolid() && player->speed.get_x() < 0 ||
+        player->blockRight().isSolid() &&
+            player->speed.get_x() > 0) {  // Hitting walls
+        player->speed = {0, player->speed.get_y()};
+    }
 }
 
-Vector Vector::operator+=(Vector other) {
-    x += other.x;
-    y += other.y;
-    return *this;
+void PhysicsObserver::updateGravity() {
+    if (!player->blockBelow().isSolid() && !player->blockBelow().isHangableOn()) {
+        player->speed = {
+                player->speed.get_x(), player->speed.get_y() + FREEFALL_ACCELERATION};
+    }
 }
 
-Vector Vector::operator-(Vector other) const {
-    return {x - other.x, y - other.y};
+void PhysicsObserver::updateMovement() {
+    player->move(player->speed);
 }
 
-Vector Vector::operator-=(Vector other) {
-    x -= other.x;
-    y -= other.y;
-    return *this;
+void PhysicsObserver::update() {
+    updateGravity();
+    updateCollision();
+    updateMovement();
 }
-
-Vector Vector::operator*(float k) const {
-    return {
-        static_cast<int>(std::lrint(static_cast<float>(x) * k)),
-        static_cast<int>(std::lrint(static_cast<float>(y) * k))};
-}
-
-Vector Vector::operator*=(float k) {
-    x = static_cast<int>(std::lrint(static_cast<float>(x) * k));
-    y = static_cast<int>(std::lrint(static_cast<float>(y) * k));
-    return *this;
-}
+}  // namespace observers
 
 Player::Player(Game *game_) : game(game_) {
 }
 
 Player::Player(Game *game_, Vector pos_) : game(game_), pos(pos_) {
-    auto phys_obs = observers::PhysicsObserver(this);
+    auto physObs =
+        std::unique_ptr<observers::Observer>(new observers::PhysicsObserver(this
+        ));
     observerCollection = std::vector<std::unique_ptr<observers::Observer>>();
-    observerCollection.push_back(std::make_unique<observers::Observer>(phys_obs)
-    );
+    observerCollection.push_back(std::move(physObs));
 }
 
 Player::Player(Game *game_, Vector pos_, int width_, int height_)
@@ -61,17 +63,18 @@ void Player::moveLeft() {
 }
 
 void Player::moveRight() {
-    if (!blockLeft().isSolid()) {
+    if (!blockRight().isSolid()) {
         move({PLAYER_SPEED, 0});
     }
     pose = Pose::LOOKING_RIGHT;
 }
 
 void Player::jump() {
-    if (blockBelow().isSolid() && !blockAbove().isSolid()) {
-        speed = {speed.get_x(), -PLAYER_SPEED};
-    } else if (blockBelow().isHangableOn()) {
+    if (blockBelow().isHangableOn()) {
+        speed = {0, 0};
         move({0, -PLAYER_SPEED});
+    } else if (blockBelow().isSolid() && !blockAbove().isSolid()) {
+        speed = {speed.get_x(), -PLAYER_SPEED};
     }
 }
 
@@ -92,62 +95,30 @@ void Player::notifyAll() {
 }
 
 Block Player::blockInside() {
-    return game->getField()[pos.get_x() / BLOCK_SIZE][pos.get_y() / BLOCK_SIZE];
+    return game->getBlock(divide(pos.get_x(), BLOCK_SIZE), divide(pos.get_y(), BLOCK_SIZE));
 }
 
 Block Player::blockAbove() {
-    return game->getField(
-    )[pos.get_x() / BLOCK_SIZE][(pos.get_y() - height / 2) / BLOCK_SIZE];
+    return game->getBlock(
+        divide(pos.get_y() - height / 2, BLOCK_SIZE), divide(pos.get_x(), BLOCK_SIZE)
+    );
 }
 
 Block Player::blockBelow() {
-    return game->getField(
-    )[pos.get_x() / BLOCK_SIZE][(pos.get_y() + height / 2) / BLOCK_SIZE];
+    return game->getBlock(
+        divide(pos.get_y() + height / 2, BLOCK_SIZE), divide(pos.get_x(), BLOCK_SIZE)
+    );
 }
 
 Block Player::blockLeft() {
-    return game->getField(
-    )[(pos.get_x() - width / 2) / BLOCK_SIZE][pos.get_y() / BLOCK_SIZE];
+    return game->getBlock(
+        divide(pos.get_y(), BLOCK_SIZE), divide(pos.get_x() - width / 2, BLOCK_SIZE)
+    );
 }
 
 Block Player::blockRight() {
-    return game->getField(
-    )[(pos.get_x() + width / 2) / BLOCK_SIZE][pos.get_y() / BLOCK_SIZE];
+    return game->getBlock(
+        divide(pos.get_y(), BLOCK_SIZE), divide(pos.get_x() + width / 2, BLOCK_SIZE)
+    );
 }
-
-namespace observers {
-PhysicsObserver::PhysicsObserver(Player *player_) : player(player_) {
-}
-
-void PhysicsObserver::updateCollision() {
-    if (player->blockAbove().isSolid() &&
-        player->speed.get_y() < 0) {  // Hitting ceiling
-        player->speed = {player->speed.get_x(), -player->speed.get_y()};
-    }
-    if (player->blockLeft().isSolid() && player->speed.get_x() < 0 ||
-        player->blockRight().isSolid() &&
-            player->speed.get_x() > 0) {  // Hitting walls
-        player->speed = {0, player->speed.get_y()};
-    }
-    if (player->blockBelow().isSolid() &&
-        player->speed.get_y() > 0) {  // Hitting ground
-        player->speed = {player->speed.get_x(), 0};
-    }
-}
-
-void PhysicsObserver::updateGravity() {
-    player->speed = {
-        player->speed.get_x(), player->speed.get_y() + FREEFALL_ACCELERATION};
-}
-
-void PhysicsObserver::updateMovement() {
-    player->move(player->speed);
-}
-
-void PhysicsObserver::update() {
-    updateGravity();
-    updateCollision();
-    updateMovement();
-}
-}  // namespace observers
 }  // namespace Platformer
