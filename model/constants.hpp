@@ -7,3 +7,5 @@ const int BLOCK_SIZE =
 const int PLAYER_SPEED = 10;
 const int FREEFALL_ACCELERATION = 5;
 }  // namespace Platformer
+
+#endif  // PLATFORMERGAMECPP_CONSTANTS_HPP_

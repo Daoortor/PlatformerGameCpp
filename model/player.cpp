@@ -42,11 +42,8 @@ Player::Player(Game *game_) : game(game_) {
 
 Player::Player(Game *game_, Vector pos_) : game(game_), pos(pos_) {
     auto phys_obs = observers::PhysicsObserver(this);
-    auto pose_obs = observers::PoseObserver(this);
     observerCollection = std::vector<std::unique_ptr<observers::Observer>>();
     observerCollection.push_back(std::make_unique<observers::Observer>(phys_obs)
-    );
-    observerCollection.push_back(std::make_unique<observers::Observer>(pose_obs)
     );
 }
 
@@ -60,12 +57,14 @@ void Player::moveLeft() {
     if (!blockLeft().isSolid()) {
         move({-PLAYER_SPEED, 0});
     }
+    pose = Pose::LOOKING_LEFT;
 }
 
 void Player::moveRight() {
     if (!blockLeft().isSolid()) {
         move({PLAYER_SPEED, 0});
     }
+    pose = Pose::LOOKING_RIGHT;
 }
 
 void Player::jump() {
@@ -143,17 +142,6 @@ void PhysicsObserver::update() {
     updateGravity();
     updateCollision();
     updateMovement();
-}
-
-PoseObserver::PoseObserver(Player *player_) : player(player_) {
-}
-
-void PoseObserver::update() {
-    if (player->speed.get_x() > 0) {
-        player->pose = Pose::LOOKING_RIGHT;
-    } else if (player->speed.get_x() < 0) {
-        player->pose = Pose::LOOKING_LEFT;
-    }
 }
 }  // namespace observers
 }  // namespace Platformer

@@ -47,14 +47,6 @@ public:
     explicit PhysicsObserver(Player *player_);
     void update() override;
 };
-
-class PoseObserver : public Observer {
-    Player *player;
-
-public:
-    explicit PoseObserver(Player *player_);
-    void update() override;
-};
 }  // namespace observers
 
 class Player {
@@ -83,7 +75,6 @@ public:
     Block blockRight();
 
     friend observers::PhysicsObserver;
-    friend observers::PoseObserver;
 };
 }  // namespace Platformer
 
