@@ -16,6 +16,8 @@ class Game {
     bool is_paused = false;
 
 public:
+    Game(int height_, int width_, std::vector<std::vector<Block>> field_);
+
     Player *getPlayer() {
         return player.get();
     }
@@ -23,6 +25,9 @@ public:
     std::vector<std::vector<Block>> getField() {
         return field;
     }
+
+    void act(char command);
+    void update();
 };
 }  // namespace Platformer
 

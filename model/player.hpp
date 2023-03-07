@@ -66,6 +66,7 @@ public:
     void moveLeft();
     void moveRight();
     void jump();
+    void moveDown();
     void move(Vector delta);
     void notifyAll();
     Block blockInside();

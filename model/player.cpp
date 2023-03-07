@@ -70,8 +70,14 @@ void Player::moveRight() {
 void Player::jump() {
     if (blockBelow().isSolid() && !blockAbove().isSolid()) {
         speed = {speed.get_x(), -PLAYER_SPEED};
-    } else if (blockInside().isHangableOn()) {
+    } else if (blockBelow().isHangableOn()) {
         move({0, -PLAYER_SPEED});
+    }
+}
+
+void Player::moveDown() {
+    if (blockBelow().isHangableOn()) {
+        move({0, PLAYER_SPEED});
     }
 }
 
