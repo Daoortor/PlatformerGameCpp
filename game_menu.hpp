@@ -40,6 +40,7 @@ namespace interface {
             }
         }
     };
+
 }
 
 #endif //PROJECTGAME_GAME_MENU_HPP

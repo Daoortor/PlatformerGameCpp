@@ -99,5 +99,6 @@ namespace interface {
 
         [[maybe_unused]] sf::Sprite * getCurrentSprite();
     };
+
 }
 #endif //PROJECTGAME_BUTTON_HPP

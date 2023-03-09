@@ -8,8 +8,7 @@ void start_game() {
     std::cout << "Game started!\n";
 
 }
-int main()
-{
+int main() {
     sf::RenderWindow window(sf::VideoMode(800, 600), "Platformer game");
     window.setPosition(sf::Vector2i(200, 50));
     interface::Menu menu;
