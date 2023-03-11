@@ -1,6 +1,8 @@
 #ifndef PLATFORMERGAMECPP_BLOCK_HPP_
 #define PLATFORMERGAMECPP_BLOCK_HPP_
 
+#include <string>
+
 namespace Platformer {
 // Полиморфизм работает с std::unique_ptr.
 // Можно переделать без использования наследования.
