@@ -2,35 +2,15 @@
 #define PLATFORMERGAMECPP_PLAYER_HPP_
 
 #include <memory>
+#include <ostream>
 #include <vector>
 #include "block.hpp"
 #include "constants.hpp"
 #include "game.hpp"
 #include "observers.hpp"
+#include "utilities.hpp"
 
 namespace Platformer {
-class Vector {
-    int x = 0;
-    int y = 0;
-
-public:
-    Vector() = default;
-    Vector(int x_, int y_);
-    Vector operator+(Vector other) const;
-    Vector operator-(Vector other) const;
-    Vector operator+=(Vector other);
-    Vector operator-=(Vector other);
-    Vector operator*(float k) const;
-    Vector operator*=(float k);
-
-    [[nodiscard]] int get_x() const {
-        return x;
-    }
-
-    [[nodiscard]] int get_y() const {
-        return y;
-    }
-};
 
 enum class Pose { LOOKING_LEFT, LOOKING_RIGHT };
 
@@ -52,8 +32,8 @@ public:
 class Player {
     Vector pos;
     Vector speed;
-    int height = BLOCK_SIZE * 3 / 4;
-    int width = BLOCK_SIZE * 2 / 4;
+    int height = BLOCK_SIZE * 3 / 2;
+    int width = BLOCK_SIZE * 3 / 4;
     Pose pose = Pose::LOOKING_RIGHT;
     std::vector<std::unique_ptr<observers::Observer>> observerCollection;
     Game *game = nullptr;
@@ -63,6 +43,15 @@ public:
     explicit Player(Game *game_);
     Player(Game *game_, Vector pos_);
     Player(Game *game_, Vector pos_, int width_, int height_);
+
+    Vector getPos() {
+        return pos;
+    }
+
+    Vector getSpeed() {
+        return speed;
+    }
+
     void moveLeft();
     void moveRight();
     void jump();

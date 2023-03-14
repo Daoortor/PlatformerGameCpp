@@ -5,6 +5,7 @@
 #include <vector>
 #include "block.hpp"
 #include "player_fwd.hpp"
+#include "utilities.hpp"
 
 namespace Platformer {
 class Game {
@@ -16,7 +17,7 @@ class Game {
     bool is_paused = false;
 
 public:
-    Game(int height_, int width_, std::vector<std::vector<Block>> field_);
+    Game(std::vector<std::vector<Block>> field_, Vector playerPos);
 
     Player *getPlayer() {
         return player.get();
@@ -26,6 +27,7 @@ public:
         return field;
     }
 
+    Block getBlock(int x, int y);
     void act(char command);
     void update();
 };
