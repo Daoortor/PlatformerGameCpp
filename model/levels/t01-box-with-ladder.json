@@ -1,0 +1,14 @@
+{
+  "levelName": "test01-box-with-ladder",
+  "width": 7,
+  "height": 5,
+  "blockMap": [
+    ["Stone", "Ladder", "Stone", "Stone", "Stone", "Stone", "Stone"],
+    ["Stone", "Ladder", "Air", "Air", "Air", "Air", "Stone"],
+    ["Stone", "Ladder", "Air", "Air", "Air", "Air", "Stone"],
+    ["Stone", "Ladder", "Air", "Air", "Air", "Air", "Stone"],
+    ["Stone", "Stone", "Stone", "Stone", "Stone", "Stone", "Stone"]
+  ],
+  "playerStartPos": [350, 325],
+  "endPos": [50, -75]
+}

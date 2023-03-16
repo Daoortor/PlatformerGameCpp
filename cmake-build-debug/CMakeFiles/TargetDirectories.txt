@@ -1,3 +1,0 @@
-/mnt/c/Users/maksn/CLionProjects/ProjectGame/cmake-build-debug/CMakeFiles/ProjectGame.dir
-/mnt/c/Users/maksn/CLionProjects/ProjectGame/cmake-build-debug/CMakeFiles/edit_cache.dir
-/mnt/c/Users/maksn/CLionProjects/ProjectGame/cmake-build-debug/CMakeFiles/rebuild_cache.dir
