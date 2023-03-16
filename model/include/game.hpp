@@ -19,19 +19,23 @@ class Game {
 
 public:
     ~Game();
-    Game(std::vector<std::vector<std::unique_ptr<Block>>> field_, utilities::Vector playerPos, utilities::Vector endPos_);
-    explicit Game(const std::string& filename);
+    Game(
+        std::vector<std::vector<std::unique_ptr<Block>>> field_,
+        utilities::Vector playerPos,
+        utilities::Vector endPos_
+    );
+    explicit Game(const std::string &filename);
 
     Player *getPlayer() {
         return player.get();
     }
 
-    std::vector<std::vector<std::unique_ptr<Block>>>& getField() {
+    std::vector<std::vector<std::unique_ptr<Block>>> &getField() {
         return field;
     }
 
-    const std::unique_ptr<Block>& getBlock(utilities::Vector pos);
-    const std::unique_ptr<Block>& getBlockByCoordinates(utilities::Vector pos);
+    const std::unique_ptr<Block> &getBlock(utilities::Vector pos);
+    const std::unique_ptr<Block> &getBlockByCoordinates(utilities::Vector pos);
     void act(char command);
     void update();
 };

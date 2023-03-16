@@ -48,4 +48,4 @@ int divide(int a, unsigned int b) {  // Always rounded down
     }
     return a / static_cast<int>(b);
 }
-}  // namespace Platformer
+}  // namespace Platformer::utilities

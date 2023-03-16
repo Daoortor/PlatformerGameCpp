@@ -9,21 +9,23 @@ PhysicsObserver::PhysicsObserver(Player *player_) : player(player_) {
 
 void PhysicsObserver::updateCollision() {
     if ((player->blockAbove()->isSolid() && player->speed.get_y() < 0) ||
-            (player->blockBelow()->isSolid() &&
-            player->speed.get_y() > 0)) {  // Hitting ceiling or ground
+        (player->blockBelow()->isSolid() && player->speed.get_y() > 0
+        )) {  // Hitting ceiling or ground
         player->speed = {player->speed.get_x(), 0};
     }
     if ((player->blockLeft()->isSolid() && player->speed.get_x() < 0) ||
-            (player->blockRight()->isSolid() &&
-            player->speed.get_x() > 0)) {  // Hitting walls
+        (player->blockRight()->isSolid() && player->speed.get_x() > 0
+        )) {  // Hitting walls
         player->speed = {0, player->speed.get_y()};
     }
 }
 
 void PhysicsObserver::updateGravity() {
-    if (!player->blockBelow()->isSolid() && !player->blockBelow()->isHangableOn()) {
+    if (!player->blockBelow()->isSolid() &&
+        !player->blockBelow()->isHangableOn()) {
         player->speed = {
-                player->speed.get_x(), player->speed.get_y() + FREEFALL_ACCELERATION};
+            player->speed.get_x(),
+            player->speed.get_y() + FREEFALL_ACCELERATION};
     }
 }
 
@@ -103,28 +105,31 @@ void Player::notifyAll() {
     }
 }
 
-const std::unique_ptr<Block>& Player::blockInside() {
+const std::unique_ptr<Block> &Player::blockInside() {
     return game->getBlockByCoordinates({pos.get_x(), pos.get_y()});
 }
 
-const std::unique_ptr<Block>& Player::blockAbove() {
+const std::unique_ptr<Block> &Player::blockAbove() {
     return game->getBlockByCoordinates({pos.get_x(), pos.get_y() - height / 2});
 }
 
-const std::unique_ptr<Block>& Player::blockBelow() {
+const std::unique_ptr<Block> &Player::blockBelow() {
     return game->getBlockByCoordinates({pos.get_x(), pos.get_y() + height / 2});
 }
 
-const std::unique_ptr<Block>& Player::blockLeft() {
+const std::unique_ptr<Block> &Player::blockLeft() {
     return game->getBlockByCoordinates({pos.get_x() - width / 2, pos.get_y()});
 }
 
-const std::unique_ptr<Block>& Player::blockRight() {
+const std::unique_ptr<Block> &Player::blockRight() {
     return game->getBlockByCoordinates({pos.get_x() + width / 2, pos.get_y()});
 }
 
-utilities::Vector Player::distByVector(utilities::Vector position, utilities::Vector moveVector) {
-    utilities::Vector currentCordinates{utilities::divide(position.get_x(), BLOCK_SIZE) * BLOCK_SIZE, utilities::divide(position.get_y(), BLOCK_SIZE) * BLOCK_SIZE};
+utilities::Vector
+Player::distByVector(utilities::Vector position, utilities::Vector moveVector) {
+    utilities::Vector currentCordinates{
+        utilities::divide(position.get_x(), BLOCK_SIZE) * BLOCK_SIZE,
+        utilities::divide(position.get_y(), BLOCK_SIZE) * BLOCK_SIZE};
     utilities::Vector padding;
     if (moveVector.get_x() < 0) {
         padding = {1, 0};
@@ -133,9 +138,13 @@ utilities::Vector Player::distByVector(utilities::Vector position, utilities::Ve
         padding = {0, 1};
     }
     currentCordinates -= padding;
-    for (int it=0; it<MAX_FIELD_SIZE; it++) {
+    for (int it = 0; it < MAX_FIELD_SIZE; it++) {
         if (game->getBlockByCoordinates(currentCordinates)->isSolid()) {
-            return utilities::Vector(std::abs(position.get_x() - currentCordinates.get_x()), std::abs(position.get_y() - currentCordinates.get_y())) - padding;
+            return utilities::Vector(
+                       std::abs(position.get_x() - currentCordinates.get_x()),
+                       std::abs(position.get_y() - currentCordinates.get_y())
+                   ) -
+                   padding;
         }
         currentCordinates += moveVector;
     }
@@ -143,34 +152,50 @@ utilities::Vector Player::distByVector(utilities::Vector position, utilities::Ve
 }
 
 int Player::distAbove() {
-    utilities::Vector upperLeftCorner{pos.get_x() - width / 2 + 1, pos.get_y() - height / 2};
-    utilities::Vector upperRightCorner{pos.get_x() + width / 2 - 1, pos.get_y() - height / 2};
-    return std::min(distByVector(upperLeftCorner, {0, -BLOCK_SIZE}).get_y(),
-                    distByVector(upperRightCorner, {0, -BLOCK_SIZE}).get_y());
+    utilities::Vector upperLeftCorner{
+        pos.get_x() - width / 2 + 1, pos.get_y() - height / 2};
+    utilities::Vector upperRightCorner{
+        pos.get_x() + width / 2 - 1, pos.get_y() - height / 2};
+    return std::min(
+        distByVector(upperLeftCorner, {0, -BLOCK_SIZE}).get_y(),
+        distByVector(upperRightCorner, {0, -BLOCK_SIZE}).get_y()
+    );
 }
 
 int Player::distBelow() {
-    utilities::Vector lowerLeftCorner{pos.get_x() - width / 2 + 1, pos.get_y() + height / 2};
-    utilities::Vector lowerRightCorner{pos.get_x() + width / 2 - 1, pos.get_y() + height / 2};
-    return std::min(distByVector(lowerLeftCorner, {0, BLOCK_SIZE}).get_y(),
-                    distByVector(lowerRightCorner, {0, BLOCK_SIZE}).get_y());
+    utilities::Vector lowerLeftCorner{
+        pos.get_x() - width / 2 + 1, pos.get_y() + height / 2};
+    utilities::Vector lowerRightCorner{
+        pos.get_x() + width / 2 - 1, pos.get_y() + height / 2};
+    return std::min(
+        distByVector(lowerLeftCorner, {0, BLOCK_SIZE}).get_y(),
+        distByVector(lowerRightCorner, {0, BLOCK_SIZE}).get_y()
+    );
 }
 
 int Player::distLeft() {
-    utilities::Vector lowerLeft{pos.get_x() - width / 2, pos.get_y() + height / 2 - 1};
+    utilities::Vector lowerLeft{
+        pos.get_x() - width / 2, pos.get_y() + height / 2 - 1};
     utilities::Vector middleLeft{pos.get_x() - width / 2, pos.get_y()};
-    utilities::Vector upperLeft{pos.get_x() - width / 2, pos.get_y() - height / 2 + 1};
-    return std::min({distByVector(lowerLeft, {-BLOCK_SIZE, 0}).get_x(),
-                    distByVector(middleLeft, {-BLOCK_SIZE, 0}).get_x(),
-                    distByVector(upperLeft, {-BLOCK_SIZE, 0}).get_x()});
+    utilities::Vector upperLeft{
+        pos.get_x() - width / 2, pos.get_y() - height / 2 + 1};
+    return std::min(
+        {distByVector(lowerLeft, {-BLOCK_SIZE, 0}).get_x(),
+         distByVector(middleLeft, {-BLOCK_SIZE, 0}).get_x(),
+         distByVector(upperLeft, {-BLOCK_SIZE, 0}).get_x()}
+    );
 }
 
 int Player::distRight() {
-    utilities::Vector lowerRight{pos.get_x() + width / 2, pos.get_y() + height / 2 - 1};
+    utilities::Vector lowerRight{
+        pos.get_x() + width / 2, pos.get_y() + height / 2 - 1};
     utilities::Vector middleRight{pos.get_x() + width / 2, pos.get_y()};
-    utilities::Vector upperRight{pos.get_x() + width / 2, pos.get_y() - height / 2 + 1};
-    return std::min({distByVector(lowerRight, {BLOCK_SIZE, 0}).get_x(),
-                    distByVector(middleRight, {BLOCK_SIZE, 0}).get_x(),
-                    distByVector(upperRight, {BLOCK_SIZE, 0}).get_x()});
+    utilities::Vector upperRight{
+        pos.get_x() + width / 2, pos.get_y() - height / 2 + 1};
+    return std::min(
+        {distByVector(lowerRight, {BLOCK_SIZE, 0}).get_x(),
+         distByVector(middleRight, {BLOCK_SIZE, 0}).get_x(),
+         distByVector(upperRight, {BLOCK_SIZE, 0}).get_x()}
+    );
 }
 }  // namespace Platformer

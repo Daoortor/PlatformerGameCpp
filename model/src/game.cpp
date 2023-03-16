@@ -1,23 +1,28 @@
 #include "../include/game.hpp"
-#include <utility>
 #include <fstream>
-#include "../include/player.hpp"
+#include <utility>
 #include "../../tools/json.hpp"
+#include "../include/player.hpp"
 
 using json = nlohmann::json;
 
 namespace Platformer {
 Game::~Game() = default;
 
-const std::unique_ptr<Block>& Game::getBlock(utilities::Vector pos) {
-    if (0 <= pos.get_x() && pos.get_x() < width && 0 <= pos.get_y() && pos.get_y() < height) {
+const std::unique_ptr<Block> &Game::getBlock(utilities::Vector pos) {
+    if (0 <= pos.get_x() && pos.get_x() < width && 0 <= pos.get_y() &&
+        pos.get_y() < height) {
         return field[pos.get_y()][pos.get_x()];
     }
     return AIR_BLOCK;
 }
 
-const std::unique_ptr<Block> &Game::getBlockByCoordinates(utilities::Vector pos) {
-    return getBlock({utilities::divide(pos.get_x(), BLOCK_SIZE), utilities::divide(pos.get_y(), BLOCK_SIZE)});
+const std::unique_ptr<Block> &Game::getBlockByCoordinates(utilities::Vector pos
+) {
+    return getBlock(
+        {utilities::divide(pos.get_x(), BLOCK_SIZE),
+         utilities::divide(pos.get_y(), BLOCK_SIZE)}
+    );
 }
 
 void Game::act(char command) {
@@ -36,7 +41,11 @@ void Game::update() {
     player->notifyAll();
 }
 
-Game::Game(std::vector<std::vector<std::unique_ptr<Block>>> field_, utilities::Vector playerPos, utilities::Vector endPos_)
+Game::Game(
+    std::vector<std::vector<std::unique_ptr<Block>>> field_,
+    utilities::Vector playerPos,
+    utilities::Vector endPos_
+)
     : field(std::move(field_)), endPos(endPos_) {
     auto *playerObject = new Player(this, playerPos);
     player = std::unique_ptr<Player>(playerObject);
@@ -62,12 +71,13 @@ Game::Game(const std::string &filename) {
     std::ifstream f(filename);
     json levelData = json::parse(f);
     std::vector<std::vector<std::string>> blockMap = levelData["blockMap"];
-    utilities::Vector playerPos = {levelData["playerStartPos"][0], levelData["playerStartPos"][1]};
+    utilities::Vector playerPos = {
+        levelData["playerStartPos"][0], levelData["playerStartPos"][1]};
     auto *playerObject = new Player(this, playerPos);
     player = std::unique_ptr<Player>(playerObject);
-    for (int row=0; row<blockMap.size(); row++) {
+    for (int row = 0; row < blockMap.size(); row++) {
         field.emplace_back();
-        for (const std::string& blockName : blockMap[row]) {
+        for (const std::string &blockName : blockMap[row]) {
             field[row].push_back(makeBlock(blockName));
         }
     }

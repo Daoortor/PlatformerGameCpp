@@ -1,10 +1,10 @@
 #ifndef PLATFORMERGAMECPP_BLOCK_HPP_
 #define PLATFORMERGAMECPP_BLOCK_HPP_
 
-#include <string>
-#include <memory>
-#include <map>
 #include <exception>
+#include <map>
+#include <memory>
+#include <string>
 #include <utility>
 
 namespace Platformer {
@@ -18,7 +18,10 @@ protected:
 
 public:
     Block() = default;
-    Block(std::string name, bool isSolid, bool isHangableOn) : name_(std::move(name)), isSolid_(isSolid), isHangableOn_(isHangableOn){};
+    Block(std::string name, bool isSolid, bool isHangableOn)
+        : name_(std::move(name)),
+          isSolid_(isSolid),
+          isHangableOn_(isHangableOn){};
 
     [[nodiscard]] std::string name() const {
         return name_;
@@ -35,30 +38,34 @@ public:
 
 class Stone : public Block {
 public:
-    Stone() : Block("Stone", true, false){}
+    Stone() : Block("Stone", true, false) {
+    }
 };
 
 class Air : public Block {
 public:
-    Air() : Block("Air", false, false){}
+    Air() : Block("Air", false, false) {
+    }
 };
 
 class Ladder : public Block {
 public:
-    Ladder() : Block("Ladder", false, true){}
+    Ladder() : Block("Ladder", false, true) {
+    }
 };
 
 class UnknownBlockType : public std::exception {
     std::string message;
 
 public:
-    explicit UnknownBlockType(std::string  blockName) : message("Unknown block type: " + std::move(blockName)){};
-    [[nodiscard]] const char * what() const noexcept override;
+    explicit UnknownBlockType(std::string blockName)
+        : message("Unknown block type: " + std::move(blockName)){};
+    [[nodiscard]] const char *what() const noexcept override;
 };
 
 const auto AIR_BLOCK = std::make_unique<Block>(Air());
 
-std::unique_ptr<Block> makeBlock(const std::string& name);
+std::unique_ptr<Block> makeBlock(const std::string &name);
 
 }  // namespace Platformer
 

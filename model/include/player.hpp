@@ -38,7 +38,8 @@ class Player {
     std::vector<std::unique_ptr<observers::Observer>> observerCollection;
     Game *game = nullptr;
 
-    utilities::Vector distByVector(utilities::Vector pos, utilities::Vector moveVector);
+    utilities::Vector
+    distByVector(utilities::Vector pos, utilities::Vector moveVector);
 
 public:
     Player() = default;
@@ -61,11 +62,11 @@ public:
     void move(utilities::Vector delta);
     void notifyAll();
 
-    const std::unique_ptr<Block>& blockInside();
-    const std::unique_ptr<Block>& blockAbove();
-    const std::unique_ptr<Block>& blockBelow();
-    const std::unique_ptr<Block>& blockLeft();
-    const std::unique_ptr<Block>& blockRight();
+    const std::unique_ptr<Block> &blockInside();
+    const std::unique_ptr<Block> &blockAbove();
+    const std::unique_ptr<Block> &blockBelow();
+    const std::unique_ptr<Block> &blockLeft();
+    const std::unique_ptr<Block> &blockRight();
 
     int distAbove();
     int distBelow();
