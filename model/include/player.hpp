@@ -61,6 +61,7 @@ public:
     void moveDown();
     void move(utilities::Vector delta);
     void notifyAll();
+    void act(char command);
 
     const std::unique_ptr<Block> &blockInside();
     const std::unique_ptr<Block> &blockAbove();
