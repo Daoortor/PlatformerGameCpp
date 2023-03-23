@@ -1,5 +1,5 @@
 #include "../tools/json.hpp"
-#include "include/menu.hpp"
+#include "../gui/include/menu.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <iostream>
