@@ -12,8 +12,8 @@ add_executable(PlatformerGameCpp
         model/src/observers.cpp
         model/src/player.cpp
         model/src/utilities.cpp
-        model/src/button.cpp
-        model/src/menu.cpp
+        gui/src/button.cpp
+        gui/src/menu.cpp
         )
 
 target_link_libraries(PlatformerGameCpp sfml-graphics)
