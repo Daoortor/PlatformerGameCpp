@@ -36,6 +36,7 @@ int main() {
                                                        50,
                                                        "../gui/assets/textures/interface/wallpaper.png",
                                                        "../model/levels/");
+
     while (window.isOpen()) {
         sf::Event event{};
         while (window.pollEvent(event)) {
