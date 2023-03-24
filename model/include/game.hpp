@@ -25,7 +25,7 @@ public:
     );
     explicit Game(const std::string &filename);
 
-    Player *getPlayer() {
+    [[nodiscard]] Player *getPlayer() const {
         return player.get();
     }
 

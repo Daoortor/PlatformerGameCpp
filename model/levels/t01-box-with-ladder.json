@@ -3,11 +3,11 @@
   "width": 7,
   "height": 5,
   "blockMap": [
-    ["Stone", "Ladder", "Stone", "Stone", "Stone", "Stone", "Stone"],
-    ["Stone", "Ladder", "Air", "Air", "Air", "Air", "Stone"],
-    ["Stone", "Ladder", "Air", "Air", "Air", "Air", "Stone"],
-    ["Stone", "Ladder", "Air", "Air", "Air", "Air", "Stone"],
-    ["Stone", "Stone", "Stone", "Stone", "Stone", "Stone", "Stone"]
+    ["stone", "ladder", "stone", "stone", "stone", "stone", "stone"],
+    ["stone", "ladder", "air", "air", "air", "air", "stone"],
+    ["stone", "ladder", "air", "air", "air", "air", "stone"],
+    ["stone", "ladder", "air", "air", "air", "air", "stone"],
+    ["stone", "stone", "stone", "stone", "stone", "stone", "stone"]
   ],
   "playerStartPos": [350, 325],
   "endPos": [50, -75]

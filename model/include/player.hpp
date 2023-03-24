@@ -5,7 +5,7 @@
 #include <ostream>
 #include <vector>
 #include "block.hpp"
-#include "constants.hpp"
+#include "model-constants.hpp"
 #include "game.hpp"
 #include "observers.hpp"
 #include "utilities.hpp"
@@ -47,11 +47,11 @@ public:
     Player(Game *game_, utilities::Vector pos_);
     Player(Game *game_, utilities::Vector pos_, int width_, int height_);
 
-    utilities::Vector getPos() {
+    [[nodiscard]] utilities::Vector getPos() const {
         return pos;
     }
 
-    utilities::Vector getSpeed() {
+    [[nodiscard]] utilities::Vector getSpeed() const {
         return speed;
     }
 

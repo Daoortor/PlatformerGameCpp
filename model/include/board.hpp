@@ -21,6 +21,9 @@ public:
     std::vector<std::vector<std::unique_ptr<Block>>> &getBoard() {
         return board;
     }
+    [[nodiscard]] utilities::Vector getSize() const {
+        return {width, height};
+    }
 
     const std::unique_ptr<Block> &getBlock(utilities::Vector pos);
     const std::unique_ptr<Block> &getBlockByCoordinates(utilities::Vector pos);
