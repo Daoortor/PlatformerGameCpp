@@ -1,6 +1,6 @@
 #include <filesystem>
 #include "../include/menu.hpp"
-#include "../include/button.hpp"
+
 namespace interface {
 std::unique_ptr<RectangleButton> &interface::Menu::addRectangleButton(
     interface::RectangleButton buttonSample
@@ -63,10 +63,11 @@ MainMenu::MainMenu(
     const sf::Font &font,
     int fontSize,
     int buttonDistance,
-    const std::string &BackgroundTextureFilepath
+    const std::string &BackgroundTextureFilepath,
+    sf::Vector2f startingButtonPosition
 )
 {
-    sf::Vector2f startingButtonPosition = {340, 250}; // TODO: window Width & Height dependency
+    // TODO: window Width & Height dependency
     sf::Vector2f buttonIndent = {10, 5};
     loadBackgroundSpriteFromTextureFile(BackgroundTextureFilepath,
                                         255, 255, 255, 128, windowWidth, windowHeight);
@@ -77,6 +78,8 @@ MainMenu::MainMenu(
         auto buttonWidth = buttonText.getGlobalBounds().width + 2 * buttonIndent.x;
         auto buttonHeight = buttonText.getGlobalBounds().height + 2 * buttonIndent.y;
         sf::RectangleShape buttonShape({buttonWidth, buttonHeight});
+        // TODO: change to Overlord class methods
+        std::function<void()> action = [buttonStringLabels, i](){std::cout << "<" << buttonStringLabels[i] << "> was pressed\n";};
         interface::RectangleButton button(buttonShape,
                                           sf::Color(255, 0, 48, 192),
                                           sf::Color(118, 114, 111, 192),
@@ -84,7 +87,8 @@ MainMenu::MainMenu(
                                           sf::Color(255, 95, 0, 192),
                                           buttonText,
                                           buttonIndent,
-                                          startingButtonPosition + sf::Vector2f(0, static_cast<float>(i*buttonDistance)));
+                                          startingButtonPosition + sf::Vector2f(0, static_cast<float>(i*buttonDistance)),
+                                          action);
         addRectangleButton(button); // TODO: add button action when implemented
     }
 }
@@ -113,6 +117,8 @@ LevelSelectionMenu::LevelSelectionMenu(
         auto buttonWidth = buttonText.getGlobalBounds().width + 2 * buttonIndent.x;
         auto buttonHeight = buttonText.getGlobalBounds().height + 2 * buttonIndent.y;
         sf::RectangleShape buttonShape({buttonWidth, buttonHeight});
+        // TODO: change to Overlord class methods
+        std::function<void()> action = [i](){std::cout << "<" << "Level" + std::to_string(i) << "> was chosen\n";};
         interface::RectangleButton button(buttonShape,
                                           sf::Color(255, 0, 48, 192),
                                           sf::Color(118, 114, 111, 192),
@@ -120,7 +126,8 @@ LevelSelectionMenu::LevelSelectionMenu(
                                           sf::Color(255, 95, 0, 192),
                                           buttonText,
                                           buttonIndent,
-                                          startingButtonPosition + sf::Vector2f(0, static_cast<float>(i*buttonDistance)));
+                                          startingButtonPosition + sf::Vector2f(0, static_cast<float>(i*buttonDistance)),
+                                          action);
         addRectangleButton(button); // TODO: add button action when implemented
     }
 }

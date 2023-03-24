@@ -31,7 +31,8 @@ namespace interface {
                  const sf::Font & font,
                  int fontSize,
                  int buttonDistance,
-                 const std::string& BackgroundTextureFilepath);
+                 const std::string& BackgroundTextureFilepath,
+                 sf::Vector2f startingButtonPosition = {340, 250});
     };
     struct LevelSelectionMenu : Menu {
     public:

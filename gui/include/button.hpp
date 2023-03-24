@@ -17,6 +17,7 @@ protected:
                           // to a pair of ints
     sf::Vector2f position;
 
+    std::function<void()> action;
 public:
     Button() {
         currentState = ButtonState::Available;
@@ -58,7 +59,8 @@ public:
         sf::Color newColorClicked,
         sf::Text newLabel,
         sf::Vector2f newIndent,
-        sf::Vector2f newPosition
+        sf::Vector2f newPosition,
+        std::function<void()> newAction
     )
         : shape(std::move(newShape)),
           colorUnavailable(newColorUnavailable),
@@ -69,6 +71,7 @@ public:
         indent = newIndent;
         position = newPosition;
         currentState = ButtonState::Available;
+        action = std::move(newAction);
     }
 
     sf::RectangleShape * getCurrentShape();

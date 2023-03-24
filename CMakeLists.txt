@@ -14,6 +14,7 @@ add_executable(PlatformerGameCpp
         model/src/utilities.cpp
         gui/src/button.cpp
         gui/src/menu.cpp
+        gui/src/overlord.cpp
         )
 
 target_link_libraries(PlatformerGameCpp sfml-graphics)

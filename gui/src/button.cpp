@@ -48,6 +48,8 @@ void RectangleButton::update(sf::RenderWindow &window, sf::Event &event) {
     if (event.type == sf::Event::MouseButtonPressed) {
         if (mouseInsideButton && currentState == ButtonState::Chosen) {
             currentState = ButtonState::Clicked;
+            // TODO: remove next line & redo properly!!!!!!!!!!!!!!
+            action();
         } else {
             currentState = ButtonState::Available;
         }

@@ -28,7 +28,8 @@ int main() {
                                         fontMario,
                                         20,
                                         50,
-                                        "../gui/assets/textures/interface/wallpaper.png");
+                                        "../gui/assets/textures/interface/JockerArt.png",
+                                        {70, 290});
     auto selectionMenu = interface::LevelSelectionMenu(windowWidth,
                                                        windowHeight,
                                                        fontMario,
