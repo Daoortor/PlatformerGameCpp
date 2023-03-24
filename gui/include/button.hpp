@@ -37,6 +37,8 @@ public:
     sf::Vector2f getPosition() const;
 
     [[maybe_unused]] void setPosition(sf::Vector2f newPosition);
+
+    void bind(std::function<void()> func);
 };
 
 class RectangleButton : public Button {
@@ -60,7 +62,7 @@ public:
         sf::Text newLabel,
         sf::Vector2f newIndent,
         sf::Vector2f newPosition,
-        std::function<void()> newAction
+        std::function<void()> newAction=[](){}
     )
         : shape(std::move(newShape)),
           colorUnavailable(newColorUnavailable),

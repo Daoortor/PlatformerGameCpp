@@ -23,6 +23,7 @@ namespace interface {
         void loadRectangleButtonsInWindow(sf::RenderWindow & window);
         void updateButtons(sf::RenderWindow & window, sf::Event event);
         void loadInWindow(sf::RenderWindow & window, sf::Event event);
+        void bindButton(int i, std::function<void()> func);
     };
     struct MainMenu : Menu {
     public:

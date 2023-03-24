@@ -1,5 +1,6 @@
 #include "../include/button.hpp"
 #include <iostream>
+#include <utility>
 
 namespace interface {
 [[maybe_unused]] void Button::setCurrentState(ButtonState newCurrentState) {
@@ -32,6 +33,10 @@ namespace interface {
 
 [[maybe_unused]] void Button::setPosition(sf::Vector2f newPosition) {
     position = newPosition;
+}
+
+void Button::bind(std::function<void()> func) {
+    action = std::move(func);
 }
 
 void RectangleButton::update(sf::RenderWindow &window, sf::Event &event) {

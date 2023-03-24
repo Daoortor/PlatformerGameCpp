@@ -1,12 +1,22 @@
 #include "../include/overlord.hpp"
 
-void control::MainMenuOverlord::startGame() {
+void control::MainMenuOverlord::openMainMenu() {
+    state = CurrentProcess::MainMenu;
 }
 
 void control::MainMenuOverlord::loadLevel(int level_num) {
 }
 
-void control::MainMenuOverlord::switchSubMenu(interface::Menu &menu) {
+void control::MainMenuOverlord::openLoadLevelMenu() {
+    state = CurrentProcess::LoadMenu;
+}
+
+control::CurrentProcess control::Overlord::getState() {
+    return state;
+}
+
+void control::Overlord::setState(CurrentProcess newState) {
+    state = newState;
 }
 
 void control::LevelOverlord::pauseOrResume() {

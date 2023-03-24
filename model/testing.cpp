@@ -1,5 +1,6 @@
 #include "../tools/json.hpp"
 #include "../gui/include/menu.hpp"
+#include "../gui/include/overlord.hpp"
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <iostream>
@@ -19,6 +20,7 @@ int main() {
     const int windowHeight = 600;
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Game");
     window.setPosition(sf::Vector2i(200, 50));
+    control::MainMenuOverlord overlord(window, "../model/levels/");
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/TypefaceMarioWorldPixelFilledRegular-Yz84q.otf");
 
@@ -29,13 +31,19 @@ int main() {
                                         50,
                                         "../gui/assets/textures/interface/JockerArt.png",
                                         {70, 290});
-    auto selectionMenu = interface::LevelSelectionMenu(windowWidth,
+
+    auto loadMenu = interface::LevelSelectionMenu(windowWidth,
                                                        windowHeight,
                                                        fontMario,
                                                        20,
                                                        50,
                                                        "../gui/assets/textures/interface/wallpaper.png",
                                                        "../model/levels/");
+    // TODO: remove next two lines after showcase
+
+    mainMenu.bindButton(1, [&](){overlord.setState(control::CurrentProcess::LoadMenu);});
+    loadMenu.bindButton(0, [&](){overlord.setState(control::CurrentProcess::MainMenu);});
+
 
     while (window.isOpen()) {
         sf::Event event{};
@@ -45,7 +53,15 @@ int main() {
             }
         }
         window.clear();
-        mainMenu.loadInWindow(window, event);
+        switch(overlord.getState()) {
+            case control::CurrentProcess::MainMenu :
+                mainMenu.loadInWindow(window, event);
+                break;
+            case control::CurrentProcess::LoadMenu :
+                loadMenu.loadInWindow(window, event);
+                break;
+        }
+
         window.display();
     }
     return 0;
