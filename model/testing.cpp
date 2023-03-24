@@ -15,7 +15,6 @@ sf::Font safeLoadFont(const std::string& file){
 }
 
 int main() {
-    // Platformer::Game game("model/levels/t01-box-with-ladder.json");
     const int windowWidth = 800;
     const int windowHeight = 600;
     sf::RenderWindow window(sf::VideoMode(windowWidth, windowHeight), "Game");
