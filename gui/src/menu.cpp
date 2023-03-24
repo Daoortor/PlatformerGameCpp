@@ -89,7 +89,7 @@ MainMenu::MainMenu(
                                           buttonIndent,
                                           startingButtonPosition + sf::Vector2f(0, static_cast<float>(i*buttonDistance)),
                                           action);
-        addRectangleButton(button); // TODO: add button action when implemented
+        addRectangleButton(button);
     }
 }
 
@@ -128,7 +128,7 @@ LevelSelectionMenu::LevelSelectionMenu(
                                           buttonIndent,
                                           startingButtonPosition + sf::Vector2f(0, static_cast<float>(i*buttonDistance)),
                                           action);
-        addRectangleButton(button); // TODO: add button action when implemented
+        addRectangleButton(button);
     }
 }
 } // namespace interface
