@@ -41,10 +41,10 @@ int main() {
                                                        "../model/levels/");
     // TODO: remove next two lines after showcase
 
-    mainMenu.bindButton(1, [&](){overlord.setState(control::CurrentProcess::LoadMenu);});
-    loadMenu.bindButton(0, [&](){overlord.setState(control::CurrentProcess::MainMenu);});
+    mainMenu.bindButton("Load game", [&](){overlord.setState(control::CurrentProcess::LoadMenu);});
+    loadMenu.bindButton("Return", [&](){overlord.setState(control::CurrentProcess::MainMenu);});
 
-
+    // Platformer::Game game("levels/t01-box-with-ladder.json");
     while (window.isOpen()) {
         sf::Event event{};
         while (window.pollEvent(event)) {
@@ -59,6 +59,13 @@ int main() {
                 break;
             case control::CurrentProcess::LoadMenu :
                 loadMenu.loadInWindow(window, event);
+                break;
+            case control::CurrentProcess::LevelRunning:
+                // TODO: load game object to window
+                // TODO: game move assignment?
+                break;
+            case control::CurrentProcess::LevelPaused:
+                // TODO: load game object to window anyway, but different controls
                 break;
         }
 

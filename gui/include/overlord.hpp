@@ -3,19 +3,21 @@
 
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
-#include <string>
 #include <filesystem>
-#include "menu.hpp"
+#include <string>
 #include "../../model/include/game.hpp"
+#include "menu.hpp"
 
 namespace control {
-enum class CurrentProcess {MainMenu, LoadMenu};
-struct Overlord { // TODO: struct -> class if private fields exist
+enum class CurrentProcess { MainMenu, LoadMenu, LevelPaused, LevelRunning };
+
+struct Overlord {  // TODO: struct -> class if private fields exist
 protected:
-    sf::RenderWindow & window;
+    sf::RenderWindow &window;
     CurrentProcess state = CurrentProcess::MainMenu;
+
 public:
-    explicit Overlord(sf::RenderWindow & window_) : window(window_){};
+    explicit Overlord(sf::RenderWindow &window_) : window(window_){};
     CurrentProcess getState();
     void setState(CurrentProcess newState);
 };
@@ -23,27 +25,35 @@ public:
 struct MainMenuOverlord : Overlord {
 private:
     std::vector<std::string> level_paths;
+
 public:
-    MainMenuOverlord(sf::RenderWindow & window_, const std::string& levels_directory) : Overlord(window_) {
+    MainMenuOverlord(
+        sf::RenderWindow &window_,
+        const std::string &levels_directory
+    )
+        : Overlord(window_) {
         // TODO: same meaning as LoadMenu constructor; should trim one of two
-        for (const auto & entry : std::filesystem::directory_iterator(levels_directory))
+        for (const auto &entry :
+             std::filesystem::directory_iterator(levels_directory))
             level_paths.push_back(entry.path().string());
     }
-    void openMainMenu();
-    void loadLevel(int level_num);
-    void openLoadLevelMenu();
+
+    [[maybe_unused]] void openMainMenu();
+    [[maybe_unused]] Platformer::Game loadLevel(int level_num);
+    [[maybe_unused]] void openLoadLevelMenu();
 };
 
 struct LevelOverlord : Overlord {
 private:
     Platformer::Game game;
+
 public:
-    void pauseOrResume();
-    void moveLeft();
-    void moveRight();
+    [[maybe_unused]] void pauseOrResume();
+    [[maybe_unused]] void moveLeft();
+    [[maybe_unused]] void moveRight();
     void jump();
-    void exit();
+    [[maybe_unused]] void exit();
 };
-}
+}  // namespace control
 
 #endif  // PLATFORMERGAMECPP_LEVEL_HPP

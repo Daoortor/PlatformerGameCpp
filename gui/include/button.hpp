@@ -18,6 +18,7 @@ protected:
     sf::Vector2f position;
 
     std::function<void()> action;
+
 public:
     Button() {
         currentState = ButtonState::Available;
@@ -44,12 +45,9 @@ public:
 class RectangleButton : public Button {
 private:
     sf::RectangleShape shape;
-    sf::Color colorUnavailable;  // like if there are no saved games,
-                                          // you can't click "Load game"
+    sf::Color colorUnavailable;
     sf::Color colorAvailable;
-    sf::Color colorChosen;  // dunno about naming; for situations when
-                                     // your cursor is hovering above it,
-    // or you chose it via arrows/keyboard, but did not activate
+    sf::Color colorChosen;
     sf::Color colorClicked;
 
 public:
@@ -62,7 +60,7 @@ public:
         sf::Text newLabel,
         sf::Vector2f newIndent,
         sf::Vector2f newPosition,
-        std::function<void()> newAction=[](){}
+        std::function<void()> newAction = []() {}
     )
         : shape(std::move(newShape)),
           colorUnavailable(newColorUnavailable),
@@ -76,9 +74,9 @@ public:
         action = std::move(newAction);
     }
 
-    sf::RectangleShape * getCurrentShape();
+    sf::RectangleShape *getCurrentShape();
     sf::Color getCurrentColor();
-    void drawInWindow(sf::RenderWindow & window);
+    void drawInWindow(sf::RenderWindow &window);
     void update(sf::RenderWindow &window, sf::Event &event);
 };
 

@@ -1,6 +1,6 @@
+#include "../include/menu.hpp"
 #include <filesystem>
 #include <utility>
-#include "../include/menu.hpp"
 
 namespace interface {
 std::unique_ptr<RectangleButton> &interface::Menu::addRectangleButton(
@@ -9,6 +9,10 @@ std::unique_ptr<RectangleButton> &interface::Menu::addRectangleButton(
     rectangleButtons.emplace_back(
         std::make_unique<RectangleButton>(std::move(buttonSample))
     );
+    buttonLabelToNum[rectangleButtons[rectangleButtons.size() - 1]
+                         ->getLabel()
+                         .getString()] =
+        static_cast<int>(rectangleButtons.size() - 1);
     return rectangleButtons[rectangleButtons.size() - 1];
 }
 
@@ -22,15 +26,17 @@ void Menu::loadBackgroundSpriteFromTextureFile(
     int height
 ) {
     if (!backgroundTexture.loadFromFile(texturePath)) {
-        std::cerr << "Failed to load background texture: " << texturePath << " invalid\n";
-    }
-    else {
+        std::cerr << "Failed to load background texture: " << texturePath
+                  << " invalid\n";
+    } else {
         auto textureSize = backgroundTexture.getSize();
 
-        float scaleWidth = static_cast<float>(width) / static_cast<float>(textureSize.x);
-        float scaleHeight = static_cast<float>(height) / static_cast<float>(textureSize.y);
+        float scaleWidth =
+            static_cast<float>(width) / static_cast<float>(textureSize.x);
+        float scaleHeight =
+            static_cast<float>(height) / static_cast<float>(textureSize.y);
 
-        backgroundSprite.setTexture(backgroundTexture); // TODO: different types, all OK?
+        backgroundSprite.setTexture(backgroundTexture);
         backgroundSprite.setColor(sf::Color(r, g, b, a));
         backgroundSprite.setScale(scaleWidth, scaleHeight);
     }
@@ -41,24 +47,29 @@ void Menu::loadBackgroundInWindow(sf::RenderWindow &window) {
 }
 
 void Menu::loadRectangleButtonsInWindow(sf::RenderWindow &window) {
-    for (auto & rectangleButton : rectangleButtons) {
+    for (auto &rectangleButton : rectangleButtons) {
         rectangleButton->drawInWindow(window);
     }
 }
 
 void Menu::updateButtons(sf::RenderWindow &window, sf::Event event) {
-    for (auto & button : rectangleButtons) {
+    for (auto &button : rectangleButtons) {
         button->update(window, event);
     }
 }
 
-void Menu::loadInWindow(sf::RenderWindow & window, sf::Event event) {
+void Menu::loadInWindow(sf::RenderWindow &window, sf::Event event) {
     loadBackgroundInWindow(window);
     updateButtons(window, event);
     loadRectangleButtonsInWindow(window);
 }
 
-void Menu::bindButton(int i, std::function<void()> func) {
+void Menu::bindButton(
+    const std::string &label_string,
+    std::function<void()> func
+) {
+    int i = buttonLabelToNum[label_string];
+    // TODO: exception handling
     rectangleButtons[i]->bind(std::move(func));
 }
 
@@ -70,30 +81,35 @@ MainMenu::MainMenu(
     int buttonDistance,
     const std::string &BackgroundTextureFilepath,
     sf::Vector2f startingButtonPosition
-)
-{
+) {
     // TODO: window Width & Height dependency
     sf::Vector2f buttonIndent = {10, 5};
-    loadBackgroundSpriteFromTextureFile(BackgroundTextureFilepath,
-                                        255, 255, 255, 128, windowWidth, windowHeight);
+    loadBackgroundSpriteFromTextureFile(
+        BackgroundTextureFilepath, 255, 255, 255, 128, windowWidth, windowHeight
+    );
 
-    std::vector<std::string> buttonStringLabels = {"Start game", "Load game", "Settings", "Author info", "Feedback"};
+    std::vector<std::string> buttonStringLabels = {
+        "Start game", "Load game", "Settings", "Author info", "Feedback"};
     for (int i = 0; i < buttonStringLabels.size(); i++) {
         sf::Text buttonText = sf::Text(buttonStringLabels[i], font, fontSize);
-        auto buttonWidth = buttonText.getGlobalBounds().width + 2 * buttonIndent.x;
-        auto buttonHeight = buttonText.getGlobalBounds().height + 2 * buttonIndent.y;
+        auto buttonWidth =
+            buttonText.getGlobalBounds().width + 2 * buttonIndent.x;
+        auto buttonHeight =
+            buttonText.getGlobalBounds().height + 2 * buttonIndent.y;
         sf::RectangleShape buttonShape({buttonWidth, buttonHeight});
         // TODO: change to Overlord class methods
-        std::function<void()> action = [buttonStringLabels, i](){std::cout << "<" << buttonStringLabels[i] << "> was pressed\n";};
-        interface::RectangleButton button(buttonShape,
-                                          sf::Color(255, 0, 48, 192),
-                                          sf::Color(118, 114, 111, 192),
-                                          sf::Color(0, 209, 255, 192),
-                                          sf::Color(255, 95, 0, 192),
-                                          buttonText,
-                                          buttonIndent,
-                                          startingButtonPosition + sf::Vector2f(0, static_cast<float>(i*buttonDistance)),
-                                          action);
+        std::function<void()> action = [buttonStringLabels, i]() {
+            std::cout << "<" << buttonStringLabels[i]
+                      << "> was pressed; no current bind\n";
+        };
+        interface::RectangleButton button(
+            buttonShape, sf::Color(255, 0, 48, 192),
+            sf::Color(118, 114, 111, 192), sf::Color(0, 209, 255, 192),
+            sf::Color(255, 95, 0, 192), buttonText, buttonIndent,
+            startingButtonPosition +
+                sf::Vector2f(0, static_cast<float>(i * buttonDistance)),
+            action
+        );
         addRectangleButton(button);
     }
 }
@@ -107,32 +123,36 @@ LevelSelectionMenu::LevelSelectionMenu(
     const std::string &BackgroundTextureFilepath,
     const std::string &LevelFilePath
 ) {
-    loadBackgroundSpriteFromTextureFile(BackgroundTextureFilepath,
-                                        255, 255, 255, 128, windowWidth, windowHeight);
-    // TODO: basically empty class, after MVP should add level preview, min time etc.
-    // right now uses almost the same code as MainMenu, but this will change
+    loadBackgroundSpriteFromTextureFile(
+        BackgroundTextureFilepath, 255, 255, 255, 128, windowWidth, windowHeight
+    );
     int count = 0;
-    for (auto& p : std::filesystem::directory_iterator(std::filesystem::path {LevelFilePath})) {
+    for (auto &p : std::filesystem::directory_iterator(std::filesystem::path{
+             LevelFilePath})) {
         count++;
     }
-    auto add_new_button = [&](const std::string& label_string, int number){
-        sf::Vector2f startingButtonPosition = {340, 250}; // TODO: window Width & Height dependency
-        sf::Vector2f buttonIndent = {10, 5};
+    auto add_new_button = [&](const std::string &label_string, int number,
+                              sf::Vector2f startingButtonPosition = {340, 250},
+                              sf::Vector2f buttonIndent = {10, 5}) {
         sf::Text buttonText = sf::Text(label_string, font, fontSize);
-        auto buttonWidth = buttonText.getGlobalBounds().width + 2 * buttonIndent.x;
-        auto buttonHeight = buttonText.getGlobalBounds().height + 2 * buttonIndent.y;
+        auto buttonWidth =
+            buttonText.getGlobalBounds().width + 2 * buttonIndent.x;
+        auto buttonHeight =
+            buttonText.getGlobalBounds().height + 2 * buttonIndent.y;
         sf::RectangleShape buttonShape({buttonWidth, buttonHeight});
         // TODO: change to Overlord class methods
-        std::function<void()> action = [&number](){std::cout << "<" << "Button" + std::to_string(number) << "> was chosen\n";};
-        interface::RectangleButton button(buttonShape,
-                                          sf::Color(255, 0, 48, 192),
-                                          sf::Color(118, 114, 111, 192),
-                                          sf::Color(178, 160, 53, 192),
-                                          sf::Color(255, 95, 0, 192),
-                                          buttonText,
-                                          buttonIndent,
-                                          startingButtonPosition + sf::Vector2f(0, static_cast<float>(number*buttonDistance)),
-                                          action);
+        std::function<void()> action = [&number]() {
+            std::cout << "<"
+                      << "Button" + std::to_string(number) << "> was chosen\n";
+        };
+        interface::RectangleButton button(
+            buttonShape, sf::Color(255, 0, 48, 192),
+            sf::Color(118, 114, 111, 192), sf::Color(178, 160, 53, 192),
+            sf::Color(255, 95, 0, 192), buttonText, buttonIndent,
+            startingButtonPosition +
+                sf::Vector2f(0, static_cast<float>(number * buttonDistance)),
+            action
+        );
         addRectangleButton(button);
     };
     add_new_button("Return", 0);
@@ -140,4 +160,4 @@ LevelSelectionMenu::LevelSelectionMenu(
         add_new_button("Level" + std::to_string(i), i);
     }
 }
-} // namespace interface
+}  // namespace interface

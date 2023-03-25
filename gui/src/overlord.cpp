@@ -1,13 +1,17 @@
 #include "../include/overlord.hpp"
 
-void control::MainMenuOverlord::openMainMenu() {
+[[maybe_unused]] void control::MainMenuOverlord::openMainMenu() {
     state = CurrentProcess::MainMenu;
 }
 
-void control::MainMenuOverlord::loadLevel(int level_num) {
+[[maybe_unused]] Platformer::Game control::MainMenuOverlord::loadLevel(
+    int level_num
+) {
+    state = CurrentProcess::LevelRunning;
+    return Platformer::Game(level_paths[level_num]); // TODO: is correct? No problems with unique_ptr?
 }
 
-void control::MainMenuOverlord::openLoadLevelMenu() {
+[[maybe_unused]] void control::MainMenuOverlord::openLoadLevelMenu() {
     state = CurrentProcess::LoadMenu;
 }
 
@@ -19,17 +23,17 @@ void control::Overlord::setState(CurrentProcess newState) {
     state = newState;
 }
 
-void control::LevelOverlord::pauseOrResume() {
+[[maybe_unused]] void control::LevelOverlord::pauseOrResume() {
 }
 
-void control::LevelOverlord::moveLeft() {
+[[maybe_unused]] void control::LevelOverlord::moveLeft() {
 }
 
-void control::LevelOverlord::moveRight() {
+[[maybe_unused]] void control::LevelOverlord::moveRight() {
 }
 
 void control::LevelOverlord::jump() {
 }
 
-void control::LevelOverlord::exit() {
+[[maybe_unused]] void control::LevelOverlord::exit() {
 }
