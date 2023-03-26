@@ -18,6 +18,9 @@ add_executable(game
         model/src/observers.cpp
         model/src/player.cpp
         model/src/utilities.cpp
+        gui/src/button.cpp
+        gui/src/menu.cpp
+        gui/src/overlord.cpp
         model/src/board.cpp)
 
 target_link_libraries(game sfml-graphics)
