@@ -4,14 +4,13 @@
 #include <memory>
 #include <vector>
 #include "block.hpp"
+#include "board.hpp"
 #include "player_fwd.hpp"
 #include "utilities.hpp"
 
 namespace Platformer {
 class Game {
-    int height;
-    int width;
-    std::vector<std::vector<std::unique_ptr<Block>>> field;
+    Board board;
     std::unique_ptr<Player> player;
     int timer = 0;
     bool is_paused = false;
@@ -20,23 +19,24 @@ class Game {
 public:
     ~Game();
     Game(
-        std::vector<std::vector<std::unique_ptr<Block>>> field_,
+        std::vector<std::vector<std::unique_ptr<Block>>> board_,
         utilities::Vector playerPos,
         utilities::Vector endPos_
     );
     explicit Game(const std::string &filename);
 
-    Player *getPlayer() {
+    [[nodiscard]] Player *getPlayer() const {
         return player.get();
     }
 
-    std::vector<std::vector<std::unique_ptr<Block>>> &getField() {
-        return field;
+    std::vector<std::vector<std::unique_ptr<Block>>> &getBoard() {
+        return board.getBoard();
     }
 
-    const std::unique_ptr<Block> &getBlock(utilities::Vector pos);
-    const std::unique_ptr<Block> &getBlockByCoordinates(utilities::Vector pos);
-    void act(char command);
+    Board &getBoardObject() {
+        return board;
+    }
+
     void update();
 };
 }  // namespace Platformer

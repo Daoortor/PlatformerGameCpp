@@ -105,24 +105,46 @@ void Player::notifyAll() {
     }
 }
 
+void Player::act(char command) {
+    if (command == 'W') {
+        jump();
+    } else if (command == 'A') {
+        moveLeft();
+    } else if (command == 'S') {
+        moveDown();
+    } else if (command == 'D') {
+        moveRight();
+    }
+}
+
 const std::unique_ptr<Block> &Player::blockInside() {
-    return game->getBlockByCoordinates({pos.get_x(), pos.get_y()});
+    return game->getBoardObject().getBlockByCoordinates(
+        {pos.get_x(), pos.get_y()}
+    );
 }
 
 const std::unique_ptr<Block> &Player::blockAbove() {
-    return game->getBlockByCoordinates({pos.get_x(), pos.get_y() - height / 2});
+    return game->getBoardObject().getBlockByCoordinates(
+        {pos.get_x(), pos.get_y() - height / 2}
+    );
 }
 
 const std::unique_ptr<Block> &Player::blockBelow() {
-    return game->getBlockByCoordinates({pos.get_x(), pos.get_y() + height / 2});
+    return game->getBoardObject().getBlockByCoordinates(
+        {pos.get_x(), pos.get_y() + height / 2}
+    );
 }
 
 const std::unique_ptr<Block> &Player::blockLeft() {
-    return game->getBlockByCoordinates({pos.get_x() - width / 2, pos.get_y()});
+    return game->getBoardObject().getBlockByCoordinates(
+        {pos.get_x() - width / 2, pos.get_y()}
+    );
 }
 
 const std::unique_ptr<Block> &Player::blockRight() {
-    return game->getBlockByCoordinates({pos.get_x() + width / 2, pos.get_y()});
+    return game->getBoardObject().getBlockByCoordinates(
+        {pos.get_x() + width / 2, pos.get_y()}
+    );
 }
 
 utilities::Vector
@@ -139,7 +161,9 @@ Player::distByVector(utilities::Vector position, utilities::Vector moveVector) {
     }
     currentCordinates -= padding;
     for (int it = 0; it < MAX_FIELD_SIZE; it++) {
-        if (game->getBlockByCoordinates(currentCordinates)->isSolid()) {
+        if (game->getBoardObject()
+                .getBlockByCoordinates(currentCordinates)
+                ->isSolid()) {
             return utilities::Vector(
                        std::abs(position.get_x() - currentCordinates.get_x()),
                        std::abs(position.get_y() - currentCordinates.get_y())
