@@ -38,19 +38,19 @@ public:
 
 class Stone : public Block {
 public:
-    Stone() : Block("Stone", true, false) {
+    Stone() : Block("stone", true, false) {
     }
 };
 
 class Air : public Block {
 public:
-    Air() : Block("Air", false, false) {
+    Air() : Block("air", false, false) {
     }
 };
 
 class Ladder : public Block {
 public:
-    Ladder() : Block("Ladder", false, true) {
+    Ladder() : Block("ladder", false, true) {
     }
 };
 
