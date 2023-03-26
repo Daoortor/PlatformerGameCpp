@@ -4,11 +4,11 @@
 #include <memory>
 #include <ostream>
 #include <vector>
-#include "block.hpp"
-#include "model-constants.hpp"
-#include "game.hpp"
-#include "observers.hpp"
 #include "../../tools/utilities.hpp"
+#include "block.hpp"
+#include "game.hpp"
+#include "model-constants.hpp"
+#include "observers.hpp"
 
 namespace Platformer {
 
@@ -61,7 +61,6 @@ public:
     void moveDown();
     void move(utilities::Vector delta);
     void notifyAll();
-    void act(char command);
 
     const std::unique_ptr<Block> &blockInside();
     const std::unique_ptr<Block> &blockAbove();

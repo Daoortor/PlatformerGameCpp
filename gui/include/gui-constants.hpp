@@ -1,15 +1,17 @@
 #ifndef PLATFORMERGAMECPP_CONSTANTS_HPP_
 #define PLATFORMERGAMECPP_CONSTANTS_HPP_
 
-#include <vector>
+#include <SFML/Window.hpp>
 #include <string>
+#include <vector>
 
 namespace Platformer::gui {
-    unsigned int const WINDOW_WIDTH = 800;
-    unsigned int const WINDOW_HEIGHT = 600;
-    unsigned int const LEVEL_WIDTH = 450;
-    unsigned int const LEVEL_HEIGHT = 450;
-    std::vector<std::string> const BLOCK_NAMES = {"ladder", "stone", "air"};
-}
+const unsigned int WINDOW_WIDTH = sf::VideoMode::getDesktopMode().width * 2 / 5;
+const unsigned int WINDOW_HEIGHT =
+    sf::VideoMode::getDesktopMode().height * 11 / 20;
+const unsigned int LEVEL_WIDTH = WINDOW_WIDTH * 2 / 3;
+const unsigned int LEVEL_HEIGHT = WINDOW_HEIGHT * 2 / 3;
+const std::vector<std::string> BLOCK_NAMES = {"ladder", "stone", "air"};
+}  // namespace Platformer::gui
 
-#endif //PLATFORMERGAMECPP_CONSTANTS_HPP_
+#endif  // PLATFORMERGAMECPP_CONSTANTS_HPP_

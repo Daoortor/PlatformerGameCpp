@@ -105,18 +105,6 @@ void Player::notifyAll() {
     }
 }
 
-void Player::act(char command) {
-    if (command == 'W') {
-        jump();
-    } else if (command == 'A') {
-        moveLeft();
-    } else if (command == 'S') {
-        moveDown();
-    } else if (command == 'D') {
-        moveRight();
-    }
-}
-
 const std::unique_ptr<Block> &Player::blockInside() {
     return game->getBoardObject().getBlockByCoordinates(
         {pos.get_x(), pos.get_y()}

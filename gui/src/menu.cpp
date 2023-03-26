@@ -22,8 +22,8 @@ void Menu::loadBackgroundSpriteFromTextureFile(
     int g,
     int b,
     int a,
-    int width,
-    int height
+    unsigned int width,
+    unsigned int height
 ) {
     if (!backgroundTexture.loadFromFile(texturePath)) {
         std::cerr << "Failed to load background texture: " << texturePath
@@ -74,8 +74,8 @@ void Menu::bindButton(
 }
 
 MainMenu::MainMenu(
-    int windowWidth,
-    int windowHeight,
+    unsigned int windowWidth,
+    unsigned int windowHeight,
     const sf::Font &font,
     int fontSize,
     int buttonDistance,
@@ -121,8 +121,8 @@ MainMenu::MainMenu(
 }
 
 LevelSelectionMenu::LevelSelectionMenu(
-    int windowWidth,
-    int windowHeight,
+    unsigned int windowWidth,
+    unsigned int windowHeight,
     const sf::Font &font,
     int fontSize,
     int buttonDistance,

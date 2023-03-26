@@ -5,10 +5,7 @@ SET(CMAKE_CXX_STANDARD 17)
 
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 
-file(COPY gui/assets DESTINATION ${CMAKE_BINARY_DIR})
-file(COPY model/levels DESTINATION ${CMAKE_BINARY_DIR})
-file(COPY model/include DESTINATION ${CMAKE_BINARY_DIR})
-file(COPY gui/include DESTINATION ${CMAKE_BINARY_DIR})
+include_directories(gui/assets model/levels model/include gui/include)
 
 add_executable(game
         gui/main.cpp

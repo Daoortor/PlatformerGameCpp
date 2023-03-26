@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <string>
 #include "../../model/include/game.hpp"
+#include "../../model/include/player.hpp"
 
 namespace control {
 enum class CurrentProcess { MainMenu, LoadMenu, LevelPaused, LevelRunning };
@@ -47,11 +48,18 @@ private:
     Platformer::Game game;
 
 public:
+    LevelOverlord(sf::RenderWindow &window_, Platformer::Game game_);
     [[maybe_unused]] void pauseOrResume();
     [[maybe_unused]] void moveLeft();
     [[maybe_unused]] void moveRight();
+    [[maybe_unused]] void moveDown();
     void jump();
     [[maybe_unused]] void exit();
+    void setLevel(Platformer::Game game_);
+
+    Platformer::Game &getLevel() {
+        return game;
+    }
 };
 }  // namespace control
 

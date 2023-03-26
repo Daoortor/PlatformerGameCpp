@@ -3,12 +3,13 @@
 
 #include <memory>
 #include <vector>
+#include "../../tools/utilities.hpp"
 #include "block.hpp"
 #include "board.hpp"
 #include "player_fwd.hpp"
-#include "../../tools/utilities.hpp"
 
 namespace Platformer {
+
 class Game {
     Board board;
     std::unique_ptr<Player> player;
@@ -18,7 +19,8 @@ class Game {
 
 public:
     ~Game();
-    Game(Game&& other) = default;
+    Game(Game &&other) = default;
+    Game& operator=(Game &&other) = default;
     Game(
         std::vector<std::vector<std::unique_ptr<Block>>> board_,
         utilities::Vector playerPos,

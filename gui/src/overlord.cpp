@@ -8,7 +8,8 @@
     int level_num
 ) {
     state = CurrentProcess::LevelRunning;
-    return Platformer::Game(level_paths[level_num]); // TODO: is correct? No problems with unique_ptr?
+    return Platformer::Game(level_paths[level_num]
+    );  // TODO: is correct? No problems with unique_ptr?
 }
 
 [[maybe_unused]] void control::MainMenuOverlord::openLoadLevelMenu() {
@@ -27,13 +28,31 @@ void control::Overlord::setState(CurrentProcess newState) {
 }
 
 [[maybe_unused]] void control::LevelOverlord::moveLeft() {
+    game.getPlayer()->moveLeft();
 }
 
 [[maybe_unused]] void control::LevelOverlord::moveRight() {
+    game.getPlayer()->moveRight();
+}
+
+[[maybe_unused]] void control::LevelOverlord::moveDown() {
+    game.getPlayer()->moveDown();
 }
 
 void control::LevelOverlord::jump() {
+    game.getPlayer()->jump();
 }
 
 [[maybe_unused]] void control::LevelOverlord::exit() {
+}
+
+control::LevelOverlord::LevelOverlord(
+    sf::RenderWindow &window_,
+    Platformer::Game game_
+)
+    : Overlord(window_), game(std::move(game_)) {
+}
+
+void control::LevelOverlord::setLevel(Platformer::Game game_) {
+    game = std::move(game_);
 }

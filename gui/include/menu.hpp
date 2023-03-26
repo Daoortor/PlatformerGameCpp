@@ -30,8 +30,8 @@ public:
         int g,
         int b,
         int a,
-        int width,
-        int height
+        unsigned int width,
+        unsigned int height
     );
     void loadBackgroundInWindow(sf::RenderWindow &window);
     void loadRectangleButtonsInWindow(sf::RenderWindow &window);
@@ -44,8 +44,8 @@ public:
 struct MainMenu : Menu {
 public:
     MainMenu(
-        int windowWidth,
-        int windowHeight,
+        unsigned int windowWidth,
+        unsigned int windowHeight,
         const sf::Font &font,
         int fontSize,
         int buttonDistance,
@@ -58,8 +58,8 @@ public:
 struct LevelSelectionMenu : Menu {
 public:
     LevelSelectionMenu(
-        int windowWidth,
-        int windowHeight,
+        unsigned int windowWidth,
+        unsigned int windowHeight,
         const sf::Font &font,
         int fontSize,
         int buttonDistance,

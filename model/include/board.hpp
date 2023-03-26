@@ -3,8 +3,8 @@
 
 #include <memory>
 #include <vector>
-#include "block.hpp"
 #include "../../tools/utilities.hpp"
+#include "block.hpp"
 
 namespace Platformer {
 
@@ -21,6 +21,7 @@ public:
     std::vector<std::vector<std::unique_ptr<Block>>> &getBoard() {
         return board;
     }
+
     [[nodiscard]] utilities::Vector getSize() const {
         return {width, height};
     }
