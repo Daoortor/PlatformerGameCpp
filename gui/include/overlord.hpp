@@ -6,7 +6,6 @@
 #include <filesystem>
 #include <string>
 #include "../../model/include/game.hpp"
-#include "menu.hpp"
 
 namespace control {
 enum class CurrentProcess { MainMenu, LoadMenu, LevelPaused, LevelRunning };

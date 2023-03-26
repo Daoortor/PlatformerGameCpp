@@ -43,4 +43,29 @@ namespace Platformer::gui {
         blockTexture->loadFromFile("assets/textures/blocks/" + type + ".png");
         return blockTexture;
     }
+
+    levelWindow::levelWindow(int windowWidth, int windowHeight, const std::string &backgroundTextureFilepath,
+                             const std::string &levelFilepath) : game(levelFilepath) {
+        backgroundTexture.loadFromFile(backgroundTextureFilepath);
+        sf::Vector2u TextureSize = backgroundTexture.getSize();
+        float BackgroundScale = static_cast<float>(windowHeight) / static_cast<float>(TextureSize.y);
+        backgroundSprite.setTexture(backgroundTexture);
+        backgroundSprite.setScale(BackgroundScale, BackgroundScale);
+
+        for (const std::string& blockType : Platformer::gui::BLOCK_NAMES) {
+            blockTextures[blockType] = Platformer::gui::makeBlockTexture(blockType);
+        }
+        boardSprites = Platformer::gui::makeBlockSprites(game, blockTextures);
+    }
+
+    void levelWindow::loadInWindow(sf::RenderWindow &window) {
+        window.clear();
+        window.draw(backgroundSprite);
+        for (const auto& row : boardSprites) {
+            for (const auto& sprite : row) {
+                window.draw(sprite);
+            }
+        }
+        window.display();
+    }
 }

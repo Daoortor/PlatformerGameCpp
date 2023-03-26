@@ -80,6 +80,7 @@ MainMenu::MainMenu(
     int fontSize,
     int buttonDistance,
     const std::string &BackgroundTextureFilepath,
+    control::MainMenuOverlord &overlord,
     sf::Vector2f startingButtonPosition
 ) {
     // TODO: window Width & Height dependency
@@ -102,6 +103,11 @@ MainMenu::MainMenu(
             std::cout << "<" << buttonStringLabels[i]
                       << "> was pressed; no current bind\n";
         };
+        if (buttonStringLabels[i] == "Start game") {
+            action = [&overlord]() {
+                overlord.setState(control::CurrentProcess::LevelRunning);
+            };
+        }
         interface::RectangleButton button(
             buttonShape, sf::Color(255, 0, 48, 192),
             sf::Color(118, 114, 111, 192), sf::Color(0, 209, 255, 192),

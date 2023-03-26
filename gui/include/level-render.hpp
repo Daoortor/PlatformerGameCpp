@@ -7,6 +7,7 @@
 #include <map>
 #include <memory>
 #include "../../model/include/game.hpp"
+#include "../../model/include/player.hpp"
 
 namespace Platformer::gui {
     struct spriteWithTexture {
@@ -18,6 +19,19 @@ namespace Platformer::gui {
     std::vector<std::vector<sf::Sprite>> makeBlockSprites(Game &game,
                                              std::map<std::string, std::unique_ptr<sf::Texture>>& blockTextures);
     std::unique_ptr<sf::Texture> makeBlockTexture(const std::string& type);
+
+    class levelWindow {
+        Platformer::Game game;
+        sf::Texture backgroundTexture;
+        sf::Sprite backgroundSprite;
+        std::map<std::string, std::unique_ptr<sf::Texture>> blockTextures;
+        std::vector<std::vector<sf::Sprite>> boardSprites;
+
+    public:
+        levelWindow(int windowWidth, int windowHeight, const std::string &backgroundTextureFilepath,
+                    const std::string &levelFilepath);
+        void loadInWindow(sf::RenderWindow &window);
+    };
 }
 
 #endif //PLATFORMERGAMECPP_LEVEL_RENDER_HPP_

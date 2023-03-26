@@ -4,7 +4,7 @@
 #include <memory>
 #include <vector>
 #include "block.hpp"
-#include "utilities.hpp"
+#include "../../tools/utilities.hpp"
 
 namespace Platformer {
 

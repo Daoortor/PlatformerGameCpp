@@ -8,7 +8,7 @@
 #include "model-constants.hpp"
 #include "game.hpp"
 #include "observers.hpp"
-#include "utilities.hpp"
+#include "../../tools/utilities.hpp"
 
 namespace Platformer {
 

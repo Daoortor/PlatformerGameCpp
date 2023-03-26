@@ -6,7 +6,7 @@
 #include "block.hpp"
 #include "board.hpp"
 #include "player_fwd.hpp"
-#include "utilities.hpp"
+#include "../../tools/utilities.hpp"
 
 namespace Platformer {
 class Game {
@@ -18,6 +18,7 @@ class Game {
 
 public:
     ~Game();
+    Game(Game&& other) = default;
     Game(
         std::vector<std::vector<std::unique_ptr<Block>>> board_,
         utilities::Vector playerPos,

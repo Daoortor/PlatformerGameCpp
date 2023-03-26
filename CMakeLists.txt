@@ -11,13 +11,13 @@ file(COPY model/include DESTINATION ${CMAKE_BINARY_DIR})
 file(COPY gui/include DESTINATION ${CMAKE_BINARY_DIR})
 
 add_executable(game
+        gui/main.cpp
         gui/src/level-render.cpp
-        gui/level-render-main.cpp
         model/src/block.cpp
         model/src/game.cpp
         model/src/observers.cpp
         model/src/player.cpp
-        model/src/utilities.cpp
+        tools/utilities.cpp
         gui/src/button.cpp
         gui/src/menu.cpp
         gui/src/overlord.cpp

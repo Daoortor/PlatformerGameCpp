@@ -1,4 +1,4 @@
-#include "../include/utilities.hpp"
+#include "utilities.hpp"
 #include <cmath>
 
 namespace Platformer::utilities {

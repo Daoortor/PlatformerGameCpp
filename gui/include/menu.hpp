@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 #include "button.hpp"
+#include "overlord.hpp"
 
 namespace interface {
 struct Menu {
@@ -49,6 +50,7 @@ public:
         int fontSize,
         int buttonDistance,
         const std::string &BackgroundTextureFilepath,
+        control::MainMenuOverlord &overlord,
         sf::Vector2f startingButtonPosition = {340, 250}
     );
 };
