@@ -46,11 +46,8 @@ void control::LevelOverlord::jump() {
 [[maybe_unused]] void control::LevelOverlord::exit() {
 }
 
-control::LevelOverlord::LevelOverlord(
-    sf::RenderWindow &window_,
-    std::unique_ptr<Platformer::Game> game_
-)
-    : Overlord(window_), game(std::move(game_)) {
+control::LevelOverlord::LevelOverlord(sf::RenderWindow &window_)
+    : Overlord(window_) {
 }
 
 void control::LevelOverlord::setLevel(std::unique_ptr<Platformer::Game> game_) {

@@ -111,10 +111,6 @@ levelWindow::levelWindow(
     control::LevelOverlord &overlord
 )
     : overlord(overlord) {
-    utilities::Vector boardSize =
-        overlord.getLevel()->getBoardObject().getSize();
-    int boardWidth = boardSize.get_x();
-    int boardHeight = boardSize.get_y();
     overlord.setLevel(std::make_unique<Game>(levelFilepath));
     backgroundTexture.loadFromFile(backgroundTextureFilepath);
     sf::Vector2u textureSize = backgroundTexture.getSize();

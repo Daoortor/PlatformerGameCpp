@@ -27,11 +27,7 @@ int main() {
     window.setPosition(sf::Vector2i(200, 50));
     window.setFramerateLimit(60);
     control::MainMenuOverlord mainMenuOverlord(window, "../model/levels/");
-    control::LevelOverlord levelOverlord(
-        window, std::make_unique<Platformer::Game>(
-                    "../model/levels/t01-box-with-ladder.json"
-                )
-    );
+    control::LevelOverlord levelOverlord(window);
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/lofi.ttf");
 
