@@ -55,6 +55,14 @@ public:
         return speed;
     }
 
+    [[nodiscard]] Pose getPose() const {
+        return pose;
+    }
+
+    [[nodiscard]] utilities::Vector getSize() const {
+        return {width, height};
+    }
+
     void moveLeft();
     void moveRight();
     void jump();

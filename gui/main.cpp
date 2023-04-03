@@ -28,15 +28,17 @@ int main() {
     window.setFramerateLimit(60);
     control::MainMenuOverlord mainMenuOverlord(window, "../model/levels/");
     control::LevelOverlord levelOverlord(
-        window, Platformer::Game("../model/levels/t01-box-with-ladder.json")
+        window, std::make_unique<Platformer::Game>(
+                    "../model/levels/t01-box-with-ladder.json"
+                )
     );
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/lofi.ttf");
 
     auto mainMenu = interface::MainMenu(
-            windowWidth, windowHeight, fontMario, 20, 50,
-            "../gui/assets/textures/interface/main-menu-background.png", mainMenuOverlord,
-            {70, 290}
+        windowWidth, windowHeight, fontMario, 20, 50,
+        "../gui/assets/textures/interface/main-menu-background.png",
+        mainMenuOverlord, {70, 290}
     );
 
     auto loadMenu = interface::LevelSelectionMenu(
@@ -47,6 +49,7 @@ int main() {
 
     auto levelWindow = Platformer::gui::levelWindow(
         windowHeight, "../gui/assets/textures/interface/level-background.png",
+        "../gui/assets/textures/player",
         "../model/levels/t01-box-with-ladder.json", levelOverlord
     );
 

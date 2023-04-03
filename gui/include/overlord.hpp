@@ -45,19 +45,22 @@ public:
 
 struct LevelOverlord : Overlord {
 private:
-    Platformer::Game game;
+    std::unique_ptr<Platformer::Game> game;
 
 public:
-    LevelOverlord(sf::RenderWindow &window_, Platformer::Game game_);
+    LevelOverlord(
+        sf::RenderWindow &window_,
+        std::unique_ptr<Platformer::Game> game_
+    );
     [[maybe_unused]] void pauseOrResume();
     [[maybe_unused]] void moveLeft();
     [[maybe_unused]] void moveRight();
     [[maybe_unused]] void moveDown();
     void jump();
     [[maybe_unused]] void exit();
-    void setLevel(Platformer::Game game_);
+    void setLevel(std::unique_ptr<Platformer::Game> game_);
 
-    Platformer::Game &getLevel() {
+    std::unique_ptr<Platformer::Game> &getLevel() {
         return game;
     }
 };

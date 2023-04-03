@@ -20,7 +20,7 @@ class Game {
 public:
     ~Game();
     Game(Game &&other) = default;
-    Game& operator=(Game &&other) = default;
+    Game &operator=(Game &&other) = default;
     Game(
         std::vector<std::vector<std::unique_ptr<Block>>> board_,
         utilities::Vector playerPos,

@@ -28,19 +28,19 @@ void control::Overlord::setState(CurrentProcess newState) {
 }
 
 [[maybe_unused]] void control::LevelOverlord::moveLeft() {
-    game.getPlayer()->moveLeft();
+    game->getPlayer()->moveLeft();
 }
 
 [[maybe_unused]] void control::LevelOverlord::moveRight() {
-    game.getPlayer()->moveRight();
+    game->getPlayer()->moveRight();
 }
 
 [[maybe_unused]] void control::LevelOverlord::moveDown() {
-    game.getPlayer()->moveDown();
+    game->getPlayer()->moveDown();
 }
 
 void control::LevelOverlord::jump() {
-    game.getPlayer()->jump();
+    game->getPlayer()->jump();
 }
 
 [[maybe_unused]] void control::LevelOverlord::exit() {
@@ -48,11 +48,11 @@ void control::LevelOverlord::jump() {
 
 control::LevelOverlord::LevelOverlord(
     sf::RenderWindow &window_,
-    Platformer::Game game_
+    std::unique_ptr<Platformer::Game> game_
 )
     : Overlord(window_), game(std::move(game_)) {
 }
 
-void control::LevelOverlord::setLevel(Platformer::Game game_) {
+void control::LevelOverlord::setLevel(std::unique_ptr<Platformer::Game> game_) {
     game = std::move(game_);
 }
