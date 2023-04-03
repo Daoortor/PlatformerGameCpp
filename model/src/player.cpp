@@ -27,6 +27,8 @@ void PhysicsObserver::updateGravity() {
         player->speed = {
             player->speed.get_x(),
             player->speed.get_y() + FREEFALL_ACCELERATION};
+    } else if (player->blockBelow()->isHangableOn()) {
+        player->speed = {player->speed.get_x(), 0};
     }
 }
 
