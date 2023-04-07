@@ -5,7 +5,7 @@
 #include "include/gui-constants.hpp"
 #include "include/level-render.hpp"
 #include "include/menu.hpp"
-#include "include/overlord.hpp"
+#include "include/performer.hpp"
 
 using json = nlohmann::json;
 
@@ -26,35 +26,33 @@ int main() {
     );
     window.setPosition(sf::Vector2i(200, 50));
     window.setFramerateLimit(60);
-    control::MainMenuOverlord mainMenuOverlord(window, "../model/levels/");
-    control::LevelOverlord levelOverlord(window);
+    control::MenuPerformer menuPerformer(window, "../model/levels/");
+    control::LevelPerformer levelPerformer(window);
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/lofi.ttf");
 
     auto mainMenu = interface::MainMenu(
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/main-menu-background.png",
-        mainMenuOverlord, {70, 290}
+        menuPerformer, levelPerformer
     );
 
     auto loadMenu = interface::LevelSelectionMenu(
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/level-selection-menu-background.png",
-        "../model/levels/"
+        "../model/levels/", menuPerformer, levelPerformer
     );
 
+    auto pauseMenu = interface::PauseMenu(windowWidth, windowHeight, fontMario, 20, 50,
+                                          "../gui/assets/textures/interface/transparent.jpg", menuPerformer,
+        levelPerformer
+    );
     auto levelWindow = Platformer::gui::levelWindow(
-        windowHeight, "../gui/assets/textures/interface/level-background.png",
+        windowHeight,
+        "../gui/assets/textures/interface/level-background.png",
         "../gui/assets/textures/player",
-        "../model/levels/t01-box-with-ladder.json", levelOverlord
+        "../model/levels/t01-box-with-ladder.json", levelPerformer
     );
-
-    mainMenu.bindButton("Load game", [&]() {
-        mainMenuOverlord.setState(control::CurrentProcess::LoadMenu);
-    });
-    loadMenu.bindButton("Return", [&]() {
-        mainMenuOverlord.setState(control::CurrentProcess::MainMenu);
-    });
 
     while (window.isOpen()) {
         sf::Event event{};
@@ -64,24 +62,34 @@ int main() {
             }
         }
         window.clear();
-        switch (mainMenuOverlord.getState()) {
-            case control::CurrentProcess::MainMenu:
-                mainMenu.loadInWindow(window, event);
+        // TODO: some kind of global state? Looks bad rn
+        switch (levelPerformer.getState()) {
+            case control::LevelState::Empty:
                 break;
-            case control::CurrentProcess::LoadMenu:
-                loadMenu.loadInWindow(window, event);
-                break;
-            case control::CurrentProcess::LevelRunning:
-                // TODO: load game object to window
-                // TODO: game move assignment?
+            case control::LevelState::Running:
                 levelWindow.loadInWindow(window);
                 break;
-            case control::CurrentProcess::LevelPaused:
-                // TODO: load game object to window anyway, but different
-                // controls
+            case control::LevelState::Paused:
+                // TODO: resolve flickering when using line below
+                // levelWindow.loadInWindow(window);
+                // TODO: line below is very ugly, but RN no way to get
+                //  signal from inside level-renderer to mainMenu
+                menuPerformer.openPauseMenu();
                 break;
         }
-
+        switch (menuPerformer.getState()) {
+            case control::MenuState::MainMenu:
+                mainMenu.loadInWindow(window, event);
+                break;
+            case control::MenuState::LoadMenu:
+                loadMenu.loadInWindow(window, event);
+                break;
+            case control::MenuState::PauseMenu:
+                pauseMenu.loadInWindow(window, event);
+                break;
+            case control::MenuState::Empty:
+                break;
+        }
         window.display();
     }
     return 0;

@@ -17,7 +17,7 @@ add_executable(game
         tools/utilities.cpp
         gui/src/button.cpp
         gui/src/menu.cpp
-        gui/src/overlord.cpp
+        gui/src/performer.cpp
         model/src/board.cpp)
 
 target_link_libraries(game sfml-graphics)

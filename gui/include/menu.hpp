@@ -8,13 +8,12 @@
 #include <utility>
 #include <vector>
 #include "button.hpp"
-#include "overlord.hpp"
+#include "performer.hpp"
 
 namespace interface {
 struct Menu {
 protected:
     std::vector<std::unique_ptr<RectangleButton>> rectangleButtons;
-    // TODO: button class should include link to GameEvent it triggers
     // TODO: do we even need unique_ptr here?
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
@@ -39,6 +38,16 @@ public:
     void loadInWindow(sf::RenderWindow &window, sf::Event event);
     void
     bindButton(const std::string &label_string, std::function<void()> func);
+    void addNewButton(
+        const std::string &label_string,
+        int number,
+        const sf::Font &font,
+        int fontSize,
+        std::vector<sf::Color> &buttonColorsList,
+        int buttonDistance,
+        sf::Vector2f startingButtonPosition,
+        sf::Vector2f buttonIndent
+    );
 };
 
 struct MainMenu : Menu {
@@ -50,8 +59,8 @@ public:
         int fontSize,
         int buttonDistance,
         const std::string &BackgroundTextureFilepath,
-        control::MainMenuOverlord &overlord,
-        sf::Vector2f startingButtonPosition = {340, 250}
+        control::MenuPerformer &menuPerformer,
+        control::LevelPerformer &levelPerformer
     );
 };
 
@@ -64,7 +73,23 @@ public:
         int fontSize,
         int buttonDistance,
         const std::string &BackgroundTextureFilepath,
-        const std::string &LevelFilePath
+        const std::string &LevelFilePath,
+        control::MenuPerformer &menuPerformer,
+        control::LevelPerformer &levelPerformer
+    );
+};
+
+struct PauseMenu : Menu {
+public:
+    PauseMenu(
+        unsigned int windowWidth,
+        unsigned int windowHeight,
+        const sf::Font &font,
+        int fontSize,
+        int buttonDistance,
+        const std::string &BackgroundTextureFilepath,
+        control::MenuPerformer &menuPerformer,
+        control::LevelPerformer &levelPerformer
     );
 };
 }  // namespace interface

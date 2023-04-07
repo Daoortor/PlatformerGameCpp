@@ -9,49 +9,56 @@
 #include "../../model/include/player.hpp"
 
 namespace control {
-enum class CurrentProcess { MainMenu, LoadMenu, LevelPaused, LevelRunning };
+enum class MenuState { MainMenu, LoadMenu, PauseMenu, Empty };
+enum class LevelState { Empty, Running, Paused };
 
-struct Overlord {  // TODO: struct -> class if private fields exist
+struct Performer {
 protected:
     sf::RenderWindow &window;
-    CurrentProcess state = CurrentProcess::MainMenu;
 
 public:
-    explicit Overlord(sf::RenderWindow &window_) : window(window_){};
-    CurrentProcess getState();
-    void setState(CurrentProcess newState);
+    explicit Performer(sf::RenderWindow &window_) : window(window_){};
 };
 
-struct MainMenuOverlord : Overlord {
+class LevelPerformer;
+
+class MenuPerformer : Performer {
 private:
     std::vector<std::string> level_paths;
+    MenuState state = MenuState::MainMenu;
 
 public:
-    MainMenuOverlord(
+    MenuPerformer(
         sf::RenderWindow &window_,
         const std::string &levels_directory
     )
-        : Overlord(window_) {
+        : Performer(window_) {
         // TODO: same meaning as LoadMenu constructor; should trim one of two
         for (const auto &entry :
              std::filesystem::directory_iterator(levels_directory))
             level_paths.push_back(entry.path().string());
     }
 
+    MenuState getState();
+
     [[maybe_unused]] void openMainMenu();
-    [[maybe_unused]] Platformer::Game loadLevel(int level_num);
+    [[maybe_unused]] Platformer::Game
+    loadLevel(control::LevelPerformer &levelPerformer, int level_num);
     [[maybe_unused]] void openLoadLevelMenu();
+    [[maybe_unused]] void openPauseMenu();
+    void closeCurrentMenu();
+    void quit();
 };
 
-struct LevelOverlord : Overlord {
+class LevelPerformer : Performer {
 private:
     std::unique_ptr<Platformer::Game> game = nullptr;
+    LevelState state = LevelState::Empty;
 
 public:
-    explicit LevelOverlord(
-        sf::RenderWindow &window_
-    );
-    [[maybe_unused]] void pauseOrResume();
+    explicit LevelPerformer(sf::RenderWindow &window_);
+    [[maybe_unused]] void pause();
+    [[maybe_unused]] void resume();
     [[maybe_unused]] void moveLeft();
     [[maybe_unused]] void moveRight();
     [[maybe_unused]] void moveDown();
@@ -59,9 +66,10 @@ public:
     [[maybe_unused]] void exit();
     void setLevel(std::unique_ptr<Platformer::Game> game_);
 
-    std::unique_ptr<Platformer::Game> &getLevel() {
-        return game;
-    }
+    std::unique_ptr<Platformer::Game> &getLevel();
+
+    LevelState getState();
+    void setState(LevelState newState);
 };
 }  // namespace control
 

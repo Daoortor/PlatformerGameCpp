@@ -1,4 +1,5 @@
 #include "../include/level-render.hpp"
+#include <iostream>
 #include "../include/gui-constants.hpp"
 
 namespace Platformer::gui {
@@ -108,10 +109,10 @@ levelWindow::levelWindow(
     const std::string &backgroundTextureFilepath,
     const std::string &playerFilepath,
     const std::string &levelFilepath,
-    control::LevelOverlord &overlord
+    control::LevelPerformer &levelPerformer
 )
-    : overlord(overlord) {
-    overlord.setLevel(std::make_unique<Game>(levelFilepath));
+    : levelPerformer(levelPerformer) {
+    levelPerformer.setLevel(std::make_unique<Game>(levelFilepath));
     backgroundTexture.loadFromFile(backgroundTextureFilepath);
     sf::Vector2u textureSize = backgroundTexture.getSize();
     float backgroundScale =
@@ -122,8 +123,9 @@ levelWindow::levelWindow(
     for (const std::string &blockType : Platformer::gui::BLOCK_NAMES) {
         blockTextures[blockType] = Platformer::gui::makeBlockTexture(blockType);
     }
-    boardSprites =
-        Platformer::gui::makeBlockSprites(overlord.getLevel(), blockTextures);
+    boardSprites = Platformer::gui::makeBlockSprites(
+        levelPerformer.getLevel(), blockTextures
+    );
     playerTextures[Platformer::Pose::LOOKING_LEFT] = sf::Texture();
     playerTextures[Platformer::Pose::LOOKING_LEFT].loadFromFile(
         playerFilepath + "/player-left.png"
@@ -133,30 +135,45 @@ levelWindow::levelWindow(
         playerFilepath + "/player-right.png"
     );
     playerSprite.setTexture(
-        playerTextures[overlord.getLevel()->getPlayer()->getPose()]
+        playerTextures[levelPerformer.getLevel()->getPlayer()->getPose()]
     );
     float playerScale =
-        getPlayerSize(overlord.getLevel()).y /
+        getPlayerSize(levelPerformer.getLevel()).y /
         static_cast<float>(playerSprite.getTexture()->getSize().y);
     playerSprite.setScale(playerScale, playerScale);
-    sf::Vector2f playerCoordinates = getPlayerCoordinates(overlord.getLevel());
+    sf::Vector2f playerCoordinates =
+        getPlayerCoordinates(levelPerformer.getLevel());
     playerSprite.setPosition(playerCoordinates.x, playerCoordinates.y);
 }
 
 void levelWindow::loadInWindow(sf::RenderWindow &window) {
     window.clear();
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) ||
-        sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-        overlord.jump();
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-        overlord.moveLeft();
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-        overlord.moveDown();
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-        overlord.moveRight();
+    if (levelPerformer.getState() == control::LevelState::Running) {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) ||
+            sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+            levelPerformer.jump();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+            levelPerformer.moveLeft();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+            levelPerformer.moveDown();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+            levelPerformer.moveRight();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+            levelPerformer.pause();
+        }
+    } else if (levelPerformer.getState() == control::LevelState::Paused) {
+        /*
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+            levelPerformer.resume();
+            std::cout << "Game resumed\n" << '\n';
+        } // dubs as 'Resume' button in Pause menu
+         */
+        // TODO: some kind of timer to check there is no loop pause-resume,
+        //  as is right now; or should actually rewrite button to isKeyReleased
     }
     window.draw(backgroundSprite);
     for (const auto &row : boardSprites) {
@@ -164,11 +181,12 @@ void levelWindow::loadInWindow(sf::RenderWindow &window) {
             window.draw(sprite);
         }
     }
-    overlord.getLevel()->update();
-    sf::Vector2f playerCoordinates = getPlayerCoordinates(overlord.getLevel());
+    levelPerformer.getLevel()->update();
+    sf::Vector2f playerCoordinates =
+        getPlayerCoordinates(levelPerformer.getLevel());
     playerSprite.setPosition(playerCoordinates.x, playerCoordinates.y);
     playerSprite.setTexture(
-        playerTextures[overlord.getLevel()->getPlayer()->getPose()]
+        playerTextures[levelPerformer.getLevel()->getPlayer()->getPose()]
     );
     window.draw(playerSprite);
     window.display();
