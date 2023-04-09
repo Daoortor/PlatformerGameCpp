@@ -45,8 +45,8 @@ int main() {
 
     auto levelWindow = Platformer::gui::levelWindow(
         windowHeight, "../gui/assets/textures/interface/level-background.png",
-        "../gui/assets/textures/player",
-        "../model/levels/t02-hard-jumps.json", levelOverlord
+        "../gui/assets/textures/player", "../model/levels/t02-hard-jumps.json",
+        levelOverlord
     );
 
     mainMenu.bindButton("Load game", [&]() {

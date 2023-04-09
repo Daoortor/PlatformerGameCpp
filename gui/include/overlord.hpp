@@ -48,9 +48,7 @@ private:
     std::unique_ptr<Platformer::Game> game = nullptr;
 
 public:
-    explicit LevelOverlord(
-        sf::RenderWindow &window_
-    );
+    explicit LevelOverlord(sf::RenderWindow &window_);
     [[maybe_unused]] void pauseOrResume();
     [[maybe_unused]] void moveLeft();
     [[maybe_unused]] void moveRight();

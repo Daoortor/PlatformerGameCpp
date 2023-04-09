@@ -10,11 +10,12 @@ PhysicsObserver::PhysicsObserver(Player *player_) : player(player_) {
 }
 
 void PhysicsObserver::updateCollision() {
-    if ((player->isStanding() && player->speed.get_y() > 0
-        )) {
+    if ((player->isStanding() && player->speed.get_y() > 0)) {
         player->speed = {player->speed.get_x(), 0};
     } else if (!player->canJump()) {
-        int newSpeed = -static_cast<int>(static_cast<float>(player->speed.get_y()) * BOUNCE_COEFFICIENT);
+        int newSpeed = -static_cast<int>(
+            static_cast<float>(player->speed.get_y()) * BOUNCE_COEFFICIENT
+        );
         player->speed = {player->speed.get_x(), newSpeed};
     }
     if ((player->distLeft() == 0 && player->speed.get_x() < 0) ||
@@ -25,8 +26,7 @@ void PhysicsObserver::updateCollision() {
 }
 
 void PhysicsObserver::updateGravity() {
-    if (!player->isStanding() &&
-        !player->isHanging()) {
+    if (!player->isStanding() && !player->isHanging()) {
         player->speed = {
             player->speed.get_x(),
             player->speed.get_y() + FREEFALL_ACCELERATION};
@@ -142,20 +142,26 @@ std::vector<utilities::Vector> Player::coordsBelow() {
 std::vector<const Block *> Player::blocksAbove() {
     auto coords = coordsAbove();
     std::vector<const Block *> result(coordsBelow().size());
-    std::transform(coords.begin(), coords.end(), result.begin(),
-                   [this] (utilities::Vector position) {
-                       return game->getBoardObject().getBlockByCoordinates(position - utilities::Vector(0, 1)).get();
-                   });
+    std::transform(
+        coords.begin(), coords.end(), result.begin(),
+        [this](utilities::Vector position) {
+            return game->getBoardObject()
+                .getBlockByCoordinates(position - utilities::Vector(0, 1))
+                .get();
+        }
+    );
     return result;
 }
 
 std::vector<const Block *> Player::blocksBelow() {
     auto coords = coordsBelow();
     std::vector<const Block *> result(coordsBelow().size());
-    std::transform(coords.begin(), coords.end(), result.begin(),
-                   [this] (utilities::Vector position) {
-                       return game->getBoardObject().getBlockByCoordinates(position).get();
-                   });
+    std::transform(
+        coords.begin(), coords.end(), result.begin(),
+        [this](utilities::Vector position) {
+            return game->getBoardObject().getBlockByCoordinates(position).get();
+        }
+    );
     return result;
 }
 
@@ -190,20 +196,24 @@ Player::distByVector(utilities::Vector position, utilities::Vector moveVector) {
 int Player::distAbove() {
     auto coordsAbove_ = coordsAbove();
     std::vector<int> distances(coordsAbove_.size());
-    std::transform(coordsAbove_.begin(), coordsAbove_.end(),
-                   distances.begin(), [this] (utilities::Vector position) {
-                       return distByVector(position, {0, -BLOCK_SIZE}).get_y();
-                   });
+    std::transform(
+        coordsAbove_.begin(), coordsAbove_.end(), distances.begin(),
+        [this](utilities::Vector position) {
+            return distByVector(position, {0, -BLOCK_SIZE}).get_y();
+        }
+    );
     return *std::min_element(distances.begin(), distances.end());
 }
 
 int Player::distBelow() {
     auto coordsBelow_ = coordsBelow();
     std::vector<int> distances(coordsBelow_.size());
-    std::transform(coordsBelow_.begin(), coordsBelow_.end(),
-                   distances.begin(), [this] (utilities::Vector position) {
-                       return distByVector(position, {0, BLOCK_SIZE}).get_y();
-                   });
+    std::transform(
+        coordsBelow_.begin(), coordsBelow_.end(), distances.begin(),
+        [this](utilities::Vector position) {
+            return distByVector(position, {0, BLOCK_SIZE}).get_y();
+        }
+    );
     return *std::min_element(distances.begin(), distances.end());
 }
 
@@ -237,26 +247,23 @@ bool Player::isHanging() {
     auto blocksBelow_ = blocksBelow();
     return std::any_of(
         blocksBelow_.begin(), blocksBelow_.end(),
-        [] (const Block * block) {
-            return block->isHangableOn();
-        });
+        [](const Block *block) { return block->isHangableOn(); }
+    );
 }
 
 bool Player::isStanding() {
     auto blocksBelow_ = blocksBelow();
     return std::any_of(
         blocksBelow_.begin(), blocksBelow_.end(),
-        [] (const Block * block) {
-            return block->isSolid();
-        });
+        [](const Block *block) { return block->isSolid(); }
+    );
 }
 
 bool Player::canJump() {
     auto blocksAbove_ = blocksAbove();
     return !std::any_of(
         blocksAbove_.begin(), blocksAbove_.end(),
-        [] (const Block * block) {
-            return block->isSolid();
-        });
+        [](const Block *block) { return block->isSolid(); }
+    );
 }
 }  // namespace Platformer
