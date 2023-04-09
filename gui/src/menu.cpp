@@ -68,9 +68,14 @@ void Menu::bindButton(
     const std::string &label_string,
     std::function<void()> func
 ) {
-    int i = buttonLabelToNum[label_string];
-    // TODO: exception handling: is string label valid?
-    rectangleButtons[i]->bind(std::move(func));
+    // TODO: better exception handling
+    if (buttonLabelToNum.count(label_string) == 0) {
+        std::cerr << "No available button named " << label_string
+                  << "; binding halted\n";
+    } else {
+        int i = buttonLabelToNum[label_string];
+        rectangleButtons[i]->bind(std::move(func));
+    }
 }
 
 void Menu::addNewButton(
@@ -115,7 +120,7 @@ MainMenu::MainMenu(
     sf::Vector2f startingButtonPosition = {340, 250};
     sf::Vector2f buttonIndent = {10, 5};
     loadBackgroundSpriteFromTextureFile(
-        BackgroundTextureFilepath, 255, 255, 255, 128, windowWidth, windowHeight
+        BackgroundTextureFilepath, 255, 255, 255, 255, windowWidth, windowHeight
     );
 
     std::vector<std::string> buttonStringLabels = {"Start game", "Load game",
@@ -134,7 +139,7 @@ MainMenu::MainMenu(
         menuPerformer.loadLevel(levelPerformer, 0);
     });
     bindButton("Load game", [&]() { menuPerformer.openLoadLevelMenu(); });
-    bindButton("Quit", [&]() { menuPerformer.quit(); });
+    bindButton("Quit", [&]() { menuPerformer.closeWindow(); });
 }
 
 LevelSelectionMenu::LevelSelectionMenu(
@@ -155,8 +160,9 @@ LevelSelectionMenu::LevelSelectionMenu(
         BackgroundTextureFilepath, 255, 255, 255, 128, windowWidth, windowHeight
     );
     int count = 0;
-    for (auto &p : std::filesystem::directory_iterator(std::filesystem::path{
-             LevelFilePath})) {
+    for ([[maybe_unused]] auto &p : std::filesystem::directory_iterator(
+             std::filesystem::path{LevelFilePath}
+         )) {
         count++;
     }
     addNewButton(
@@ -195,9 +201,9 @@ PauseMenu::PauseMenu(
     );
     std::vector<std::string> buttonStringLabels = {
         "Resume", "Back to title screen"};
-    for (int i = 0; i < buttonStringLabels.size(); i++) {
+    for (int number = 0; number < buttonStringLabels.size(); number++) {
         addNewButton(
-            buttonStringLabels[i], i, font, fontSize, colorsList,
+            buttonStringLabels[number], number, font, fontSize, colorsList,
             buttonDistance, startingButtonPosition, buttonIndent
         );
     }

@@ -47,7 +47,7 @@ public:
     [[maybe_unused]] void openLoadLevelMenu();
     [[maybe_unused]] void openPauseMenu();
     void closeCurrentMenu();
-    void quit();
+    void closeWindow();
 };
 
 class LevelPerformer : Performer {

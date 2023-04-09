@@ -10,7 +10,8 @@ MenuPerformer::loadLevel(LevelPerformer &levelPerformer, int level_num) {
     state = MenuState::Empty;
     levelPerformer.setState(LevelState::Running);
     return Platformer::Game(level_paths[level_num]
-    );  // TODO: rewrite with proper method owner & state field usage
+    );  // TODO: rewrite with proper method owner & state field usage;
+        //  right now it doesn't do anything
 }
 
 [[maybe_unused]] void MenuPerformer::openLoadLevelMenu() {
@@ -29,7 +30,7 @@ void MenuPerformer::closeCurrentMenu() {
     state = MenuState::Empty;
 }
 
-void MenuPerformer::quit() {
+void MenuPerformer::closeWindow() {
     window.close();
 }
 
@@ -58,6 +59,7 @@ void LevelPerformer::jump() {
 }
 
 [[maybe_unused]] void LevelPerformer::exit() {
+    // TODO: level reset
     state = LevelState::Empty;
 }
 
