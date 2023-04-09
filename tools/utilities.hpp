@@ -39,6 +39,7 @@ public:
 
 int divide(int a, unsigned int b);
 
+int sign(int n);
 }  // namespace Platformer::utilities
 
 #endif  // PLATFORMERGAMECPP_UTILITIES_HPP_
