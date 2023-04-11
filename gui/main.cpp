@@ -51,7 +51,7 @@ int main() {
         windowHeight,
         "../gui/assets/textures/interface/level-background.png",
         "../gui/assets/textures/player",
-        "../model/levels/t01-box-with-ladder.json", levelPerformer
+        "../model/levels/t02-hard-jumps.json", levelPerformer
     );
 
     while (window.isOpen()) {
