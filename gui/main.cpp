@@ -27,16 +27,14 @@ int main() {
     window.setPosition(sf::Vector2i(200, 50));
     window.setFramerateLimit(60);
     control::MainMenuOverlord mainMenuOverlord(window, "../model/levels/");
-    control::LevelOverlord levelOverlord(
-        window, Platformer::Game("../model/levels/t01-box-with-ladder.json")
-    );
+    control::LevelOverlord levelOverlord(window);
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/lofi.ttf");
 
     auto mainMenu = interface::MainMenu(
-            windowWidth, windowHeight, fontMario, 20, 50,
-            "../gui/assets/textures/interface/main-menu-background.png", mainMenuOverlord,
-            {70, 290}
+        windowWidth, windowHeight, fontMario, 20, 50,
+        "../gui/assets/textures/interface/main-menu-background.png",
+        mainMenuOverlord, {70, 290}
     );
 
     auto loadMenu = interface::LevelSelectionMenu(
@@ -47,7 +45,8 @@ int main() {
 
     auto levelWindow = Platformer::gui::levelWindow(
         windowHeight, "../gui/assets/textures/interface/level-background.png",
-        "../model/levels/t01-box-with-ladder.json", levelOverlord
+        "../gui/assets/textures/player", "../model/levels/t02-hard-jumps.json",
+        levelOverlord
     );
 
     mainMenu.bindButton("Load game", [&]() {

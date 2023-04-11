@@ -25,16 +25,19 @@ std::vector<std::vector<sf::Sprite>> makeBlockSprites(
 std::unique_ptr<sf::Texture> makeBlockTexture(const std::string &type);
 
 class levelWindow {
-    control::Overlord &overlord;
+    control::LevelOverlord &overlord;
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
     std::map<std::string, std::unique_ptr<sf::Texture>> blockTextures;
     std::vector<std::vector<sf::Sprite>> boardSprites;
+    std::map<Platformer::Pose, sf::Texture> playerTextures;
+    sf::Sprite playerSprite;
 
 public:
     levelWindow(
         unsigned int windowHeight,
         const std::string &backgroundTextureFilepath,
+        const std::string &playerFilepath,
         const std::string &levelFilepath,
         control::LevelOverlord &overlord
     );

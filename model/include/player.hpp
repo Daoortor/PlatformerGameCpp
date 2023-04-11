@@ -41,6 +41,12 @@ class Player {
     utilities::Vector
     distByVector(utilities::Vector pos, utilities::Vector moveVector);
 
+    std::vector<utilities::Vector> coordsAbove();
+    std::vector<utilities::Vector> coordsBelow();
+
+    std::vector<const Block *> blocksAbove();
+    std::vector<const Block *> blocksBelow();
+
 public:
     Player() = default;
     explicit Player(Game *game_);
@@ -55,6 +61,14 @@ public:
         return speed;
     }
 
+    [[nodiscard]] Pose getPose() const {
+        return pose;
+    }
+
+    [[nodiscard]] utilities::Vector getSize() const {
+        return {width, height};
+    }
+
     void moveLeft();
     void moveRight();
     void jump();
@@ -62,16 +76,14 @@ public:
     void move(utilities::Vector delta);
     void notifyAll();
 
-    const std::unique_ptr<Block> &blockInside();
-    const std::unique_ptr<Block> &blockAbove();
-    const std::unique_ptr<Block> &blockBelow();
-    const std::unique_ptr<Block> &blockLeft();
-    const std::unique_ptr<Block> &blockRight();
-
     int distAbove();
     int distBelow();
     int distLeft();
     int distRight();
+
+    bool isHanging();
+    bool isStanding();
+    bool canJump();
 
     friend observers::PhysicsObserver;
 };

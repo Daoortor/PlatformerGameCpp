@@ -1,5 +1,5 @@
 {
-  "levelName": "test01-box-with-ladder",
+  "levelName": "t01-box-with-ladder",
   "width": 7,
   "height": 5,
   "blockMap": [
@@ -9,6 +9,6 @@
     ["stone", "ladder", "air", "air", "air", "air", "stone"],
     ["stone", "stone", "stone", "stone", "stone", "stone", "stone"]
   ],
-  "playerStartPos": [350, 325],
-  "endPos": [50, -75]
+  "playerStartPos": [3500, 3250],
+  "endPos": [500, -750]
 }
