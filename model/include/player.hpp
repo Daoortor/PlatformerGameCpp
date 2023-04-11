@@ -85,6 +85,8 @@ public:
     bool isStanding();
     bool canJump();
 
+    bool contains(utilities::Vector position);
+
     friend observers::PhysicsObserver;
 };
 }  // namespace Platformer

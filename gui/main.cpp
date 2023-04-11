@@ -51,6 +51,7 @@ int main() {
         windowHeight,
         "../gui/assets/textures/interface/level-background.png",
         "../gui/assets/textures/player",
+        "../gui/assets/textures/misc",
         "../model/levels/t02-hard-jumps.json", levelPerformer
     );
 
@@ -76,6 +77,10 @@ int main() {
                 //  signal from inside level-renderer to mainMenu
                 menuPerformer.openPauseMenu();
                 break;
+            case control::LevelState::Won:
+                menuPerformer.openMainMenu();
+                levelPerformer.setState(control::LevelState::Empty);
+                levelPerformer.reset();
         }
         switch (menuPerformer.getState()) {
             case control::MenuState::MainMenu:

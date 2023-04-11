@@ -40,6 +40,10 @@ public:
         return board;
     }
 
+    utilities::Vector getEndPos() {
+        return endPos;
+    }
+
     void update();
 };
 }  // namespace Platformer

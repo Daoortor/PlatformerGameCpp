@@ -266,4 +266,13 @@ bool Player::canJump() {
         [](const Block *block) { return block->isSolid(); }
     );
 }
+
+bool Player::contains(utilities::Vector position) {
+    int top = pos.get_y() - height / 2;
+    int bottom = pos.get_y() + height / 2;
+    int left = pos.get_x() - width / 2;
+    int right = pos.get_x() + width / 2;
+    return top <= position.get_y() && position.get_y() <= bottom &&
+           left <= position.get_x() && position.get_x() <= right;
+}
 }  // namespace Platformer

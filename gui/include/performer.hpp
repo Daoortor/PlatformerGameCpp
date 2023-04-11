@@ -10,7 +10,7 @@
 
 namespace control {
 enum class MenuState { MainMenu, LoadMenu, PauseMenu, Empty };
-enum class LevelState { Empty, Running, Paused };
+enum class LevelState { Empty, Running, Paused, Won };
 
 struct Performer {
 protected:
@@ -59,6 +59,7 @@ public:
     explicit LevelPerformer(sf::RenderWindow &window_);
     [[maybe_unused]] void pause();
     [[maybe_unused]] void resume();
+    [[maybe_unused]] void reset();
     [[maybe_unused]] void moveLeft();
     [[maybe_unused]] void moveRight();
     [[maybe_unused]] void moveDown();

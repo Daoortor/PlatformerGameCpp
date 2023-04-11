@@ -38,18 +38,22 @@ sf::Vector2f getPlayerSize(std::unique_ptr<Platformer::Game> &game) {
             getBlockSize(game) / BLOCK_SIZE};
 }
 
-sf::Vector2f getPlayerCoordinates(std::unique_ptr<Platformer::Game> &game) {
+sf::Vector2f getCoordinates(utilities::Vector pos,
+                            std::unique_ptr<Platformer::Game> &game) {
     float scale = getBlockSize(game) / BLOCK_SIZE;
     sf::Vector2f topLeftCorner = getTopLeftCorner(game);
     float xPos =
         topLeftCorner.x +
-        static_cast<float>(game->getPlayer()->getPos().get_x()) * scale -
-        getPlayerSize(game).x / 2;
+        static_cast<float>(pos.get_x()) * scale;
     float yPos =
         topLeftCorner.y +
-        static_cast<float>(game->getPlayer()->getPos().get_y()) * scale -
-        getPlayerSize(game).y / 2;
+        static_cast<float>(pos.get_y()) * scale;
     return {xPos, yPos};
+}
+
+sf::Vector2f getPlayerCoordinates(std::unique_ptr<Platformer::Game> &game) {
+    return getCoordinates(game->getPlayer()->getPos(), game) -
+    sf::Vector2f(getPlayerSize(game).x / 2, getPlayerSize(game).y / 2);
 }
 
 sf::Sprite makeBlockSprite(
@@ -108,6 +112,7 @@ levelWindow::levelWindow(
     unsigned int windowHeight,
     const std::string &backgroundTextureFilepath,
     const std::string &playerFilepath,
+    const std::string &miscFilepath,
     const std::string &levelFilepath,
     control::LevelPerformer &levelPerformer
 )
@@ -144,10 +149,26 @@ levelWindow::levelWindow(
     sf::Vector2f playerCoordinates =
         getPlayerCoordinates(levelPerformer.getLevel());
     playerSprite.setPosition(playerCoordinates.x, playerCoordinates.y);
+    levelEndTexture.loadFromFile(miscFilepath + "/level-end.png");
+    levelEndSprite.setTexture(levelEndTexture);
+    float levelEndScale = static_cast<float>(
+                              getBlockSize(levelPerformer.getLevel())) / 2 /
+              static_cast<float>(levelEndSprite.getTexture()->getSize().y);
+    levelEndSprite.setScale(levelEndScale, levelEndScale);
+    sf::Vector2f offset = sf::Vector2f(getBlockSize(levelPerformer.getLevel()) / 4,
+                                       getBlockSize(levelPerformer.getLevel()) / 4);
+    sf::Vector2f levelEndPos = getCoordinates(levelPerformer.getLevel()->getEndPos(),
+                                      levelPerformer.getLevel());
+    levelEndSprite.setPosition(levelEndPos - offset);
 }
 
 void levelWindow::loadInWindow(sf::RenderWindow &window) {
     window.clear();
+    if (levelPerformer.getLevel()->getPlayer()->contains(
+            levelPerformer.getLevel()->getEndPos())) {
+        levelPerformer.setState(control::LevelState::Won);
+        return;
+    }
     if (levelPerformer.getState() == control::LevelState::Running) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) ||
             sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
@@ -164,6 +185,9 @@ void levelWindow::loadInWindow(sf::RenderWindow &window) {
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
             levelPerformer.pause();
+        }
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5)) {
+            levelPerformer.reset();
         }
     } else if (levelPerformer.getState() == control::LevelState::Paused) {
         /*
@@ -188,6 +212,7 @@ void levelWindow::loadInWindow(sf::RenderWindow &window) {
     playerSprite.setTexture(
         playerTextures[levelPerformer.getLevel()->getPlayer()->getPose()]
     );
+    window.draw(levelEndSprite);
     window.draw(playerSprite);
     window.display();
 }
