@@ -42,7 +42,7 @@ public:
         const std::string &playerFilepath,
         const std::string &miscFilepath,
         const std::string &levelFilepath,
-        control::LevelPerformer *levelPerformer
+        control::LevelPerformer *levelPerformerPtr
     );
     void loadInWindow(sf::RenderWindow &window);
 };

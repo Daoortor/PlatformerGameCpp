@@ -141,8 +141,8 @@ MainMenu::MainMenu(
         levelWindow = Platformer::gui::LevelWindow(
             windowHeight,
             "../gui/assets/textures/interface/level-background.png",
-            "../gui/assets/textures/player", menuPerformer.getLevelFilePath(0),
-            &levelPerformer
+            "../gui/assets/textures/player", "../gui/assets/textures/misc",
+            menuPerformer.getLevelFilePath(0), &levelPerformer
         );
         // TODO: big rewrite of levelPerformer-levelWindow relationship
     });
@@ -189,7 +189,7 @@ LevelSelectionMenu::LevelSelectionMenu(
             levelWindow = Platformer::gui::LevelWindow(
                 windowHeight,
                 "../gui/assets/textures/interface/level-background.png",
-                "../gui/assets/textures/player",
+                "../gui/assets/textures/player", "../gui/assets/textures/misc",
                 menuPerformer.getLevelFilePath(i - 1), &levelPerformer
             );
             // TODO: implementation above is due to rewrite

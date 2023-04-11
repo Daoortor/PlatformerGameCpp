@@ -33,8 +33,8 @@ int main() {
 
     auto levelWindow = Platformer::gui::LevelWindow(
         windowHeight, "../gui/assets/textures/interface/level-background.png",
-        "../gui/assets/textures/player", "../model/levels/t02-hard-jumps.json",
-        &levelPerformer
+        "../gui/assets/textures/player", "../gui/assets/textures/misc",
+        "../model/levels/t02-hard-jumps.json", &levelPerformer
     );
 
     auto mainMenu = interface::MainMenu(
@@ -53,13 +53,6 @@ int main() {
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/transparent.jpg", menuPerformer,
         levelPerformer
-    );
-    auto levelWindow = Platformer::gui::levelWindow(
-        windowHeight,
-        "../gui/assets/textures/interface/level-background.png",
-        "../gui/assets/textures/player",
-        "../gui/assets/textures/misc",
-        "../model/levels/t02-hard-jumps.json", levelPerformer
     );
 
     while (window.isOpen()) {

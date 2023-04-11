@@ -46,7 +46,10 @@ void MenuPerformer::closeWindow() {
 }
 
 [[maybe_unused]] void LevelPerformer::reset() {
-    game = std::move(std::make_unique<Platformer::Game>("../model/levels/t02-hard-jumps.json"));
+    game = std::move(std::make_unique<Platformer::Game>(
+        "../model/levels/t02-hard-jumps.json"
+    ));
+    // TODO: redo
 }
 
 [[maybe_unused]] void LevelPerformer::moveLeft() {

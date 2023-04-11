@@ -38,22 +38,18 @@ sf::Vector2f getPlayerSize(std::unique_ptr<Platformer::Game> &game) {
             getBlockSize(game) / BLOCK_SIZE};
 }
 
-sf::Vector2f getCoordinates(utilities::Vector pos,
-                            std::unique_ptr<Platformer::Game> &game) {
+sf::Vector2f
+getCoordinates(utilities::Vector pos, std::unique_ptr<Platformer::Game> &game) {
     float scale = getBlockSize(game) / BLOCK_SIZE;
     sf::Vector2f topLeftCorner = getTopLeftCorner(game);
-    float xPos =
-        topLeftCorner.x +
-        static_cast<float>(pos.get_x()) * scale;
-    float yPos =
-        topLeftCorner.y +
-        static_cast<float>(pos.get_y()) * scale;
+    float xPos = topLeftCorner.x + static_cast<float>(pos.get_x()) * scale;
+    float yPos = topLeftCorner.y + static_cast<float>(pos.get_y()) * scale;
     return {xPos, yPos};
 }
 
 sf::Vector2f getPlayerCoordinates(std::unique_ptr<Platformer::Game> &game) {
     return getCoordinates(game->getPlayer()->getPos(), game) -
-    sf::Vector2f(getPlayerSize(game).x / 2, getPlayerSize(game).y / 2);
+           sf::Vector2f(getPlayerSize(game).x / 2, getPlayerSize(game).y / 2);
 }
 
 sf::Sprite makeBlockSprite(
@@ -151,25 +147,30 @@ LevelWindow::LevelWindow(
     playerSprite.setPosition(playerCoordinates.x, playerCoordinates.y);
     levelEndTexture.loadFromFile(miscFilepath + "/level-end.png");
     levelEndSprite.setTexture(levelEndTexture);
-    float levelEndScale = static_cast<float>(
-                              getBlockSize(levelPerformer.getLevel())) / 2 /
-              static_cast<float>(levelEndSprite.getTexture()->getSize().y);
+    float levelEndScale =
+        static_cast<float>(getBlockSize(levelPerformerPtr->getLevel())) / 2 /
+        static_cast<float>(levelEndSprite.getTexture()->getSize().y);
     levelEndSprite.setScale(levelEndScale, levelEndScale);
-    sf::Vector2f offset = sf::Vector2f(getBlockSize(levelPerformer.getLevel()) / 4,
-                                       getBlockSize(levelPerformer.getLevel()) / 4);
-    sf::Vector2f levelEndPos = getCoordinates(levelPerformer.getLevel()->getEndPos(),
-                                      levelPerformer.getLevel());
+    sf::Vector2f offset = sf::Vector2f(
+        getBlockSize(levelPerformerPtr->getLevel()) / 4,
+        getBlockSize(levelPerformerPtr->getLevel()) / 4
+    );
+    sf::Vector2f levelEndPos = getCoordinates(
+        levelPerformerPtr->getLevel()->getEndPos(),
+        levelPerformerPtr->getLevel()
+    );
     levelEndSprite.setPosition(levelEndPos - offset);
 }
 
 void LevelWindow::loadInWindow(sf::RenderWindow &window) {
     window.clear();
-    if (levelPerformer.getLevel()->getPlayer()->contains(
-            levelPerformer.getLevel()->getEndPos())) {
-        levelPerformer.setState(control::LevelState::Won);
+    if (levelPerformerPtr->getLevel()->getPlayer()->contains(
+            levelPerformerPtr->getLevel()->getEndPos()
+        )) {
+        levelPerformerPtr->setState(control::LevelState::Won);
         return;
     }
-    if (levelPerformer.getState() == control::LevelState::Running) {
+    if (levelPerformerPtr->getState() == control::LevelState::Running) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) ||
             sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
             levelPerformerPtr->jump();
@@ -187,9 +188,9 @@ void LevelWindow::loadInWindow(sf::RenderWindow &window) {
             levelPerformerPtr->pause();
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5)) {
-            levelPerformer.reset();
+            levelPerformerPtr->reset();
         }
-    } else if (levelPerformer.getState() == control::LevelState::Paused) {
+    } else if (levelPerformerPtr->getState() == control::LevelState::Paused) {
         /*
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
             levelPerformerPtr.resume();
@@ -214,7 +215,9 @@ void LevelWindow::loadInWindow(sf::RenderWindow &window) {
     playerSprite.setTexture(
         playerTextures[levelPerformerPtr->getLevel()->getPlayer()->getPose()]
     );
+    levelEndSprite.setTexture(levelEndTexture);
     window.draw(levelEndSprite);
+    // TODO: resolve texture loss that occurs after removing line above
     window.draw(playerSprite);
     window.display();
 }
