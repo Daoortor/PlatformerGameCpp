@@ -14,7 +14,7 @@
     ["stone", "ladder", "stone", "stone", "stone", "stone", "stone", "stone", "stone", "stone", "stone"],
     ["stone", "ladder", "air", "air", "air", "air", "air", "air", "air", "air", "stone"],
     ["stone", "ladder", "air", "air", "air", "air", "air", "air", "air", "air", "stone"],
-    ["stone", "stone", "stone", "stone", "stone", "stone", "stone", "stone", "stone", "stone", "stone"]
+    ["stone", "stone", "stone", "air", "air", "stone", "air", "air", "stone", "stone", "stone"]
   ],
   "playerStartPos": [9500, 10250],
   "endPos": [500, -750]

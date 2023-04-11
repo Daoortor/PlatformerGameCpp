@@ -32,12 +32,15 @@ class LevelWindow {
     std::vector<std::vector<sf::Sprite>> boardSprites;
     std::map<Platformer::Pose, sf::Texture> playerTextures;
     sf::Sprite playerSprite;
+    sf::Texture levelEndTexture;
+    sf::Sprite levelEndSprite;
 
 public:
     explicit LevelWindow(
         unsigned int windowHeight,
         const std::string &backgroundTextureFilepath,
         const std::string &playerFilepath,
+        const std::string &miscFilepath,
         const std::string &levelFilepath,
         control::LevelPerformer *levelPerformer
     );

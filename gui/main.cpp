@@ -54,6 +54,13 @@ int main() {
         "../gui/assets/textures/interface/transparent.jpg", menuPerformer,
         levelPerformer
     );
+    auto levelWindow = Platformer::gui::levelWindow(
+        windowHeight,
+        "../gui/assets/textures/interface/level-background.png",
+        "../gui/assets/textures/player",
+        "../gui/assets/textures/misc",
+        "../model/levels/t02-hard-jumps.json", levelPerformer
+    );
 
     while (window.isOpen()) {
         sf::Event event{};
@@ -77,6 +84,10 @@ int main() {
                 //  signal from inside level-renderer to mainMenu
                 menuPerformer.openPauseMenu();
                 break;
+            case control::LevelState::Won:
+                menuPerformer.openMainMenu();
+                levelPerformer.setState(control::LevelState::Empty);
+                levelPerformer.reset();
         }
         switch (menuPerformer.getState()) {
             case control::MenuState::MainMenu:

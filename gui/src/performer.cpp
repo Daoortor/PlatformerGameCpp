@@ -45,6 +45,10 @@ void MenuPerformer::closeWindow() {
     state = LevelState::Running;
 }
 
+[[maybe_unused]] void LevelPerformer::reset() {
+    game = std::move(std::make_unique<Platformer::Game>("../model/levels/t02-hard-jumps.json"));
+}
+
 [[maybe_unused]] void LevelPerformer::moveLeft() {
     game->getPlayer()->moveLeft();
 }
