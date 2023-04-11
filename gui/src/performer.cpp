@@ -5,13 +5,12 @@ namespace control {
     state = MenuState::MainMenu;
 }
 
-[[maybe_unused]] Platformer::Game
-MenuPerformer::loadLevel(LevelPerformer &levelPerformer, int level_num) {
-    state = MenuState::Empty;
-    levelPerformer.setState(LevelState::Running);
-    return Platformer::Game(level_paths[level_num]
-    );  // TODO: rewrite with proper method owner & state field usage;
-        //  right now it doesn't do anything
+[[maybe_unused]] void control::MenuPerformer::loadLevel(
+    LevelPerformer &levelPerformer
+) {
+    setState(control::MenuState::Empty);
+    levelPerformer.setState(control::LevelState::Running);
+    // TODO: rewrite or rename, cross or underpants
 }
 
 [[maybe_unused]] void MenuPerformer::openLoadLevelMenu() {
@@ -24,6 +23,10 @@ void MenuPerformer::openPauseMenu() {
 
 MenuState MenuPerformer::getState() {
     return state;
+}
+
+void MenuPerformer::setState(MenuState newState) {
+    state = newState;
 }
 
 void MenuPerformer::closeCurrentMenu() {
@@ -82,5 +85,9 @@ void LevelPerformer::setState(LevelState newState) {
 
 std::unique_ptr<Platformer::Game> &LevelPerformer::getLevel() {
     return game;
+}
+
+std::string MenuPerformer::getLevelFilePath(int num) {
+    return level_paths[num];
 }
 }  // namespace control

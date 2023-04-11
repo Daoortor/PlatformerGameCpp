@@ -31,27 +31,28 @@ int main() {
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/lofi.ttf");
 
+    auto levelWindow = Platformer::gui::LevelWindow(
+        windowHeight, "../gui/assets/textures/interface/level-background.png",
+        "../gui/assets/textures/player", "../model/levels/t02-hard-jumps.json",
+        &levelPerformer
+    );
+
     auto mainMenu = interface::MainMenu(
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/main-menu-background.png",
-        menuPerformer, levelPerformer
+        menuPerformer, levelPerformer, levelWindow
     );
 
     auto loadMenu = interface::LevelSelectionMenu(
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/level-selection-menu-background.png",
-        "../model/levels/", menuPerformer, levelPerformer
+        "../model/levels/", menuPerformer, levelPerformer, levelWindow
     );
 
-    auto pauseMenu = interface::PauseMenu(windowWidth, windowHeight, fontMario, 20, 50,
-                                          "../gui/assets/textures/interface/transparent.jpg", menuPerformer,
+    auto pauseMenu = interface::PauseMenu(
+        windowWidth, windowHeight, fontMario, 20, 50,
+        "../gui/assets/textures/interface/transparent.jpg", menuPerformer,
         levelPerformer
-    );
-    auto levelWindow = Platformer::gui::levelWindow(
-        windowHeight,
-        "../gui/assets/textures/interface/level-background.png",
-        "../gui/assets/textures/player",
-        "../model/levels/t02-hard-jumps.json", levelPerformer
     );
 
     while (window.isOpen()) {
@@ -62,7 +63,7 @@ int main() {
             }
         }
         window.clear();
-        // TODO: some kind of global state? Looks bad rn
+        // TODO: some kind of global state?
         switch (levelPerformer.getState()) {
             case control::LevelState::Empty:
                 break;
@@ -71,7 +72,7 @@ int main() {
                 break;
             case control::LevelState::Paused:
                 // TODO: resolve flickering when using line below
-                // levelWindow.loadInWindow(window);
+                // LevelWindow.loadInWindow(window);
                 // TODO: line below is very ugly, but RN no way to get
                 //  signal from inside level-renderer to mainMenu
                 menuPerformer.openPauseMenu();

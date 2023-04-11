@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 #include "button.hpp"
+#include "level-render.hpp"
 #include "performer.hpp"
 
 namespace interface {
@@ -60,7 +61,8 @@ public:
         int buttonDistance,
         const std::string &BackgroundTextureFilepath,
         control::MenuPerformer &menuPerformer,
-        control::LevelPerformer &levelPerformer
+        control::LevelPerformer &levelPerformer,
+        Platformer::gui::LevelWindow &levelWindow
     );
 };
 
@@ -75,7 +77,8 @@ public:
         const std::string &BackgroundTextureFilepath,
         const std::string &LevelFilePath,
         control::MenuPerformer &menuPerformer,
-        control::LevelPerformer &levelPerformer
+        control::LevelPerformer &levelPerformer,
+        Platformer::gui::LevelWindow &levelWindow
     );
 };
 

@@ -104,15 +104,15 @@ std::unique_ptr<sf::Texture> makeBlockTexture(const std::string &type) {
     return blockTexture;
 }
 
-levelWindow::levelWindow(
+LevelWindow::LevelWindow(
     unsigned int windowHeight,
     const std::string &backgroundTextureFilepath,
     const std::string &playerFilepath,
     const std::string &levelFilepath,
-    control::LevelPerformer &levelPerformer
+    control::LevelPerformer *levelPerformer
 )
-    : levelPerformer(levelPerformer) {
-    levelPerformer.setLevel(std::make_unique<Game>(levelFilepath));
+    : levelPerformerPtr(levelPerformer) {
+    levelPerformerPtr->setLevel(std::make_unique<Game>(levelFilepath));
     backgroundTexture.loadFromFile(backgroundTextureFilepath);
     sf::Vector2u textureSize = backgroundTexture.getSize();
     float backgroundScale =
@@ -124,7 +124,7 @@ levelWindow::levelWindow(
         blockTextures[blockType] = Platformer::gui::makeBlockTexture(blockType);
     }
     boardSprites = Platformer::gui::makeBlockSprites(
-        levelPerformer.getLevel(), blockTextures
+        levelPerformerPtr->getLevel(), blockTextures
     );
     playerTextures[Platformer::Pose::LOOKING_LEFT] = sf::Texture();
     playerTextures[Platformer::Pose::LOOKING_LEFT].loadFromFile(
@@ -135,58 +135,60 @@ levelWindow::levelWindow(
         playerFilepath + "/player-right.png"
     );
     playerSprite.setTexture(
-        playerTextures[levelPerformer.getLevel()->getPlayer()->getPose()]
+        playerTextures[levelPerformerPtr->getLevel()->getPlayer()->getPose()]
     );
     float playerScale =
-        getPlayerSize(levelPerformer.getLevel()).y /
+        getPlayerSize(levelPerformerPtr->getLevel()).y /
         static_cast<float>(playerSprite.getTexture()->getSize().y);
     playerSprite.setScale(playerScale, playerScale);
     sf::Vector2f playerCoordinates =
-        getPlayerCoordinates(levelPerformer.getLevel());
+        getPlayerCoordinates(levelPerformerPtr->getLevel());
     playerSprite.setPosition(playerCoordinates.x, playerCoordinates.y);
 }
 
-void levelWindow::loadInWindow(sf::RenderWindow &window) {
+void LevelWindow::loadInWindow(sf::RenderWindow &window) {
     window.clear();
-    if (levelPerformer.getState() == control::LevelState::Running) {
+    if (levelPerformerPtr->getState() == control::LevelState::Running) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) ||
             sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-            levelPerformer.jump();
+            levelPerformerPtr->jump();
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-            levelPerformer.moveLeft();
+            levelPerformerPtr->moveLeft();
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-            levelPerformer.moveDown();
+            levelPerformerPtr->moveDown();
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-            levelPerformer.moveRight();
+            levelPerformerPtr->moveRight();
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-            levelPerformer.pause();
+            levelPerformerPtr->pause();
         }
-    } else if (levelPerformer.getState() == control::LevelState::Paused) {
+    } else if (levelPerformerPtr->getState() == control::LevelState::Paused) {
         /*
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-            levelPerformer.resume();
+            levelPerformerPtr.resume();
             std::cout << "Game resumed\n" << '\n';
         } // dubs as 'Resume' button in Pause menu
          */
         // TODO: some kind of timer to check there is no loop pause-resume,
         //  as is right now; or should actually rewrite button to isKeyReleased
     }
+    backgroundSprite.setTexture(backgroundTexture);
+    // TODO: resolve texture loss that occurs after removing line above
     window.draw(backgroundSprite);
     for (const auto &row : boardSprites) {
         for (const auto &sprite : row) {
             window.draw(sprite);
         }
     }
-    levelPerformer.getLevel()->update();
+    levelPerformerPtr->getLevel()->update();
     sf::Vector2f playerCoordinates =
-        getPlayerCoordinates(levelPerformer.getLevel());
+        getPlayerCoordinates(levelPerformerPtr->getLevel());
     playerSprite.setPosition(playerCoordinates.x, playerCoordinates.y);
     playerSprite.setTexture(
-        playerTextures[levelPerformer.getLevel()->getPlayer()->getPose()]
+        playerTextures[levelPerformerPtr->getLevel()->getPlayer()->getPose()]
     );
     window.draw(playerSprite);
     window.display();

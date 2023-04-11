@@ -24,8 +24,8 @@ namespace Platformer::gui {
 );
 std::unique_ptr<sf::Texture> makeBlockTexture(const std::string &type);
 
-class levelWindow {
-    control::LevelPerformer &levelPerformer;
+class LevelWindow {
+    control::LevelPerformer *levelPerformerPtr;
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
     std::map<std::string, std::unique_ptr<sf::Texture>> blockTextures;
@@ -34,12 +34,12 @@ class levelWindow {
     sf::Sprite playerSprite;
 
 public:
-    levelWindow(
+    explicit LevelWindow(
         unsigned int windowHeight,
         const std::string &backgroundTextureFilepath,
         const std::string &playerFilepath,
         const std::string &levelFilepath,
-        control::LevelPerformer &levelPerformer
+        control::LevelPerformer *levelPerformer
     );
     void loadInWindow(sf::RenderWindow &window);
 };

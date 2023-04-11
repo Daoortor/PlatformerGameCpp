@@ -42,12 +42,13 @@ public:
     MenuState getState();
 
     [[maybe_unused]] void openMainMenu();
-    [[maybe_unused]] Platformer::Game
-    loadLevel(control::LevelPerformer &levelPerformer, int level_num);
+    [[maybe_unused]] void loadLevel(LevelPerformer &levelPerformer);
     [[maybe_unused]] void openLoadLevelMenu();
     [[maybe_unused]] void openPauseMenu();
     void closeCurrentMenu();
     void closeWindow();
+    void setState(MenuState newState);
+    std::string getLevelFilePath(int num);
 };
 
 class LevelPerformer : Performer {

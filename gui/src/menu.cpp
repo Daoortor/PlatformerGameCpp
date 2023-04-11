@@ -114,7 +114,8 @@ MainMenu::MainMenu(
     int buttonDistance,
     const std::string &BackgroundTextureFilepath,
     control::MenuPerformer &menuPerformer,
-    control::LevelPerformer &levelPerformer
+    control::LevelPerformer &levelPerformer,
+    Platformer::gui::LevelWindow &levelWindow
 ) {
     // TODO: window Width & Height dependency
     sf::Vector2f startingButtonPosition = {340, 250};
@@ -136,7 +137,14 @@ MainMenu::MainMenu(
         );
     }
     bindButton("Start game", [&]() {
-        menuPerformer.loadLevel(levelPerformer, 0);
+        menuPerformer.loadLevel(levelPerformer);
+        levelWindow = Platformer::gui::LevelWindow(
+            windowHeight,
+            "../gui/assets/textures/interface/level-background.png",
+            "../gui/assets/textures/player", menuPerformer.getLevelFilePath(0),
+            &levelPerformer
+        );
+        // TODO: big rewrite of levelPerformer-levelWindow relationship
     });
     bindButton("Load game", [&]() { menuPerformer.openLoadLevelMenu(); });
     bindButton("Quit", [&]() { menuPerformer.closeWindow(); });
@@ -151,7 +159,8 @@ LevelSelectionMenu::LevelSelectionMenu(
     const std::string &BackgroundTextureFilepath,
     const std::string &LevelFilePath,
     control::MenuPerformer &menuPerformer,
-    control::LevelPerformer &levelPerformer
+    control::LevelPerformer &levelPerformer,
+    Platformer::gui::LevelWindow &levelWindow
 ) {
     auto colorsList = std::vector{
         sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
@@ -175,8 +184,15 @@ LevelSelectionMenu::LevelSelectionMenu(
             "Level " + std::to_string(i), i, font, fontSize, colorsList,
             buttonDistance, {340, 250}, {10, 5}
         );
-        bindButton("Level " + std::to_string(i), [&]() {
-            menuPerformer.loadLevel(levelPerformer, 0);
+        bindButton("Level " + std::to_string(i), [&, i]() {
+            menuPerformer.loadLevel(levelPerformer);
+            levelWindow = Platformer::gui::LevelWindow(
+                windowHeight,
+                "../gui/assets/textures/interface/level-background.png",
+                "../gui/assets/textures/player",
+                menuPerformer.getLevelFilePath(i - 1), &levelPerformer
+            );
+            // TODO: implementation above is due to rewrite
         });
     }
 }
