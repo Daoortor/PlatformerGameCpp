@@ -1,12 +1,44 @@
 #include "../include/game.hpp"
 #include <fstream>
 #include <utility>
+#include <chrono>
 #include "../../tools/json.hpp"
 #include "../include/player.hpp"
 
 using json = nlohmann::json;
 
 namespace Platformer {
+void Statistics::startingGame() {
+    startTime = std::chrono::steady_clock::now();
+}
+
+void Statistics::playerDeath() {
+    lastRespawnTime = std::chrono::steady_clock::now();
+    deathCount++;
+}
+
+void Statistics::endingGame() {
+    isEnded = true;
+    endTime = std::chrono::steady_clock::now();
+}
+
+std::chrono::steady_clock::time_point Statistics::getStartTime() const {
+    return startTime;
+}
+
+std::chrono::steady_clock::time_point Statistics::getEndTime() const {
+    return endTime;
+}
+
+double Statistics::getAverageDeathTime() const {
+    std::chrono::duration<double> result = (endTime - startTime) / deathCount;
+    return result.count();
+}
+
+int Statistics::getDeathCount() const {
+    return deathCount;
+}
+
 Game::~Game() = default;
 
 void Game::update() {
@@ -21,6 +53,7 @@ Game::Game(
     : board(std::move(board_)), endPos(endPos_) {
     auto *playerObject = new Player(this, playerPos);
     player = std::unique_ptr<Player>(playerObject);
+    statistics = Statistics(&(*player));
 }
 
 Game::Game(const std::string &filename) {
@@ -33,5 +66,6 @@ Game::Game(const std::string &filename) {
     player = std::unique_ptr<Player>(playerObject);
     board = Board(blockMap);
     endPos = {levelData["endPos"][0], levelData["endPos"][1]};
+    statistics = Statistics(&(*player));
 }
 }  // namespace Platformer
