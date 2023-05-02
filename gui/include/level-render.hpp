@@ -8,7 +8,9 @@
 #include <string>
 #include "../../model/include/game.hpp"
 #include "../../model/include/player.hpp"
+#include "../include/button.hpp"
 #include "performer.hpp"
+#include "scrollbar.hpp"
 
 namespace Platformer::gui {
 
@@ -25,18 +27,31 @@ namespace Platformer::gui {
 std::unique_ptr<sf::Texture> makeBlockTexture(const std::string &type);
 
 class LevelWindow {
-    control::LevelPerformer *levelPerformerPtr;
+protected:
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
     std::map<std::string, std::unique_ptr<sf::Texture>> blockTextures;
     std::vector<std::vector<sf::Sprite>> boardSprites;
+
+public:
+    LevelWindow(
+        unsigned int windowHeight,
+        const std::string &backgroundTextureFilepath,
+        const std::string &miscFilepath,
+        const std::string &levelFilepath
+    );
+    void loadLevel(sf::RenderWindow &window, std::unique_ptr<Game> &game);
+};
+
+class LevelGameplayWindow : public LevelWindow {
+    control::LevelPerformer *levelPerformerPtr;
     std::map<Platformer::Pose, sf::Texture> playerTextures;
     sf::Sprite playerSprite;
     sf::Texture levelEndTexture;
     sf::Sprite levelEndSprite;
 
 public:
-    explicit LevelWindow(
+    explicit LevelGameplayWindow(
         unsigned int windowHeight,
         const std::string &backgroundTextureFilepath,
         const std::string &playerFilepath,
@@ -45,6 +60,21 @@ public:
         control::LevelPerformer *levelPerformerPtr
     );
     void loadInWindow(sf::RenderWindow &window);
+};
+
+class LevelEditor : public LevelWindow {
+    std::unique_ptr<Game> game;
+    interface::Scrollbar blockSelectionBar;
+
+public:
+    LevelEditor(
+        unsigned int windowHeight,
+        const std::string &backgroundTextureFilepath,
+        const std::string &blockFilepath,
+        const std::string &miscFilepath,
+        const std::string &levelFilepath
+    );
+    void loadInWindow(sf::RenderWindow &window, sf::Event event);
 };
 }  // namespace Platformer::gui
 

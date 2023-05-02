@@ -1,6 +1,7 @@
 #include "../include/level-render.hpp"
 #include <iostream>
 #include "../include/gui-constants.hpp"
+#include "../include/scrollbar.hpp"
 
 namespace Platformer::gui {
 
@@ -107,13 +108,9 @@ std::unique_ptr<sf::Texture> makeBlockTexture(const std::string &type) {
 LevelWindow::LevelWindow(
     unsigned int windowHeight,
     const std::string &backgroundTextureFilepath,
-    const std::string &playerFilepath,
     const std::string &miscFilepath,
-    const std::string &levelFilepath,
-    control::LevelPerformer *levelPerformer
-)
-    : levelPerformerPtr(levelPerformer) {
-    levelPerformerPtr->setLevel(std::make_unique<Game>(levelFilepath));
+    const std::string &levelFilepath
+) {
     backgroundTexture.loadFromFile(backgroundTextureFilepath);
     sf::Vector2u textureSize = backgroundTexture.getSize();
     float backgroundScale =
@@ -124,9 +121,40 @@ LevelWindow::LevelWindow(
     for (const std::string &blockType : Platformer::gui::BLOCK_NAMES) {
         blockTextures[blockType] = Platformer::gui::makeBlockTexture(blockType);
     }
-    boardSprites = Platformer::gui::makeBlockSprites(
-        levelPerformerPtr->getLevel(), blockTextures
-    );
+    auto game = std::make_unique<Game>(levelFilepath);
+    boardSprites = Platformer::gui::makeBlockSprites(game, blockTextures);
+}
+
+void LevelWindow::loadLevel(
+    sf::RenderWindow &window,
+    std::unique_ptr<Platformer::Game> &game
+) {
+    backgroundSprite.setTexture(backgroundTexture);
+    // TODO: resolve texture loss that occurs after removing line above
+    window.draw(backgroundSprite);
+    for (const auto &row : boardSprites) {
+        for (const auto &sprite : row) {
+            window.draw(sprite);
+        }
+    }
+}
+
+LevelGameplayWindow::LevelGameplayWindow(
+    unsigned int windowHeight,
+    const std::string &backgroundTextureFilepath,
+    const std::string &playerFilepath,
+    const std::string &miscFilepath,
+    const std::string &levelFilepath,
+    control::LevelPerformer *levelPerformer
+)
+    : levelPerformerPtr(levelPerformer),
+      LevelWindow(
+          windowHeight,
+          backgroundTextureFilepath,
+          miscFilepath,
+          levelFilepath
+      ) {
+    levelPerformerPtr->setLevel(std::make_unique<Game>(levelFilepath));
     playerTextures[Platformer::Pose::LOOKING_LEFT] = sf::Texture();
     playerTextures[Platformer::Pose::LOOKING_LEFT].loadFromFile(
         playerFilepath + "/player-left.png"
@@ -162,7 +190,7 @@ LevelWindow::LevelWindow(
     levelEndSprite.setPosition(levelEndPos - offset);
 }
 
-void LevelWindow::loadInWindow(sf::RenderWindow &window) {
+void LevelGameplayWindow::loadInWindow(sf::RenderWindow &window) {
     window.clear();
     if (levelPerformerPtr->getLevel()->getPlayer()->contains(
             levelPerformerPtr->getLevel()->getEndPos()
@@ -202,12 +230,7 @@ void LevelWindow::loadInWindow(sf::RenderWindow &window) {
     }
     backgroundSprite.setTexture(backgroundTexture);
     // TODO: resolve texture loss that occurs after removing line above
-    window.draw(backgroundSprite);
-    for (const auto &row : boardSprites) {
-        for (const auto &sprite : row) {
-            window.draw(sprite);
-        }
-    }
+    loadLevel(window, levelPerformerPtr->getLevel());
     levelPerformerPtr->getLevel()->update();
     sf::Vector2f playerCoordinates =
         getPlayerCoordinates(levelPerformerPtr->getLevel());
@@ -219,6 +242,46 @@ void LevelWindow::loadInWindow(sf::RenderWindow &window) {
     window.draw(levelEndSprite);
     // TODO: resolve texture loss that occurs after removing line above
     window.draw(playerSprite);
+    window.display();
+}
+
+LevelEditor::LevelEditor(
+    unsigned int windowHeight,
+    const std::string &backgroundTextureFilepath,
+    const std::string &blockFilepath,
+    const std::string &miscFilepath,
+    const std::string &levelFilepath
+)
+    : LevelWindow(
+          windowHeight,
+          backgroundTextureFilepath,
+          miscFilepath,
+          levelFilepath
+      ),
+      game(std::make_unique<Game>(levelFilepath)),
+      blockSelectionBar(
+          {40, 100},
+          {50, 50},
+          {10, 20},
+          20,
+          40,
+          2,
+          BUTTON_COLORS_LIST,
+          "../gui/assets/textures/misc/"
+      ) {
+    for (const std::string &block : BLOCK_NAMES) {
+        interface::ButtonWithImage newButton(
+            blockFilepath + block + ".png", sf::RectangleShape({50, 50}),
+            {0, 0}, {0, 0}, std::vector<sf::Color>(4, sf::Color::Transparent)
+        );
+        blockSelectionBar.addItem(newButton);
+    }
+}
+
+void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
+    window.clear();
+    loadLevel(window, game);
+    blockSelectionBar.loadInWindow(window, event);
     window.display();
 }
 }  // namespace Platformer::gui

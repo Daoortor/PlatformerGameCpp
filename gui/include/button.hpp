@@ -37,13 +37,13 @@ public:
     [[maybe_unused]] void setIndent(sf::Vector2f newIndent);
     sf::Vector2f getPosition() const;
 
-    [[maybe_unused]] void setPosition(sf::Vector2f newPosition);
+    [[maybe_unused]] virtual void setPosition(sf::Vector2f newPosition);
 
     void bind(std::function<void()> func);
 };
 
 class RectangleButton : public Button {
-private:
+protected:
     sf::RectangleShape shape;
     sf::Color colorUnavailable;
     sf::Color colorAvailable;
@@ -76,8 +76,26 @@ public:
 
     sf::RectangleShape *getCurrentShape();
     sf::Color getCurrentColor();
-    void drawInWindow(sf::RenderWindow &window);
+    virtual void drawInWindow(sf::RenderWindow &window);
     void update(sf::RenderWindow &window, sf::Event &event);
+};
+
+class ButtonWithImage : public RectangleButton {
+private:
+    sf::Sprite imageSprite;
+    sf::Texture imageTexture;
+
+public:
+    ButtonWithImage(
+        const std::string &imageFilename,
+        sf::RectangleShape newShape,
+        sf::Vector2f newIndent,
+        sf::Vector2f newPosition,
+        const std::vector<sf::Color> &buttonColorsList,
+        std::function<void()> newAction = []() {}
+    );
+    void drawInWindow(sf::RenderWindow &window) override;
+    void setPosition(sf::Vector2f newPosition) override;
 };
 
 }  // namespace interface

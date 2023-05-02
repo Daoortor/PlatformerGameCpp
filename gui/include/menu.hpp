@@ -62,7 +62,7 @@ public:
         const std::string &BackgroundTextureFilepath,
         control::MenuPerformer &menuPerformer,
         control::LevelPerformer &levelPerformer,
-        Platformer::gui::LevelWindow &levelWindow
+        Platformer::gui::LevelGameplayWindow &levelWindow
     );
 };
 
@@ -78,7 +78,7 @@ public:
         const std::string &LevelFilePath,
         control::MenuPerformer &menuPerformer,
         control::LevelPerformer &levelPerformer,
-        Platformer::gui::LevelWindow &levelWindow
+        Platformer::gui::LevelGameplayWindow &levelWindow
     );
 };
 

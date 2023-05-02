@@ -31,22 +31,28 @@ int main() {
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/lofi.ttf");
 
-    auto levelWindow = Platformer::gui::LevelWindow(
+    auto levelGameplayWindow = Platformer::gui::LevelGameplayWindow(
         windowHeight, "../gui/assets/textures/interface/level-background.png",
         "../gui/assets/textures/player", "../gui/assets/textures/misc",
         "../model/levels/t02-hard-jumps.json", &levelPerformer
     );
 
+    auto levelEditor = Platformer::gui::LevelEditor(
+        windowHeight, "../gui/assets/textures/interface/level-background.png",
+        "../gui/assets/textures/blocks/", "../gui/assets/textures/misc",
+        "../model/levels/t02-hard-jumps.json"
+    );
+
     auto mainMenu = interface::MainMenu(
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/main-menu-background.png",
-        menuPerformer, levelPerformer, levelWindow
+        menuPerformer, levelPerformer, levelGameplayWindow
     );
 
     auto loadMenu = interface::LevelSelectionMenu(
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/level-selection-menu-background.png",
-        "../model/levels/", menuPerformer, levelPerformer, levelWindow
+        "../model/levels/", menuPerformer, levelPerformer, levelGameplayWindow
     );
 
     auto pauseMenu = interface::PauseMenu(
@@ -68,11 +74,11 @@ int main() {
             case control::LevelState::Empty:
                 break;
             case control::LevelState::Running:
-                levelWindow.loadInWindow(window);
+                levelGameplayWindow.loadInWindow(window);
                 break;
             case control::LevelState::Paused:
                 // TODO: resolve flickering when using line below
-                // LevelWindow.loadInWindow(window);
+                // LevelGameplayWindow.loadInWindow(window);
                 // TODO: line below is very ugly, but RN no way to get
                 //  signal from inside level-renderer to mainMenu
                 menuPerformer.openPauseMenu();
@@ -81,6 +87,9 @@ int main() {
                 menuPerformer.openMainMenu();
                 levelPerformer.setState(control::LevelState::Empty);
                 levelPerformer.reset();
+                break;
+            case control::LevelState::Editor:
+                levelEditor.loadInWindow(window, event);
         }
         switch (menuPerformer.getState()) {
             case control::MenuState::MainMenu:

@@ -1,4 +1,3 @@
-
 #include "../include/player.hpp"
 #include <algorithm>
 #include <iostream>

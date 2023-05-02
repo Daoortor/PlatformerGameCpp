@@ -1,5 +1,4 @@
 #include "../include/button.hpp"
-#include <iostream>
 #include <utility>
 
 namespace interface {
@@ -103,4 +102,44 @@ sf::RectangleShape *RectangleButton::getCurrentShape() {
     return &shape;
 }
 
+ButtonWithImage::ButtonWithImage(
+    const std::string &imageFilename,
+    sf::RectangleShape newShape,
+    sf::Vector2f newIndent,
+    sf::Vector2f newPosition,
+    const std::vector<sf::Color> &buttonColorsList,
+    std::function<void()> newAction
+)
+    : RectangleButton(
+          std::move(newShape),
+          buttonColorsList[0],
+          buttonColorsList[1],
+          buttonColorsList[2],
+          buttonColorsList[3],
+          sf::Text(),
+          newIndent,
+          newPosition,
+          std::move(newAction)
+      ) {
+    imageTexture.loadFromFile(imageFilename);
+    float imageScaleX = static_cast<float>(shape.getSize().x) /
+                        static_cast<float>(imageTexture.getSize().x);
+    float imageScaleY = static_cast<float>(shape.getSize().y) /
+                        static_cast<float>(imageTexture.getSize().y);
+    float imageScale = std::min(imageScaleX, imageScaleY);
+    imageSprite.setTexture(imageTexture);
+    imageSprite.setScale(imageScale, imageScale);
+    imageSprite.setPosition(newPosition);
+}
+
+void ButtonWithImage::drawInWindow(sf::RenderWindow &window) {
+    RectangleButton::drawInWindow(window);
+    imageSprite.setTexture(imageTexture);
+    window.draw(imageSprite);
+}
+
+void ButtonWithImage::setPosition(sf::Vector2f newPosition) {
+    Button::setPosition(newPosition);
+    imageSprite.setPosition(newPosition);
+}
 }  // namespace interface

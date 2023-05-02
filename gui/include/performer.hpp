@@ -10,7 +10,7 @@
 
 namespace control {
 enum class MenuState { MainMenu, LoadMenu, PauseMenu, Empty };
-enum class LevelState { Empty, Running, Paused, Won };
+enum class LevelState { Empty, Running, Paused, Won, Editor };
 
 struct Performer {
 protected:

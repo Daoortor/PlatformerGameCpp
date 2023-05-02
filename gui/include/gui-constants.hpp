@@ -12,6 +12,9 @@ const unsigned int WINDOW_HEIGHT =
 const unsigned int LEVEL_WIDTH = WINDOW_WIDTH * 2 / 3;
 const unsigned int LEVEL_HEIGHT = WINDOW_HEIGHT * 2 / 3;
 const std::vector<std::string> BLOCK_NAMES = {"ladder", "stone", "air"};
+const auto BUTTON_COLORS_LIST = std::vector{
+    sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
+    sf::Color(0, 209, 255, 192), sf::Color(255, 95, 0, 192)};
 }  // namespace Platformer::gui
 
 #endif  // PLATFORMERGAMECPP_CONSTANTS_HPP_
