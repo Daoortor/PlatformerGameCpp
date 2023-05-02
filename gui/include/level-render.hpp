@@ -14,10 +14,19 @@
 
 namespace Platformer::gui {
 
+float getBlockSize(std::unique_ptr<Platformer::Game> &game);
+sf::Vector2f getGameFrameSize(std::unique_ptr<Platformer::Game> &game);
+sf::Vector2f getTopLeftCorner(std::unique_ptr<Platformer::Game> &game);
+sf::Vector2f getPlayerSize(std::unique_ptr<Platformer::Game> &game);
+sf::Vector2f
+getCoordinates(utilities::Vector pos, std::unique_ptr<Platformer::Game> &game);
+sf::Vector2f
+getPlayerCoordinates(sf::Vector2f pos, std::unique_ptr<Platformer::Game> &game);
+sf::Vector2i
+getInGameCoordinates(sf::Vector2f pos, std::unique_ptr<Platformer::Game> &game);
 [[maybe_unused]] sf::Sprite makeBlockSprite(
-    const std::string &type,
-    sf::Texture &blockTexture,
-    int size,
+    const std::unique_ptr<sf::Texture> &blockTexture,
+    float size,
     sf::Vector2f pos
 );
 [[maybe_unused]] std::vector<std::vector<sf::Sprite>> makeBlockSprites(
@@ -65,6 +74,8 @@ public:
 class LevelEditor : public LevelWindow {
     std::unique_ptr<Game> game;
     interface::Scrollbar blockSelectionBar;
+    sf::RectangleShape levelBorder;
+    std::string blockChosen;
 
 public:
     LevelEditor(
@@ -75,6 +86,7 @@ public:
         const std::string &levelFilepath
     );
     void loadInWindow(sf::RenderWindow &window, sf::Event event);
+    void addBlock(sf::Vector2u pos, const std::string &name);
 };
 }  // namespace Platformer::gui
 

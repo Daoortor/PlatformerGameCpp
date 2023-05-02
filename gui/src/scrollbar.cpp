@@ -3,15 +3,6 @@
 #include "../include/gui-constants.hpp"
 
 namespace interface {
-void moveDrawing(std::vector<sf::VertexArray> &drawing, sf::Vector2f delta) {
-    for (auto &line : drawing) {
-        for (int vertexNum = 0; vertexNum < line.getVertexCount();
-             vertexNum++) {
-            line[vertexNum] = sf::Vertex(line[vertexNum].position + delta);
-        }
-    }
-}
-
 Scrollbar::Scrollbar(
     sf::Vector2f position_,
     sf::Vector2f itemSize_,
@@ -20,6 +11,7 @@ Scrollbar::Scrollbar(
     float moveButtonsHeight_,
     std::size_t capacity_,
     const std::vector<sf::Color> &buttonColorsList,
+    sf::Color itemChosenColor_,
     const std::string &iconFilepath
 )
     : position(position_),
@@ -28,6 +20,7 @@ Scrollbar::Scrollbar(
       edgeMargin(edgeMargin_),
       itemMargin(itemMargin_),
       moveButtonsHeight(moveButtonsHeight_),
+      itemChosenColor(itemChosenColor_),
       upButton(
           iconFilepath + "up-arrow.png",
           sf::RectangleShape(
@@ -55,17 +48,16 @@ Scrollbar::Scrollbar(
 }
 
 void Scrollbar::loadInWindow(sf::RenderWindow &window, sf::Event event) {
-    for (std::size_t itemNum = offset;
-         itemNum < std::min(items.size(), offset + capacity); itemNum++) {
-        items[itemNum]->drawInWindow(window);
-        for (const auto &line : outline[itemNum]) {
-            window.draw(line);
-        }
-    }
     upButton.update(window, event);
     downButton.update(window, event);
     upButton.drawInWindow(window);
     downButton.drawInWindow(window);
+    for (std::size_t itemNum = offset;
+         itemNum < std::min(items.size(), offset + capacity); itemNum++) {
+        window.draw(outline[itemNum]);
+        items[itemNum]->drawInWindow(window);
+        items[itemNum]->update(window, event);
+    }
 }
 
 void Scrollbar::addItem(interface::ButtonWithImage &item) {
@@ -78,28 +70,13 @@ void Scrollbar::addItem(interface::ButtonWithImage &item) {
         squarePos + sf::Vector2f(edgeMargin.x, itemMargin / 2);
     item.setPosition(itemPos);
     items.push_back(std::make_unique<ButtonWithImage>(item));
-    outline.emplace_back();
-    auto &newOutline = outline[outline.size() - 1];
-    newOutline.emplace_back(sf::LineStrip, 2);
-    newOutline[newOutline.size() - 1][0] = squarePos;
-    newOutline[newOutline.size() - 1][1] =
-        squarePos + sf::Vector2f(itemSize.x + 2 * edgeMargin.x, 0);
-    newOutline.emplace_back(sf::LineStrip, 2);
-    newOutline[newOutline.size() - 1][0] = squarePos;
-    newOutline[newOutline.size() - 1][1] =
-        squarePos + sf::Vector2f(0, itemSize.y + itemMargin);
-    newOutline.emplace_back(sf::LineStrip, 2);
-    newOutline[newOutline.size() - 1][0] =
-        squarePos + sf::Vector2f(itemSize.x + 2 * edgeMargin.x, 0);
-    newOutline[newOutline.size() - 1][1] =
-        squarePos +
-        sf::Vector2f(itemSize.x + 2 * edgeMargin.x, itemSize.y + itemMargin);
-    newOutline.emplace_back(sf::LineStrip, 2);
-    newOutline[newOutline.size() - 1][0] =
-        squarePos + sf::Vector2f(0, itemSize.y + itemMargin);
-    newOutline[newOutline.size() - 1][1] =
-        squarePos +
-        sf::Vector2f(itemSize.x + 2 * edgeMargin.x, itemSize.y + itemMargin);
+    outline.emplace_back(
+        sf::Vector2f(itemSize.x + 2 * edgeMargin.x, itemSize.x + itemMargin)
+    );
+    outline[outline.size() - 1].setPosition(squarePos);
+    outline[outline.size() - 1].setFillColor(sf::Color::Transparent);
+    outline[outline.size() - 1].setOutlineThickness(1.f);
+    outline[outline.size() - 1].setOutlineColor(sf::Color::White);
 }
 
 void Scrollbar::scrollUp() {
@@ -112,7 +89,10 @@ void Scrollbar::scrollUp() {
         items[buttonNum]->setPosition(
             items[buttonNum]->getPosition() + moveVector
         );
-        interface::moveDrawing(outline[buttonNum], moveVector);
+        sf::Vector2f oldOutlinePos = outline[buttonNum].getPosition();
+        outline[buttonNum].setPosition(
+            oldOutlinePos.x + moveVector.x, oldOutlinePos.y + moveVector.y
+        );
     }
 }
 
@@ -126,7 +106,16 @@ void Scrollbar::scrollDown() {
         items[buttonNum]->setPosition(
             items[buttonNum]->getPosition() - moveVector
         );
-        interface::moveDrawing(outline[buttonNum], -moveVector);
+        sf::Vector2f oldOutlinePos = outline[buttonNum].getPosition();
+        outline[buttonNum].setPosition(
+            oldOutlinePos.x - moveVector.x, oldOutlinePos.y - moveVector.y
+        );
     }
+}
+
+void Scrollbar::chooseItem(std::size_t item) {
+    outline[itemChosen].setFillColor(sf::Color::Transparent);
+    itemChosen = item;
+    outline[item].setFillColor(itemChosenColor);
 }
 }  // namespace interface

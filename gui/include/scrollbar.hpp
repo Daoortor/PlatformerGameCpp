@@ -6,7 +6,6 @@
 #include "button.hpp"
 
 namespace interface {
-void moveDrawing(std::vector<sf::VertexArray> &drawing, sf::Vector2f delta);
 
 class Scrollbar {
 protected:
@@ -20,7 +19,9 @@ protected:
     sf::Vector2f itemSize;
     sf::Vector2f edgeMargin;
     float itemMargin;
-    std::vector<std::vector<sf::VertexArray>> outline;
+    std::vector<sf::RectangleShape> outline;
+    std::size_t itemChosen = 0;
+    sf::Color itemChosenColor;
 
 public:
     Scrollbar(
@@ -31,12 +32,14 @@ public:
         float moveButtonsHeight_,
         std::size_t capacity_,
         const std::vector<sf::Color> &buttonColorsList,
+        sf::Color itemChosenColor_,
         const std::string &iconFilepath
     );
     void loadInWindow(sf::RenderWindow &window, sf::Event event);
     void addItem(ButtonWithImage &item);
     void scrollUp();
     void scrollDown();
+    void chooseItem(std::size_t item);
 };
 }  // namespace interface
 

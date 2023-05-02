@@ -40,7 +40,7 @@ int main() {
     auto levelEditor = Platformer::gui::LevelEditor(
         windowHeight, "../gui/assets/textures/interface/level-background.png",
         "../gui/assets/textures/blocks/", "../gui/assets/textures/misc",
-        "../model/levels/t02-hard-jumps.json"
+        "../model/levels/" + Platformer::gui::levels::EMPTY_LEVEL_NAME
     );
 
     auto mainMenu = interface::MainMenu(

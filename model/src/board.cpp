@@ -56,4 +56,8 @@ const std::unique_ptr<Block> &Board::getBlockByCoordinates(utilities::Vector pos
          utilities::divide(pos.get_y(), BLOCK_SIZE)}
     );
 }
+
+void Board::addBlock(sf::Vector2u pos, const std::string &name) {
+    board.at(pos.y).at(pos.x) = makeBlock(name);
+}
 }  // namespace Platformer

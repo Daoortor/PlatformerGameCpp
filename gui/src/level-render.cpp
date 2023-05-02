@@ -1,7 +1,9 @@
 #include "../include/level-render.hpp"
+#include <cmath>
 #include <iostream>
 #include "../include/gui-constants.hpp"
 #include "../include/scrollbar.hpp"
+#include "gui-constants.hpp"
 
 namespace Platformer::gui {
 
@@ -10,9 +12,19 @@ float getBlockSize(std::unique_ptr<Platformer::Game> &game) {
     int boardWidth = boardSize.get_x();
     int boardHeight = boardSize.get_y();
     return std::min(
-        static_cast<float>(LEVEL_WIDTH) / static_cast<float>(boardWidth),
-        static_cast<float>(LEVEL_HEIGHT) / static_cast<float>(boardHeight)
+        static_cast<float>(levels::LEVEL_WIDTH) /
+            static_cast<float>(boardWidth),
+        static_cast<float>(levels::LEVEL_HEIGHT) /
+            static_cast<float>(boardHeight)
     );
+}
+
+sf::Vector2f getGameFrameSize(std::unique_ptr<Platformer::Game> &game) {
+    return {
+        static_cast<float>(game->getBoardObject().getSize().get_x()) *
+            getBlockSize(game),
+        static_cast<float>(game->getBoardObject().getSize().get_y()) *
+            getBlockSize(game)};
 }
 
 sf::Vector2f getTopLeftCorner(std::unique_ptr<Platformer::Game> &game) {
@@ -20,8 +32,10 @@ sf::Vector2f getTopLeftCorner(std::unique_ptr<Platformer::Game> &game) {
     int boardWidth = boardSize.get_x();
     int boardHeight = boardSize.get_y();
     float blockSize = std::min(
-        static_cast<float>(LEVEL_WIDTH) / static_cast<float>(boardWidth),
-        static_cast<float>(LEVEL_HEIGHT) / static_cast<float>(boardHeight)
+        static_cast<float>(levels::LEVEL_WIDTH) /
+            static_cast<float>(boardWidth),
+        static_cast<float>(levels::LEVEL_HEIGHT) /
+            static_cast<float>(boardHeight)
     );
     sf::Vector2f windowCenter{
         static_cast<float>(WINDOW_WIDTH) / 2,
@@ -53,6 +67,25 @@ sf::Vector2f getPlayerCoordinates(std::unique_ptr<Platformer::Game> &game) {
            sf::Vector2f(getPlayerSize(game).x / 2, getPlayerSize(game).y / 2);
 }
 
+sf::Vector2i getInGameCoordinates(
+    sf::Vector2f pos,
+    std::unique_ptr<Platformer::Game> &game
+) {
+    sf::Vector2f convertedFloatCoordinates =
+        (pos - getTopLeftCorner(game)) / getBlockSize(game);
+    sf::Vector2i convertedCoordinates = {
+        static_cast<int>(std::floor(convertedFloatCoordinates.x)),
+        static_cast<int>(std::floor(convertedFloatCoordinates.y))};
+    utilities::Vector boardSize = game->getBoardObject().getSize();
+    if (0 <= convertedCoordinates.x &&
+        convertedCoordinates.x < boardSize.get_x() &&
+        0 <= convertedCoordinates.y &&
+        convertedCoordinates.y < boardSize.get_y()) {
+        return convertedCoordinates;
+    }
+    return {-1, -1};
+}
+
 sf::Sprite makeBlockSprite(
     const std::unique_ptr<sf::Texture> &blockTexture,
     float size,
@@ -75,8 +108,10 @@ std::vector<std::vector<sf::Sprite>> makeBlockSprites(
     int boardWidth = boardSize.get_x();
     int boardHeight = boardSize.get_y();
     float blockSize = std::min(
-        static_cast<float>(LEVEL_WIDTH) / static_cast<float>(boardWidth),
-        static_cast<float>(LEVEL_HEIGHT) / static_cast<float>(boardHeight)
+        static_cast<float>(levels::LEVEL_WIDTH) /
+            static_cast<float>(boardWidth),
+        static_cast<float>(levels::LEVEL_HEIGHT) /
+            static_cast<float>(boardHeight)
     );
     auto &board = game->getBoard();
 
@@ -109,7 +144,7 @@ LevelWindow::LevelWindow(
     unsigned int windowHeight,
     const std::string &backgroundTextureFilepath,
     const std::string &miscFilepath,
-    const std::string &levelFilepath
+    const std::string &levelFilepath = ""
 ) {
     backgroundTexture.loadFromFile(backgroundTextureFilepath);
     sf::Vector2u textureSize = backgroundTexture.getSize();
@@ -118,7 +153,7 @@ LevelWindow::LevelWindow(
     backgroundSprite.setTexture(backgroundTexture);
     backgroundSprite.setScale(backgroundScale, backgroundScale);
 
-    for (const std::string &blockType : Platformer::gui::BLOCK_NAMES) {
+    for (const std::string &blockType : levels::BLOCK_NAMES) {
         blockTextures[blockType] = Platformer::gui::makeBlockTexture(blockType);
     }
     auto game = std::make_unique<Game>(levelFilepath);
@@ -137,6 +172,17 @@ void LevelWindow::loadLevel(
             window.draw(sprite);
         }
     }
+}
+
+void LevelEditor::addBlock(sf::Vector2u pos, const std::string &name) {
+    game->getBoardObject().addBlock(pos, name);
+    sf::Vector2f coordinates = {
+        getTopLeftCorner(game).x +
+            getBlockSize(game) * static_cast<float>(pos.x),
+        getTopLeftCorner(game).y +
+            getBlockSize(game) * static_cast<float>(pos.y)};
+    boardSprites.at(pos.y).at(pos.x) =
+        makeBlockSprite(blockTextures[name], getBlockSize(game), coordinates);
 }
 
 LevelGameplayWindow::LevelGameplayWindow(
@@ -260,28 +306,49 @@ LevelEditor::LevelEditor(
       ),
       game(std::make_unique<Game>(levelFilepath)),
       blockSelectionBar(
-          {40, 100},
+          {30, 175},
           {50, 50},
           {10, 20},
           20,
           40,
           2,
-          BUTTON_COLORS_LIST,
+          colors::BUTTON_COLORS_LIST,
+          colors::ITEM_CHOSEN_COLOR,
           "../gui/assets/textures/misc/"
       ) {
-    for (const std::string &block : BLOCK_NAMES) {
+    for (std::size_t blockNum = 0; blockNum < levels::BLOCK_NAMES.size();
+         blockNum++) {
         interface::ButtonWithImage newButton(
-            blockFilepath + block + ".png", sf::RectangleShape({50, 50}),
-            {0, 0}, {0, 0}, std::vector<sf::Color>(4, sf::Color::Transparent)
+            blockFilepath + levels::BLOCK_NAMES[blockNum] + ".png",
+            sf::RectangleShape({50, 50}), {0, 0}, {0, 0},
+            std::vector<sf::Color>(4, sf::Color::Transparent),
+            [&, blockNum]() {
+                this->blockChosen = levels::BLOCK_NAMES[blockNum];
+                blockSelectionBar.chooseItem(blockNum);
+            }
         );
         blockSelectionBar.addItem(newButton);
     }
+    levelBorder = sf::RectangleShape(getGameFrameSize(game));
+    levelBorder.setPosition(getTopLeftCorner(game));
+    levelBorder.setFillColor(sf::Color::Transparent);
+    levelBorder.setOutlineThickness(1.f);
+    levelBorder.setOutlineColor(sf::Color::White);
 }
 
 void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
     window.clear();
+    if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
+        sf::Vector2i blockPos = getInGameCoordinates(
+            window.mapPixelToCoords(sf::Mouse::getPosition(window)), game
+        );
+        if (blockPos != sf::Vector2i(-1, -1) && !blockChosen.empty()) {
+            addBlock(static_cast<sf::Vector2u>(blockPos), blockChosen);
+        }
+    }
     loadLevel(window, game);
     blockSelectionBar.loadInWindow(window, event);
+    window.draw(levelBorder);
     window.display();
 }
 }  // namespace Platformer::gui
