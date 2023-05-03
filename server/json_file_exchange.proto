@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package json_file_exchange;
+
+service Act {
+    rpc sendRequest(ActionRequest) returns (ActionReply) {}
+}
+
+message ActionRequest {
+    string action = 1;// add, check, get, delete
+    string level_name = 2;
+    LevelContent level_content = 3;
+}
+
+// Level content: needs multiple message structs to implement arrays
+message Block {
+    string type = 1;
+}
+
+message BlockRow {
+    repeated Block row = 1;
+}
+
+message IntPair {
+    int32 x = 1;
+    int32 y = 2;
+}
+
+message LevelContent {
+    string level_name = 1;// naming conventions are strange
+    int32 width = 2;
+    int32 height = 3;
+    repeated BlockRow block_map = 4;
+    IntPair player_start_pos = 5;// TODO: check whether it will work
+    IntPair end_pos = 6;         // TODO: -/-
+}// TODO: field naming convention? Coordinate with current .json level files
+
+// Action reply: contains action status and possible content of recovered level
+// Request status
+message RequestReply {
+    bool is_successful = 1;
+    string message = 2;
+}// TODO: is needed? Apparently not
+
+message ActionReply {
+    bool result = 1;
+    LevelContent level_content = 2;
+}// LevelContent can be empty if something is wrong
