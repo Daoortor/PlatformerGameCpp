@@ -6,11 +6,12 @@
 #include <map>
 #include <memory>
 #include <string>
-#include "../../model/include/game.hpp"
-#include "../../model/include/player.hpp"
-#include "../include/button.hpp"
+#include "button.hpp"
+#include "game.hpp"
 #include "performer.hpp"
+#include "player.hpp"
 #include "scrollbar.hpp"
+#include "textbox.hpp"
 
 namespace Platformer::gui {
 
@@ -76,6 +77,8 @@ class LevelEditor : public LevelWindow {
     interface::Scrollbar blockSelectionBar;
     sf::RectangleShape levelBorder;
     std::string blockChosen;
+    interface::Textbox levelNameTextbox;
+    interface::RectangleButton saveButton;
 
 public:
     LevelEditor(
@@ -83,7 +86,9 @@ public:
         const std::string &backgroundTextureFilepath,
         const std::string &blockFilepath,
         const std::string &miscFilepath,
-        const std::string &levelFilepath
+        const std::string &emptyLevelFilepath,
+        const std::string &levelsFilepath,
+        const sf::Font &font
     );
     void loadInWindow(sf::RenderWindow &window, sf::Event event);
     void addBlock(sf::Vector2u pos, const std::string &name);

@@ -1,4 +1,4 @@
-#include "../include/button.hpp"
+#include "button.hpp"
 #include <utility>
 
 namespace interface {

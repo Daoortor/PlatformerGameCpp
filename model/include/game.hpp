@@ -15,6 +15,7 @@ class Game {
     std::unique_ptr<Player> player;
     int timer = 0;
     bool is_paused = false;
+    utilities::Vector startPos;
     utilities::Vector endPos;
 
 public:
@@ -45,6 +46,8 @@ public:
     }
 
     void update();
+
+    void writeToFile(const std::string &name, const std::string &filepath);
 };
 }  // namespace Platformer
 

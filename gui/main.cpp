@@ -1,6 +1,5 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
-#include <iostream>
 #include "../tools/json.hpp"
 #include "include/gui-constants.hpp"
 #include "include/level-render.hpp"
@@ -33,14 +32,15 @@ int main() {
 
     auto levelGameplayWindow = Platformer::gui::LevelGameplayWindow(
         windowHeight, "../gui/assets/textures/interface/level-background.png",
-        "../gui/assets/textures/player", "../gui/assets/textures/misc",
+        "../gui/assets/textures/player", "../gui/assets/textures/misc/",
         "../model/levels/t02-hard-jumps.json", &levelPerformer
     );
 
     auto levelEditor = Platformer::gui::LevelEditor(
         windowHeight, "../gui/assets/textures/interface/level-background.png",
-        "../gui/assets/textures/blocks/", "../gui/assets/textures/misc",
-        "../model/levels/" + Platformer::gui::levels::EMPTY_LEVEL_NAME
+        "../gui/assets/textures/blocks/", "../gui/assets/textures/misc/",
+        "../model/levels/" + Platformer::gui::levels::EMPTY_LEVEL_NAME,
+        "../model/levels/", fontMario
     );
 
     auto mainMenu = interface::MainMenu(
@@ -69,7 +69,7 @@ int main() {
             }
         }
         window.clear();
-        // TODO: some kind of global state?
+        // TODO: some kind of global currentState?
         switch (levelPerformer.getState()) {
             case control::LevelState::Empty:
                 break;

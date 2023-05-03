@@ -1,6 +1,5 @@
-#include "../include/player.hpp"
+#include "player.hpp"
 #include <algorithm>
-#include <iostream>
 
 namespace Platformer {
 

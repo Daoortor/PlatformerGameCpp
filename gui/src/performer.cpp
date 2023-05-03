@@ -1,4 +1,4 @@
-#include "../include/performer.hpp"
+#include "performer.hpp"
 
 namespace control {
 [[maybe_unused]] void MenuPerformer::openMainMenu() {

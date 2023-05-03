@@ -1,5 +1,5 @@
-#include "../include/board.hpp"
-#include "../include/model-constants.hpp"
+#include "board.hpp"
+#include "model-constants.hpp"
 
 namespace Platformer {
 Board::Board(std::vector<std::vector<std::unique_ptr<Block>>> board_)
@@ -59,5 +59,17 @@ const std::unique_ptr<Block> &Board::getBlockByCoordinates(utilities::Vector pos
 
 void Board::addBlock(sf::Vector2u pos, const std::string &name) {
     board.at(pos.y).at(pos.x) = makeBlock(name);
+}
+
+std::vector<std::vector<std::string>> Board::getBlockMap() {
+    std::vector<std::vector<std::string>> map(
+        height, std::vector<std::string>(width)
+    );
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            map[row][col] = board[row][col]->name();
+        }
+    }
+    return map;
 }
 }  // namespace Platformer

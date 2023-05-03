@@ -1,6 +1,5 @@
-#include "../include/scrollbar.hpp"
-#include <iostream>
-#include "../include/gui-constants.hpp"
+#include "scrollbar.hpp"
+#include "gui-constants.hpp"
 
 namespace interface {
 Scrollbar::Scrollbar(

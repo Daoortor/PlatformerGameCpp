@@ -30,6 +30,7 @@ public:
     const std::unique_ptr<Block> &getBlock(utilities::Vector pos);
     const std::unique_ptr<Block> &getBlockByCoordinates(utilities::Vector pos);
     void addBlock(sf::Vector2u pos, const std::string &name);
+    std::vector<std::vector<std::string>> getBlockMap();
 };
 
 }  // namespace Platformer

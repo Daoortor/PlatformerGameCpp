@@ -1,8 +1,5 @@
-#include "../include/level-render.hpp"
+#include "level-render.hpp"
 #include <cmath>
-#include <iostream>
-#include "../include/gui-constants.hpp"
-#include "../include/scrollbar.hpp"
 #include "gui-constants.hpp"
 
 namespace Platformer::gui {
@@ -296,15 +293,17 @@ LevelEditor::LevelEditor(
     const std::string &backgroundTextureFilepath,
     const std::string &blockFilepath,
     const std::string &miscFilepath,
-    const std::string &levelFilepath
+    const std::string &emptyLevelFilepath,
+    const std::string &levelsFilepath,
+    const sf::Font &font
 )
     : LevelWindow(
           windowHeight,
           backgroundTextureFilepath,
           miscFilepath,
-          levelFilepath
+          emptyLevelFilepath
       ),
-      game(std::make_unique<Game>(levelFilepath)),
+      game(std::make_unique<Game>(emptyLevelFilepath)),
       blockSelectionBar(
           {30, 175},
           {50, 50},
@@ -315,6 +314,34 @@ LevelEditor::LevelEditor(
           colors::BUTTON_COLORS_LIST,
           colors::ITEM_CHOSEN_COLOR,
           "../gui/assets/textures/misc/"
+      ),
+      levelNameTextbox(
+          sf::RectangleShape({150, 40}),
+          "Level name...",
+          font,
+          20,
+          colors::TEXTBOX_COLORS_LIST[0],
+          colors::TEXTBOX_COLORS_LIST[1],
+          colors::TEXTBOX_COLORS_LIST[2],
+          colors::TEXTBOX_COLORS_LIST[3],
+          colors::TEXTBOX_COLORS_LIST[4],
+          colors::TEXTBOX_COLORS_LIST[5],
+          {370, 500},
+          {10, 10},
+          13
+      ),
+      saveButton(
+          sf::RectangleShape({100, 40}),
+          colors::BUTTON_COLORS_LIST[0],
+          colors::BUTTON_COLORS_LIST[1],
+          colors::BUTTON_COLORS_LIST[2],
+          colors::BUTTON_COLORS_LIST[3],
+          sf::Text("Save", font, 20),
+          {10, 10},
+          {540, 500},
+          [&, levelsFilepath]() {
+              game->writeToFile(levelNameTextbox.getText(), levelsFilepath);
+          }
       ) {
     for (std::size_t blockNum = 0; blockNum < levels::BLOCK_NAMES.size();
          blockNum++) {
@@ -348,6 +375,9 @@ void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
     }
     loadLevel(window, game);
     blockSelectionBar.loadInWindow(window, event);
+    levelNameTextbox.loadInWindow(window, event);
+    saveButton.drawInWindow(window);
+    saveButton.update(window, event);
     window.draw(levelBorder);
     window.display();
 }

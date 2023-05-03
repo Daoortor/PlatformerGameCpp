@@ -22,6 +22,10 @@ const auto BUTTON_COLORS_LIST = std::vector{
     sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
     sf::Color(0, 209, 255, 192), sf::Color(255, 95, 0, 192)};
 static sf::Color ITEM_CHOSEN_COLOR(0, 255, 0, 127);
+const auto TEXTBOX_COLORS_LIST =
+    std::vector{sf::Color(128, 128, 128),    sf::Color(0, 0, 0),
+                sf::Color(255, 0, 48, 192),  sf::Color(118, 114, 111, 192),
+                sf::Color(0, 209, 255, 192), sf::Color(255, 95, 0, 192)};
 }  // namespace colors
 }  // namespace Platformer::gui
 
