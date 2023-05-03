@@ -42,6 +42,10 @@ protected:
     sf::Sprite backgroundSprite;
     std::map<std::string, std::unique_ptr<sf::Texture>> blockTextures;
     std::vector<std::vector<sf::Sprite>> boardSprites;
+    sf::Texture levelBeginTexture;
+    sf::Sprite levelBeginSprite;
+    sf::Texture levelEndTexture;
+    sf::Sprite levelEndSprite;
 
 public:
     LevelWindow(
@@ -57,8 +61,6 @@ class LevelGameplayWindow : public LevelWindow {
     control::LevelPerformer *levelPerformerPtr;
     std::map<Platformer::Pose, sf::Texture> playerTextures;
     sf::Sprite playerSprite;
-    sf::Texture levelEndTexture;
-    sf::Sprite levelEndSprite;
 
 public:
     explicit LevelGameplayWindow(
@@ -67,7 +69,7 @@ public:
         const std::string &playerFilepath,
         const std::string &miscFilepath,
         const std::string &levelFilepath,
-        control::LevelPerformer *levelPerformerPtr
+        control::LevelPerformer *levelPerformerPtr_
     );
     void loadInWindow(sf::RenderWindow &window);
 };

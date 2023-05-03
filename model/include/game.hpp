@@ -41,6 +41,10 @@ public:
         return board;
     }
 
+    utilities::Vector getStartPos() {
+        return startPos;
+    }
+
     utilities::Vector getEndPos() {
         return endPos;
     }

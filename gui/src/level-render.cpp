@@ -154,7 +154,24 @@ LevelWindow::LevelWindow(
         blockTextures[blockType] = Platformer::gui::makeBlockTexture(blockType);
     }
     auto game = std::make_unique<Game>(levelFilepath);
+    sf::Vector2f offset =
+        sf::Vector2f(getBlockSize(game) / 4, getBlockSize(game) / 4);
+
     boardSprites = Platformer::gui::makeBlockSprites(game, blockTextures);
+    levelBeginTexture.loadFromFile(miscFilepath + "level-begin.png");
+    float levelBeginEndScale =
+        static_cast<float>(getBlockSize(game)) / 2 /
+        static_cast<float>(levelBeginTexture.getSize().y);
+    levelBeginSprite.setTexture(levelBeginTexture);
+    levelBeginSprite.setScale(levelBeginEndScale, levelBeginEndScale);
+    sf::Vector2f levelBeginPos = getCoordinates(game->getStartPos(), game);
+    levelBeginSprite.setPosition(levelBeginPos - offset);
+
+    levelEndTexture.loadFromFile(miscFilepath + "level-end.png");
+    levelEndSprite.setTexture(levelEndTexture);
+    levelEndSprite.setScale(levelBeginEndScale, levelBeginEndScale);
+    sf::Vector2f levelEndPos = getCoordinates(game->getEndPos(), game);
+    levelEndSprite.setPosition(levelEndPos - offset);
 }
 
 void LevelWindow::loadLevel(
@@ -169,6 +186,10 @@ void LevelWindow::loadLevel(
             window.draw(sprite);
         }
     }
+    levelBeginSprite.setTexture(levelBeginTexture);
+    window.draw(levelBeginSprite);
+    levelEndSprite.setTexture(levelEndTexture);
+    window.draw(levelEndSprite);
 }
 
 void LevelEditor::addBlock(sf::Vector2u pos, const std::string &name) {
@@ -188,9 +209,9 @@ LevelGameplayWindow::LevelGameplayWindow(
     const std::string &playerFilepath,
     const std::string &miscFilepath,
     const std::string &levelFilepath,
-    control::LevelPerformer *levelPerformer
+    control::LevelPerformer *levelPerformerPtr_
 )
-    : levelPerformerPtr(levelPerformer),
+    : levelPerformerPtr(levelPerformerPtr_),
       LevelWindow(
           windowHeight,
           backgroundTextureFilepath,
@@ -216,21 +237,6 @@ LevelGameplayWindow::LevelGameplayWindow(
     sf::Vector2f playerCoordinates =
         getPlayerCoordinates(levelPerformerPtr->getLevel());
     playerSprite.setPosition(playerCoordinates.x, playerCoordinates.y);
-    levelEndTexture.loadFromFile(miscFilepath + "/level-end.png");
-    levelEndSprite.setTexture(levelEndTexture);
-    float levelEndScale =
-        static_cast<float>(getBlockSize(levelPerformerPtr->getLevel())) / 2 /
-        static_cast<float>(levelEndSprite.getTexture()->getSize().y);
-    levelEndSprite.setScale(levelEndScale, levelEndScale);
-    sf::Vector2f offset = sf::Vector2f(
-        getBlockSize(levelPerformerPtr->getLevel()) / 4,
-        getBlockSize(levelPerformerPtr->getLevel()) / 4
-    );
-    sf::Vector2f levelEndPos = getCoordinates(
-        levelPerformerPtr->getLevel()->getEndPos(),
-        levelPerformerPtr->getLevel()
-    );
-    levelEndSprite.setPosition(levelEndPos - offset);
 }
 
 void LevelGameplayWindow::loadInWindow(sf::RenderWindow &window) {

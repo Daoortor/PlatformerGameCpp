@@ -1,0 +1,60 @@
+{
+    "blockMap": [
+        [
+            "ladder",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "ladder",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "ladder",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "ladder",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone"
+        ]
+    ],
+    "endPos": [
+        500,
+        -750
+    ],
+    "height": 5,
+    "levelName": "editor-test",
+    "playerStartPos": [
+        3500,
+        3250
+    ],
+    "width": 7
+}
