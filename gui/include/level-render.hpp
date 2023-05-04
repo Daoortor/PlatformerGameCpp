@@ -55,6 +55,10 @@ public:
         const std::string &levelFilepath
     );
     void loadLevel(sf::RenderWindow &window, std::unique_ptr<Game> &game);
+    void updateAll(
+        std::unique_ptr<Platformer::Game> &game,
+        const std::string &miscFilepath
+    );
 };
 
 class LevelGameplayWindow : public LevelWindow {
@@ -77,6 +81,8 @@ public:
 enum class EditorState { Idle, BlockChosen, StartPosChosen, EndPosChosen };
 
 class LevelEditor : public LevelWindow {
+    control::LevelPerformer *levelPerformerPtr;
+    control::MenuPerformer *menuPerformerPtr;
     std::unique_ptr<Game> game;
     interface::Scrollbar blockSelectionBar;
     sf::RectangleShape levelBorder;
@@ -86,10 +92,14 @@ class LevelEditor : public LevelWindow {
     interface::RectangleButton saveButton;
     interface::ButtonWithImage startPosButton;
     interface::ButtonWithImage levelEndButton;
+    interface::RectangleButton backToMenuButton;
+    interface::RectangleButton resetButton;
 
 public:
     LevelEditor(
         unsigned int windowHeight,
+        control::LevelPerformer *levelPerformerPtr_,
+        control::MenuPerformer *menuPerformerPtr_,
         const std::string &backgroundTextureFilepath,
         const std::string &blockFilepath,
         const std::string &miscFilepath,

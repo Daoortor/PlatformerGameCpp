@@ -37,7 +37,8 @@ int main() {
     );
 
     auto levelEditor = Platformer::gui::LevelEditor(
-        windowHeight, "../gui/assets/textures/interface/level-background.png",
+        windowHeight, &levelPerformer, &menuPerformer,
+        "../gui/assets/textures/interface/level-background.png",
         "../gui/assets/textures/blocks/", "../gui/assets/textures/misc/",
         "../model/levels/" + Platformer::gui::levels::EMPTY_LEVEL_NAME,
         "../model/levels/", fontMario

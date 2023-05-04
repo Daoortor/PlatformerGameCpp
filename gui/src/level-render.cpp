@@ -153,24 +153,7 @@ LevelWindow::LevelWindow(
         blockTextures[blockType] = Platformer::gui::makeBlockTexture(blockType);
     }
     auto game = std::make_unique<Game>(levelFilepath);
-    sf::Vector2f offset =
-        sf::Vector2f(getBlockSize(game) / 4, getBlockSize(game) / 4);
-
-    boardSprites = Platformer::gui::makeBlockSprites(game, blockTextures);
-    levelBeginTexture.loadFromFile(miscFilepath + "level-begin.png");
-    float levelBeginEndScale =
-        static_cast<float>(getBlockSize(game)) / 2 /
-        static_cast<float>(levelBeginTexture.getSize().y);
-    levelBeginSprite.setTexture(levelBeginTexture);
-    levelBeginSprite.setScale(levelBeginEndScale, levelBeginEndScale);
-    sf::Vector2f levelBeginPos = getCoordinates(game->getStartPos(), game);
-    levelBeginSprite.setPosition(levelBeginPos - offset);
-
-    levelEndTexture.loadFromFile(miscFilepath + "level-end.png");
-    levelEndSprite.setTexture(levelEndTexture);
-    levelEndSprite.setScale(levelBeginEndScale, levelBeginEndScale);
-    sf::Vector2f levelEndPos = getCoordinates(game->getEndPos(), game);
-    levelEndSprite.setPosition(levelEndPos - offset);
+    updateAll(game, miscFilepath);
 }
 
 void LevelWindow::loadLevel(
@@ -200,6 +183,29 @@ void LevelEditor::addBlock(sf::Vector2u pos, const std::string &name) {
             getBlockSize(game) * static_cast<float>(pos.y)};
     boardSprites.at(pos.y).at(pos.x) =
         makeBlockSprite(blockTextures[name], getBlockSize(game), coordinates);
+}
+
+void LevelWindow::updateAll(
+    std::unique_ptr<Platformer::Game> &game,
+    const std::string &miscFilepath
+) {
+    sf::Vector2f offset =
+        sf::Vector2f(getBlockSize(game) / 4, getBlockSize(game) / 4);
+    boardSprites = Platformer::gui::makeBlockSprites(game, blockTextures);
+    levelBeginTexture.loadFromFile(miscFilepath + "level-begin.png");
+    float levelBeginEndScale =
+        static_cast<float>(getBlockSize(game)) / 2 /
+        static_cast<float>(levelBeginTexture.getSize().y);
+    levelBeginSprite.setTexture(levelBeginTexture);
+    levelBeginSprite.setScale(levelBeginEndScale, levelBeginEndScale);
+    sf::Vector2f levelBeginPos = getCoordinates(game->getStartPos(), game);
+    levelBeginSprite.setPosition(levelBeginPos - offset);
+
+    levelEndTexture.loadFromFile(miscFilepath + "level-end.png");
+    levelEndSprite.setTexture(levelEndTexture);
+    levelEndSprite.setScale(levelBeginEndScale, levelBeginEndScale);
+    sf::Vector2f levelEndPos = getCoordinates(game->getEndPos(), game);
+    levelEndSprite.setPosition(levelEndPos - offset);
 }
 
 LevelGameplayWindow::LevelGameplayWindow(
@@ -295,6 +301,8 @@ void LevelGameplayWindow::loadInWindow(sf::RenderWindow &window) {
 
 LevelEditor::LevelEditor(
     unsigned int windowHeight,
+    control::LevelPerformer *levelPerformerPtr_,
+    control::MenuPerformer *menuPerformerPtr_,
     const std::string &backgroundTextureFilepath,
     const std::string &blockFilepath,
     const std::string &miscFilepath,
@@ -308,6 +316,8 @@ LevelEditor::LevelEditor(
           miscFilepath,
           emptyLevelFilepath
       ),
+      levelPerformerPtr(levelPerformerPtr_),
+      menuPerformerPtr(menuPerformerPtr_),
       game(std::make_unique<Game>(emptyLevelFilepath)),
       blockSelectionBar(
           {30, getTopLeftCorner(game).y},
@@ -378,6 +388,34 @@ LevelEditor::LevelEditor(
           true,
           10,
           colors::CHOSEN_COLOR
+      ),
+      backToMenuButton(
+          sf::RectangleShape({150, 40}),
+          colors::BUTTON_COLORS_LIST[0],
+          colors::BUTTON_COLORS_LIST[1],
+          colors::BUTTON_COLORS_LIST[2],
+          colors::BUTTON_COLORS_LIST[3],
+          sf::Text("Back to menu", font, 20),
+          {10, 10},
+          {30, 500},
+          [this]() {
+              levelPerformerPtr->exit();
+              menuPerformerPtr->openMainMenu();
+          }
+      ),
+      resetButton(
+          sf::RectangleShape({100, 40}),
+          colors::BUTTON_COLORS_LIST[0],
+          colors::BUTTON_COLORS_LIST[1],
+          colors::BUTTON_COLORS_LIST[2],
+          colors::BUTTON_COLORS_LIST[3],
+          sf::Text("Reset", font, 20),
+          {10, 10},
+          {200, 500},
+          [this, emptyLevelFilepath, miscFilepath]() {
+              this->game = std::make_unique<Game>(emptyLevelFilepath);
+              this->updateAll(this->game, miscFilepath);
+          }
       ) {
     for (std::size_t blockNum = 0; blockNum < levels::BLOCK_NAMES.size();
          blockNum++) {
@@ -414,6 +452,10 @@ void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
     startPosButton.update(window, event);
     levelEndButton.drawInWindow(window);
     levelEndButton.update(window, event);
+    backToMenuButton.drawInWindow(window);
+    backToMenuButton.update(window, event);
+    resetButton.drawInWindow(window);
+    resetButton.update(window, event);
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
         sf::Vector2f mousePos =
             window.mapPixelToCoords(sf::Mouse::getPosition(window));
