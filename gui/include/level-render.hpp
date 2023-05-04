@@ -20,7 +20,7 @@ sf::Vector2f getGameFrameSize(std::unique_ptr<Platformer::Game> &game);
 sf::Vector2f getTopLeftCorner(std::unique_ptr<Platformer::Game> &game);
 sf::Vector2f getPlayerSize(std::unique_ptr<Platformer::Game> &game);
 sf::Vector2f
-getCoordinates(utilities::Vector pos, std::unique_ptr<Platformer::Game> &game);
+getCoordinates(sf::Vector2i pos, std::unique_ptr<Platformer::Game> &game);
 sf::Vector2f
 getPlayerCoordinates(sf::Vector2f pos, std::unique_ptr<Platformer::Game> &game);
 sf::Vector2i
@@ -74,13 +74,18 @@ public:
     void loadInWindow(sf::RenderWindow &window);
 };
 
+enum class EditorState { Idle, BlockChosen, StartPosChosen, EndPosChosen };
+
 class LevelEditor : public LevelWindow {
     std::unique_ptr<Game> game;
     interface::Scrollbar blockSelectionBar;
     sf::RectangleShape levelBorder;
     std::string blockChosen;
+    EditorState state;
     interface::Textbox levelNameTextbox;
     interface::RectangleButton saveButton;
+    interface::ButtonWithImage startPosButton;
+    interface::ButtonWithImage levelEndButton;
 
 public:
     LevelEditor(
@@ -94,6 +99,9 @@ public:
     );
     void loadInWindow(sf::RenderWindow &window, sf::Event event);
     void addBlock(sf::Vector2u pos, const std::string &name);
+    void setStartPos(sf::Vector2i pos);
+    void setEndPos(sf::Vector2i pos);
+    void deactivateAll();
 };
 }  // namespace Platformer::gui
 

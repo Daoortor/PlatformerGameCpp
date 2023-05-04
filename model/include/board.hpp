@@ -23,12 +23,12 @@ public:
         return board;
     }
 
-    [[nodiscard]] utilities::Vector getSize() const {
+    [[nodiscard]] sf::Vector2i getSize() const {
         return {width, height};
     }
 
-    const std::unique_ptr<Block> &getBlock(utilities::Vector pos);
-    const std::unique_ptr<Block> &getBlockByCoordinates(utilities::Vector pos);
+    const std::unique_ptr<Block> &getBlock(sf::Vector2i pos);
+    const std::unique_ptr<Block> &getBlockByCoordinates(sf::Vector2i pos);
     void addBlock(sf::Vector2u pos, const std::string &name);
     std::vector<std::vector<std::string>> getBlockMap();
 };

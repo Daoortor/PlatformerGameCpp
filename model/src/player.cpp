@@ -8,28 +8,26 @@ PhysicsObserver::PhysicsObserver(Player *player_) : player(player_) {
 }
 
 void PhysicsObserver::updateCollision() {
-    if ((player->isStanding() && player->speed.get_y() > 0)) {
-        player->speed = {player->speed.get_x(), 0};
+    if ((player->isStanding() && player->speed.y > 0)) {
+        player->speed = {player->speed.x, 0};
     } else if (!player->canJump()) {
         int newSpeed = -static_cast<int>(
-            static_cast<float>(player->speed.get_y()) * BOUNCE_COEFFICIENT
+            static_cast<float>(player->speed.y) * BOUNCE_COEFFICIENT
         );
-        player->speed = {player->speed.get_x(), newSpeed};
+        player->speed = {player->speed.x, newSpeed};
     }
-    if ((player->distLeft() == 0 && player->speed.get_x() < 0) ||
-        (player->distRight() == 0 && player->speed.get_x() > 0
-        )) {  // Hitting walls
-        player->speed = {0, player->speed.get_y()};
+    if ((player->distLeft() == 0 && player->speed.x < 0) ||
+        (player->distRight() == 0 && player->speed.x > 0)) {  // Hitting walls
+        player->speed = {0, player->speed.y};
     }
 }
 
 void PhysicsObserver::updateGravity() {
     if (!player->isStanding() && !player->isHanging()) {
         player->speed = {
-            player->speed.get_x(),
-            player->speed.get_y() + FREEFALL_ACCELERATION};
+            player->speed.x, player->speed.y + FREEFALL_ACCELERATION};
     } else if (player->isHanging()) {
-        player->speed = {player->speed.get_x(), 0};
+        player->speed = {player->speed.x, 0};
     }
 }
 
@@ -47,7 +45,7 @@ void PhysicsObserver::update() {
 Player::Player(Game *game_) : game(game_) {
 }
 
-Player::Player(Game *game_, utilities::Vector pos_) {
+Player::Player(Game *game_, sf::Vector2i pos_) {
     game = game_;
     pos = pos_;
     auto physObs =
@@ -57,7 +55,7 @@ Player::Player(Game *game_, utilities::Vector pos_) {
     observerCollection.push_back(std::move(physObs));
 }
 
-Player::Player(Game *game_, utilities::Vector pos_, int width_, int height_)
+Player::Player(Game *game_, sf::Vector2i pos_, int width_, int height_)
     : Player(game_, pos_) {
     width = width_;
     height = height_;
@@ -75,7 +73,7 @@ void Player::moveRight() {
 
 void Player::jump() {
     if (isStanding() && canJump()) {
-        speed = {speed.get_x(), -PLAYER_SPEED};
+        speed = {speed.x, -PLAYER_SPEED};
     } else if (isHanging()) {
         speed = {0, 0};
         move({0, -PLAYER_SPEED});
@@ -88,17 +86,17 @@ void Player::moveDown() {
     }
 }
 
-void Player::move(utilities::Vector delta) {
+void Player::move(sf::Vector2i delta) {
     int deltaX, deltaY;
-    if (delta.get_x() > 0) {
-        deltaX = std::min(delta.get_x(), distRight());
+    if (delta.x > 0) {
+        deltaX = std::min(delta.x, distRight());
     } else {
-        deltaX = std::max(delta.get_x(), -distLeft());
+        deltaX = std::max(delta.x, -distLeft());
     }
-    if (delta.get_y() > 0) {
-        deltaY = std::min(delta.get_y(), distBelow());
+    if (delta.y > 0) {
+        deltaY = std::min(delta.y, distBelow());
     } else {
-        deltaY = std::max(delta.get_y(), -distAbove());
+        deltaY = std::max(delta.y, -distAbove());
     }
     pos += {deltaX, deltaY};
 }
@@ -109,30 +107,27 @@ void Player::notifyAll() {
     }
 }
 
-std::vector<utilities::Vector> Player::coordsAbove() {
-    std::vector<utilities::Vector> result;
-    utilities::Vector currentVector{
-        pos.get_x() - width / 2 + 1, pos.get_y() - height / 2 - 2};
-    while (currentVector.get_x() <= pos.get_x() + width / 2 + 1) {
+std::vector<sf::Vector2i> Player::coordsAbove() {
+    std::vector<sf::Vector2i> result;
+    sf::Vector2i currentVector{pos.x - width / 2 + 1, pos.y - height / 2 - 2};
+    while (currentVector.x <= pos.x + width / 2 + 1) {
         result.push_back(currentVector);
         currentVector += {BLOCK_SIZE, 0};
     }
-    utilities::Vector upperRightCorner{
-        pos.get_x() + width / 2 - 1, pos.get_y() - height / 2 - 2};
+    sf::Vector2i upperRightCorner{
+        pos.x + width / 2 - 1, pos.y - height / 2 - 2};
     result.push_back(upperRightCorner);
     return result;
 }
 
-std::vector<utilities::Vector> Player::coordsBelow() {
-    std::vector<utilities::Vector> result;
-    utilities::Vector currentVector{
-        pos.get_x() - width / 2 + 1, pos.get_y() + height / 2};
-    while (currentVector.get_x() <= pos.get_x() + width / 2 + 1) {
+std::vector<sf::Vector2i> Player::coordsBelow() {
+    std::vector<sf::Vector2i> result;
+    sf::Vector2i currentVector{pos.x - width / 2 + 1, pos.y + height / 2};
+    while (currentVector.x <= pos.x + width / 2 + 1) {
         result.push_back(currentVector);
         currentVector += {BLOCK_SIZE, 0};
     }
-    utilities::Vector upperRightCorner{
-        pos.get_x() + width / 2 - 1, pos.get_y() + height / 2};
+    sf::Vector2i upperRightCorner{pos.x + width / 2 - 1, pos.y + height / 2};
     result.push_back(upperRightCorner);
     return result;
 }
@@ -142,9 +137,9 @@ std::vector<const Block *> Player::blocksAbove() {
     std::vector<const Block *> result(coordsBelow().size());
     std::transform(
         coords.begin(), coords.end(), result.begin(),
-        [this](utilities::Vector position) {
+        [this](sf::Vector2i position) {
             return game->getBoardObject()
-                .getBlockByCoordinates(position - utilities::Vector(0, 1))
+                .getBlockByCoordinates(position - sf::Vector2i(0, 1))
                 .get();
         }
     );
@@ -156,23 +151,23 @@ std::vector<const Block *> Player::blocksBelow() {
     std::vector<const Block *> result(coordsBelow().size());
     std::transform(
         coords.begin(), coords.end(), result.begin(),
-        [this](utilities::Vector position) {
+        [this](sf::Vector2i position) {
             return game->getBoardObject().getBlockByCoordinates(position).get();
         }
     );
     return result;
 }
 
-utilities::Vector
-Player::distByVector(utilities::Vector position, utilities::Vector moveVector) {
-    utilities::Vector currentCordinates{
-        utilities::divide(position.get_x(), BLOCK_SIZE) * BLOCK_SIZE,
-        utilities::divide(position.get_y(), BLOCK_SIZE) * BLOCK_SIZE};
-    utilities::Vector padding;
-    if (moveVector.get_x() < 0) {
+sf::Vector2i
+Player::distByVector(sf::Vector2i position, sf::Vector2i moveVector) {
+    sf::Vector2i currentCordinates{
+        utilities::divide(position.x, BLOCK_SIZE) * BLOCK_SIZE,
+        utilities::divide(position.y, BLOCK_SIZE) * BLOCK_SIZE};
+    sf::Vector2i padding;
+    if (moveVector.x < 0) {
         padding = {1, 0};
     }
-    if (moveVector.get_y() < 0) {
+    if (moveVector.y < 0) {
         padding = {0, 1};
     }
     currentCordinates -= padding;
@@ -180,9 +175,9 @@ Player::distByVector(utilities::Vector position, utilities::Vector moveVector) {
         if (game->getBoardObject()
                 .getBlockByCoordinates(currentCordinates)
                 ->isSolid()) {
-            return utilities::Vector(
-                       std::abs(position.get_x() - currentCordinates.get_x()),
-                       std::abs(position.get_y() - currentCordinates.get_y())
+            return sf::Vector2i(
+                       std::abs(position.x - currentCordinates.x),
+                       std::abs(position.y - currentCordinates.y)
                    ) -
                    padding;
         }
@@ -196,8 +191,8 @@ int Player::distAbove() {
     std::vector<int> distances(coordsAbove_.size());
     std::transform(
         coordsAbove_.begin(), coordsAbove_.end(), distances.begin(),
-        [this](utilities::Vector position) {
-            return distByVector(position, {0, -BLOCK_SIZE}).get_y();
+        [this](sf::Vector2i position) {
+            return distByVector(position, {0, -BLOCK_SIZE}).y;
         }
     );
     return *std::min_element(distances.begin(), distances.end());
@@ -208,36 +203,32 @@ int Player::distBelow() {
     std::vector<int> distances(coordsBelow_.size());
     std::transform(
         coordsBelow_.begin(), coordsBelow_.end(), distances.begin(),
-        [this](utilities::Vector position) {
-            return distByVector(position, {0, BLOCK_SIZE}).get_y();
+        [this](sf::Vector2i position) {
+            return distByVector(position, {0, BLOCK_SIZE}).y;
         }
     );
     return *std::min_element(distances.begin(), distances.end());
 }
 
 int Player::distLeft() {
-    utilities::Vector lowerLeft{
-        pos.get_x() - width / 2, pos.get_y() + height / 2 - 1};
-    utilities::Vector middleLeft{pos.get_x() - width / 2, pos.get_y()};
-    utilities::Vector upperLeft{
-        pos.get_x() - width / 2, pos.get_y() - height / 2 + 1};
+    sf::Vector2i lowerLeft{pos.x - width / 2, pos.y + height / 2 - 1};
+    sf::Vector2i middleLeft{pos.x - width / 2, pos.y};
+    sf::Vector2i upperLeft{pos.x - width / 2, pos.y - height / 2 + 1};
     return std::min(
-        {distByVector(lowerLeft, {-BLOCK_SIZE, 0}).get_x(),
-         distByVector(middleLeft, {-BLOCK_SIZE, 0}).get_x(),
-         distByVector(upperLeft, {-BLOCK_SIZE, 0}).get_x()}
+        {distByVector(lowerLeft, {-BLOCK_SIZE, 0}).x,
+         distByVector(middleLeft, {-BLOCK_SIZE, 0}).x,
+         distByVector(upperLeft, {-BLOCK_SIZE, 0}).x}
     );
 }
 
 int Player::distRight() {
-    utilities::Vector lowerRight{
-        pos.get_x() + width / 2, pos.get_y() + height / 2 - 1};
-    utilities::Vector middleRight{pos.get_x() + width / 2, pos.get_y()};
-    utilities::Vector upperRight{
-        pos.get_x() + width / 2, pos.get_y() - height / 2 + 1};
+    sf::Vector2i lowerRight{pos.x + width / 2, pos.y + height / 2 - 1};
+    sf::Vector2i middleRight{pos.x + width / 2, pos.y};
+    sf::Vector2i upperRight{pos.x + width / 2, pos.y - height / 2 + 1};
     return std::min(
-        {distByVector(lowerRight, {BLOCK_SIZE, 0}).get_x(),
-         distByVector(middleRight, {BLOCK_SIZE, 0}).get_x(),
-         distByVector(upperRight, {BLOCK_SIZE, 0}).get_x()}
+        {distByVector(lowerRight, {BLOCK_SIZE, 0}).x,
+         distByVector(middleRight, {BLOCK_SIZE, 0}).x,
+         distByVector(upperRight, {BLOCK_SIZE, 0}).x}
     );
 }
 
@@ -265,12 +256,12 @@ bool Player::canJump() {
     );
 }
 
-bool Player::contains(utilities::Vector position) {
-    int top = pos.get_y() - height / 2;
-    int bottom = pos.get_y() + height / 2;
-    int left = pos.get_x() - width / 2;
-    int right = pos.get_x() + width / 2;
-    return top <= position.get_y() && position.get_y() <= bottom &&
-           left <= position.get_x() && position.get_x() <= right;
+bool Player::contains(sf::Vector2i position) {
+    int top = pos.y - height / 2;
+    int bottom = pos.y + height / 2;
+    int left = pos.x - width / 2;
+    int right = pos.x + width / 2;
+    return top <= position.y && position.y <= bottom && left <= position.x &&
+           position.x <= right;
 }
 }  // namespace Platformer

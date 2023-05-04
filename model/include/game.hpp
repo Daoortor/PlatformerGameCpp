@@ -15,8 +15,8 @@ class Game {
     std::unique_ptr<Player> player;
     int timer = 0;
     bool is_paused = false;
-    utilities::Vector startPos;
-    utilities::Vector endPos;
+    sf::Vector2i startPos;
+    sf::Vector2i endPos;
 
 public:
     ~Game();
@@ -24,8 +24,8 @@ public:
     Game &operator=(Game &&other) = default;
     Game(
         std::vector<std::vector<std::unique_ptr<Block>>> board_,
-        utilities::Vector playerPos,
-        utilities::Vector endPos_
+        sf::Vector2i playerPos,
+        sf::Vector2i endPos_
     );
     explicit Game(const std::string &filename);
 
@@ -41,12 +41,20 @@ public:
         return board;
     }
 
-    utilities::Vector getStartPos() {
+    sf::Vector2i getStartPos() {
         return startPos;
     }
 
-    utilities::Vector getEndPos() {
+    sf::Vector2i getEndPos() {
         return endPos;
+    }
+
+    void setStartPos(sf::Vector2i pos) {
+        startPos = pos;
+    }
+
+    void setEndPos(sf::Vector2i pos) {
+        endPos = pos;
     }
 
     void update();

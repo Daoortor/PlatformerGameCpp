@@ -19,9 +19,7 @@ protected:
     sf::Vector2f itemSize;
     sf::Vector2f edgeMargin;
     float itemMargin;
-    std::vector<sf::RectangleShape> outline;
     std::size_t itemChosen = 0;
-    sf::Color itemChosenColor;
 
 public:
     Scrollbar(
@@ -40,6 +38,7 @@ public:
     void scrollUp();
     void scrollDown();
     void chooseItem(std::size_t item);
+    void deactivate();
 };
 }  // namespace interface
 

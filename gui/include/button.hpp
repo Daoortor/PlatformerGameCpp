@@ -84,6 +84,9 @@ class ButtonWithImage : public RectangleButton {
 private:
     sf::Sprite imageSprite;
     sf::Texture imageTexture;
+    sf::RectangleShape border;
+    float borderMargin;
+    sf::Color colorActive;
 
 public:
     ButtonWithImage(
@@ -92,10 +95,16 @@ public:
         sf::Vector2f newIndent,
         sf::Vector2f newPosition,
         const std::vector<sf::Color> &buttonColorsList,
-        std::function<void()> newAction = []() {}
+        std::function<void()> newAction = []() {},
+        bool hasBorder = true,
+        float borderMargin = 0,
+        sf::Color colorActive_ = sf::Color::Transparent
     );
     void drawInWindow(sf::RenderWindow &window) override;
     void setPosition(sf::Vector2f newPosition) override;
+    void setBackgroundColor(sf::Color color);
+    void activate();
+    void deactivate();
 };
 
 }  // namespace interface

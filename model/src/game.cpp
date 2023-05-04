@@ -15,8 +15,8 @@ void Game::update() {
 
 Game::Game(
     std::vector<std::vector<std::unique_ptr<Block>>> board_,
-    utilities::Vector playerPos,
-    utilities::Vector endPos_
+    sf::Vector2i playerPos,
+    sf::Vector2i endPos_
 )
     : board(std::move(board_)), startPos(playerPos), endPos(endPos_) {
     auto *playerObject = new Player(this, playerPos);
@@ -27,7 +27,7 @@ Game::Game(const std::string &filename) {
     std::ifstream f(filename);
     json levelData = json::parse(f);
     std::vector<std::vector<std::string>> blockMap = levelData["blockMap"];
-    utilities::Vector playerPos = {
+    sf::Vector2i playerPos = {
         levelData["playerStartPos"][0], levelData["playerStartPos"][1]};
     auto *playerObject = new Player(this, playerPos);
     player = std::unique_ptr<Player>(playerObject);
@@ -39,11 +39,11 @@ Game::Game(const std::string &filename) {
 void Game::writeToFile(const std::string &name, const std::string &filepath) {
     json levelData;
     levelData["levelName"] = name;
-    levelData["width"] = board.getSize().get_x();
-    levelData["height"] = board.getSize().get_y();
+    levelData["width"] = board.getSize().x;
+    levelData["height"] = board.getSize().y;
     levelData["blockMap"] = board.getBlockMap();
-    levelData["playerStartPos"] = {startPos.get_x(), startPos.get_y()};
-    levelData["endPos"] = {endPos.get_x(), endPos.get_y()};
+    levelData["playerStartPos"] = {startPos.x, startPos.y};
+    levelData["endPos"] = {endPos.x, endPos.y};
     std::ofstream out(filepath + name + ".json");
     out << std::setw(4) << levelData << std::endl;
 }

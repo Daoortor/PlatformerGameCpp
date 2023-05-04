@@ -1,40 +1,40 @@
 {
     "blockMap": [
         [
+            "stone",
             "ladder",
-            "air",
-            "air",
-            "air",
-            "air",
-            "air",
-            "air"
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone"
         ],
         [
+            "stone",
             "ladder",
             "air",
             "air",
             "air",
             "air",
-            "air",
-            "air"
+            "stone"
         ],
         [
+            "stone",
             "ladder",
             "air",
             "air",
             "air",
             "air",
-            "air",
-            "air"
+            "stone"
         ],
         [
+            "stone",
             "ladder",
             "air",
             "air",
             "air",
             "air",
-            "air",
-            "air"
+            "stone"
         ],
         [
             "stone",

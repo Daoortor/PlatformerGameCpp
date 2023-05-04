@@ -30,19 +30,18 @@ public:
 }  // namespace observers
 
 class Player {
-    utilities::Vector pos;
-    utilities::Vector speed;
+    sf::Vector2i pos;
+    sf::Vector2i speed;
     int height = BLOCK_SIZE * 3 / 2;
     int width = BLOCK_SIZE * 3 / 4;
     Pose pose = Pose::LOOKING_RIGHT;
     std::vector<std::unique_ptr<observers::Observer>> observerCollection;
     Game *game = nullptr;
 
-    utilities::Vector
-    distByVector(utilities::Vector pos, utilities::Vector moveVector);
+    sf::Vector2i distByVector(sf::Vector2i pos, sf::Vector2i moveVector);
 
-    std::vector<utilities::Vector> coordsAbove();
-    std::vector<utilities::Vector> coordsBelow();
+    std::vector<sf::Vector2i> coordsAbove();
+    std::vector<sf::Vector2i> coordsBelow();
 
     std::vector<const Block *> blocksAbove();
     std::vector<const Block *> blocksBelow();
@@ -50,14 +49,14 @@ class Player {
 public:
     Player() = default;
     explicit Player(Game *game_);
-    Player(Game *game_, utilities::Vector pos_);
-    Player(Game *game_, utilities::Vector pos_, int width_, int height_);
+    Player(Game *game_, sf::Vector2i pos_);
+    Player(Game *game_, sf::Vector2i pos_, int width_, int height_);
 
-    [[nodiscard]] utilities::Vector getPos() const {
+    [[nodiscard]] sf::Vector2i getPos() const {
         return pos;
     }
 
-    [[nodiscard]] utilities::Vector getSpeed() const {
+    [[nodiscard]] sf::Vector2i getSpeed() const {
         return speed;
     }
 
@@ -65,7 +64,7 @@ public:
         return pose;
     }
 
-    [[nodiscard]] utilities::Vector getSize() const {
+    [[nodiscard]] sf::Vector2i getSize() const {
         return {width, height};
     }
 
@@ -73,7 +72,7 @@ public:
     void moveRight();
     void jump();
     void moveDown();
-    void move(utilities::Vector delta);
+    void move(sf::Vector2i delta);
     void notifyAll();
 
     int distAbove();
@@ -85,7 +84,7 @@ public:
     bool isStanding();
     bool canJump();
 
-    bool contains(utilities::Vector position);
+    bool contains(sf::Vector2i position);
 
     friend observers::PhysicsObserver;
 };

@@ -41,19 +41,17 @@ Board::Board(const std::vector<std::vector<std::string>> &blockMap) {
     }
 }
 
-const std::unique_ptr<Block> &Board::getBlock(utilities::Vector pos) {
-    if (0 <= pos.get_x() && pos.get_x() < width && 0 <= pos.get_y() &&
-        pos.get_y() < height) {
-        return board[pos.get_y()][pos.get_x()];
+const std::unique_ptr<Block> &Board::getBlock(sf::Vector2i pos) {
+    if (0 <= pos.x && pos.x < width && 0 <= pos.y && pos.y < height) {
+        return board[pos.y][pos.x];
     }
     return AIR_BLOCK;
 }
 
-const std::unique_ptr<Block> &Board::getBlockByCoordinates(utilities::Vector pos
-) {
+const std::unique_ptr<Block> &Board::getBlockByCoordinates(sf::Vector2i pos) {
     return getBlock(
-        {utilities::divide(pos.get_x(), BLOCK_SIZE),
-         utilities::divide(pos.get_y(), BLOCK_SIZE)}
+        {utilities::divide(pos.x, BLOCK_SIZE),
+         utilities::divide(pos.y, BLOCK_SIZE)}
     );
 }
 
