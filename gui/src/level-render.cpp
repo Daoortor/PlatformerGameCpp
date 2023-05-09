@@ -1,14 +1,16 @@
 #include "level-render.hpp"
 #include <cmath>
+#include <iostream>
+#include <memory>
 #include "gui-constants.hpp"
 #include "model-constants.hpp"
 
 namespace Platformer::gui {
 
 float getBlockSize(std::unique_ptr<Platformer::Game> &game) {
-    sf::Vector2i boardSize = game->getBoardObject().getSize();
-    int boardWidth = boardSize.x;
-    int boardHeight = boardSize.y;
+    auto boardSize = game->getBoardObject().getSize();
+    std::size_t boardWidth = boardSize.x;
+    std::size_t boardHeight = boardSize.y;
     return std::min(
         static_cast<float>(levels::LEVEL_WIDTH) /
             static_cast<float>(boardWidth),
@@ -26,9 +28,9 @@ sf::Vector2f getGameFrameSize(std::unique_ptr<Platformer::Game> &game) {
 }
 
 sf::Vector2f getTopLeftCorner(std::unique_ptr<Platformer::Game> &game) {
-    sf::Vector2i boardSize = game->getBoardObject().getSize();
-    int boardWidth = boardSize.x;
-    int boardHeight = boardSize.y;
+    auto boardSize = game->getBoardObject().getSize();
+    std::size_t boardWidth = boardSize.x;
+    std::size_t boardHeight = boardSize.y;
     float blockSize = std::min(
         static_cast<float>(levels::LEVEL_WIDTH) /
             static_cast<float>(boardWidth),
@@ -74,7 +76,7 @@ sf::Vector2i getInGameCoordinates(
     sf::Vector2i convertedCoordinates = {
         static_cast<int>(std::floor(convertedFloatCoordinates.x)),
         static_cast<int>(std::floor(convertedFloatCoordinates.y))};
-    sf::Vector2i boardSize = game->getBoardObject().getSize();
+    auto boardSize = game->getBoardObject().getSize();
     if (0 <= convertedCoordinates.x && convertedCoordinates.x < boardSize.x &&
         0 <= convertedCoordinates.y && convertedCoordinates.y < boardSize.y) {
         return convertedCoordinates;
@@ -100,9 +102,9 @@ std::vector<std::vector<sf::Sprite>> makeBlockSprites(
     std::unique_ptr<Platformer::Game> &game,
     std::map<std::string, std::unique_ptr<sf::Texture>> &blockTextures
 ) {
-    sf::Vector2i boardSize = game->getBoardObject().getSize();
-    int boardWidth = boardSize.x;
-    int boardHeight = boardSize.y;
+    auto boardSize = game->getBoardObject().getSize();
+    std::size_t boardWidth = boardSize.x;
+    std::size_t boardHeight = boardSize.y;
     float blockSize = std::min(
         static_cast<float>(levels::LEVEL_WIDTH) /
             static_cast<float>(boardWidth),
@@ -115,8 +117,8 @@ std::vector<std::vector<sf::Sprite>> makeBlockSprites(
     std::vector<std::vector<sf::Sprite>> spriteMatrix(
         boardHeight, std::vector<sf::Sprite>(boardWidth)
     );
-    for (int row = 0; row < boardHeight; row++) {
-        for (int col = 0; col < boardWidth; col++) {
+    for (std::size_t row = 0; row < boardHeight; row++) {
+        for (std::size_t col = 0; col < boardWidth; col++) {
             std::string blockName = board[row][col]->name();
             sf::Vector2f pos = {
                 topLeftCorner.x + blockSize * static_cast<float>(col),
@@ -172,17 +174,6 @@ void LevelWindow::loadLevel(
     window.draw(levelBeginSprite);
     levelEndSprite.setTexture(levelEndTexture);
     window.draw(levelEndSprite);
-}
-
-void LevelEditor::addBlock(sf::Vector2u pos, const std::string &name) {
-    game->getBoardObject().addBlock(pos, name);
-    sf::Vector2f coordinates = {
-        getTopLeftCorner(game).x +
-            getBlockSize(game) * static_cast<float>(pos.x),
-        getTopLeftCorner(game).y +
-            getBlockSize(game) * static_cast<float>(pos.y)};
-    boardSprites.at(pos.y).at(pos.x) =
-        makeBlockSprite(blockTextures[name], getBlockSize(game), coordinates);
 }
 
 void LevelWindow::updateAll(
@@ -319,6 +310,7 @@ LevelEditor::LevelEditor(
       levelPerformerPtr(levelPerformerPtr_),
       menuPerformerPtr(menuPerformerPtr_),
       game(std::make_unique<Game>(emptyLevelFilepath)),
+      gameFullCopy(std::make_unique<Game>(*game)),
       blockSelectionBar(
           {30, getTopLeftCorner(game).y},
           {40, 40},
@@ -342,7 +334,7 @@ LevelEditor::LevelEditor(
           colors::TEXTBOX_COLORS_LIST[3],
           colors::TEXTBOX_COLORS_LIST[4],
           colors::TEXTBOX_COLORS_LIST[5],
-          {370, 500},
+          {370, 520},
           {10, 10},
           13
       ),
@@ -354,7 +346,7 @@ LevelEditor::LevelEditor(
           colors::BUTTON_COLORS_LIST[3],
           sf::Text("Save", font, 20),
           {10, 10},
-          {540, 500},
+          {540, 520},
           [&, levelsFilepath]() {
               game->writeToFile(levelNameTextbox.getText(), levelsFilepath);
           }
@@ -390,30 +382,97 @@ LevelEditor::LevelEditor(
           colors::CHOSEN_COLOR
       ),
       backToMenuButton(
-          sf::RectangleShape({150, 40}),
+          sf::RectangleShape({135, 40}),
           colors::BUTTON_COLORS_LIST[0],
           colors::BUTTON_COLORS_LIST[1],
           colors::BUTTON_COLORS_LIST[2],
           colors::BUTTON_COLORS_LIST[3],
           sf::Text("Back to menu", font, 20),
           {10, 10},
-          {30, 500},
+          {30, 520},
           [this]() {
               levelPerformerPtr->exit();
               menuPerformerPtr->openMainMenu();
           }
       ),
       resetButton(
-          sf::RectangleShape({100, 40}),
+          sf::RectangleShape({65, 40}),
           colors::BUTTON_COLORS_LIST[0],
           colors::BUTTON_COLORS_LIST[1],
           colors::BUTTON_COLORS_LIST[2],
           colors::BUTTON_COLORS_LIST[3],
           sf::Text("Reset", font, 20),
           {10, 10},
-          {200, 500},
+          {185, 520},
           [this, emptyLevelFilepath, miscFilepath]() {
               this->game = std::make_unique<Game>(emptyLevelFilepath);
+              this->updateAll(this->game, miscFilepath);
+          }
+      ),
+      plusButton(
+          sf::RectangleShape({30, 40}),
+          colors::BUTTON_COLORS_LIST[0],
+          colors::BUTTON_COLORS_LIST[1],
+          colors::BUTTON_COLORS_LIST[2],
+          colors::BUTTON_COLORS_LIST[3],
+          sf::Text("+", font, 20),
+          {10, 10},
+          {270, 520},
+          [this, miscFilepath]() {
+              auto levelSize = this->game->getBoardObject().getSize();
+              if (levelSize.y == levels::INITIAL_LEVEL_BLOCK_HEIGHT) {
+                  return;
+              }
+              auto newHeight = levelSize.y - 1;
+              auto newWidth = static_cast<std::size_t>(
+                  static_cast<float>(newHeight) *
+                  (static_cast<float>(levels::LEVEL_WIDTH) /
+                   static_cast<float>(levels::LEVEL_HEIGHT))
+              );
+              if (gameFullCopy->getBoardObject().getSize().y < levelSize.y) {
+                  this->gameFullCopy = std::make_unique<Game>(*game);
+              }
+              this->game->crop(
+                  levelSize.y - newHeight, levelSize.y - newHeight,
+                  levelSize.x - newWidth, levelSize.x - newWidth
+              );
+              this->updateAll(this->game, miscFilepath);
+          }
+      ),
+      minusButton(
+          sf::RectangleShape({30, 40}),
+          colors::BUTTON_COLORS_LIST[0],
+          colors::BUTTON_COLORS_LIST[1],
+          colors::BUTTON_COLORS_LIST[2],
+          colors::BUTTON_COLORS_LIST[3],
+          sf::Text("-", font, 20),
+          {10, 10},
+          {320, 520},
+          [this, miscFilepath]() {
+              auto levelSize = this->game->getBoardObject().getSize();
+              auto deltaHeight = 1;
+              auto deltaWidth = static_cast<std::size_t>(
+                                    static_cast<float>(levelSize.y + 1) *
+                                    (static_cast<float>(levels::LEVEL_WIDTH) /
+                                     static_cast<float>(levels::LEVEL_HEIGHT))
+                                ) -
+                                levelSize.x;
+              auto copySize = this->gameFullCopy->getBoardObject().getSize();
+              if (levelSize.y + deltaHeight <= copySize.y &&
+                  levelSize.x + deltaWidth <= copySize.x) {
+                  auto deltaHeightCopy =
+                      (copySize.y - levelSize.y) / 2 - deltaHeight;
+                  auto deltaWidthCopy =
+                      (copySize.x - levelSize.x) / 2 - deltaWidth;
+                  this->game->enlarge(
+                      this->gameFullCopy, deltaHeightCopy, deltaHeightCopy,
+                      deltaWidthCopy, deltaWidthCopy
+                  );
+              } else {
+                  this->game->enlarge(
+                      deltaHeight, deltaHeight, deltaWidth, deltaWidth
+                  );
+              }
               this->updateAll(this->game, miscFilepath);
           }
       ) {
@@ -433,11 +492,28 @@ LevelEditor::LevelEditor(
         );
         blockSelectionBar.addItem(newButton);
     }
-    levelBorder = sf::RectangleShape(getGameFrameSize(game));
-    levelBorder.setPosition(getTopLeftCorner(game));
+    levelBorder = sf::RectangleShape(
+        {static_cast<float>(levels::LEVEL_WIDTH),
+         static_cast<float>(levels::LEVEL_HEIGHT)}
+    );
+    levelBorder.setPosition(
+        {(static_cast<float>(WINDOW_WIDTH) - levelBorder.getSize().x) / 2,
+         (static_cast<float>(WINDOW_HEIGHT) - levelBorder.getSize().y) / 2}
+    );
     levelBorder.setFillColor(sf::Color::Transparent);
     levelBorder.setOutlineThickness(1.f);
     levelBorder.setOutlineColor(sf::Color::White);
+}
+
+void LevelEditor::addBlock(sf::Vector2u pos, const std::string &name) {
+    game->getBoardObject().addBlock(pos, name);
+    sf::Vector2f coordinates = {
+        getTopLeftCorner(game).x +
+            getBlockSize(game) * static_cast<float>(pos.x),
+        getTopLeftCorner(game).y +
+            getBlockSize(game) * static_cast<float>(pos.y)};
+    boardSprites.at(pos.y).at(pos.x) =
+        makeBlockSprite(blockTextures[name], getBlockSize(game), coordinates);
 }
 
 void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
@@ -456,6 +532,10 @@ void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
     backToMenuButton.update(window, event);
     resetButton.drawInWindow(window);
     resetButton.update(window, event);
+    plusButton.drawInWindow(window);
+    plusButton.update(window, event);
+    minusButton.drawInWindow(window);
+    minusButton.update(window, event);
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
         sf::Vector2f mousePos =
             window.mapPixelToCoords(sf::Mouse::getPosition(window));

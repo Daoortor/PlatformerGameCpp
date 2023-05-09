@@ -11,8 +11,9 @@ const unsigned int WINDOW_HEIGHT =
     sf::VideoMode::getDesktopMode().height * 11 / 20;
 
 namespace levels {
-const unsigned int LEVEL_WIDTH = WINDOW_WIDTH * 2 / 3;
 const unsigned int LEVEL_HEIGHT = WINDOW_HEIGHT * 2 / 3;
+const unsigned int LEVEL_WIDTH = LEVEL_HEIGHT * 7 / 5;
+const unsigned int INITIAL_LEVEL_BLOCK_HEIGHT = 5;
 const std::vector<std::string> BLOCK_NAMES = {"ladder", "stone", "air"};
 const std::string EMPTY_LEVEL_NAME = "empty-level.json";
 }  // namespace levels

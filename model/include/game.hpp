@@ -14,7 +14,6 @@ class Game {
     Board board;
     std::unique_ptr<Player> player;
     int timer = 0;
-    bool is_paused = false;
     sf::Vector2i startPos;
     sf::Vector2i endPos;
 
@@ -22,6 +21,8 @@ public:
     ~Game();
     Game(Game &&other) = default;
     Game &operator=(Game &&other) = default;
+    Game(const Game &other);
+    Game &operator=(const Game &other);
     Game(
         std::vector<std::vector<std::unique_ptr<Block>>> board_,
         sf::Vector2i playerPos,
@@ -60,6 +61,25 @@ public:
     void update();
 
     void writeToFile(const std::string &name, const std::string &filepath);
+    void enlarge(
+        std::size_t deltaTop,
+        std::size_t deltaBottom,
+        std::size_t deltaLeft,
+        std::size_t deltaRight
+    );
+    void enlarge(
+        const std::unique_ptr<Game> &gameCopy,
+        std::size_t deltaTopCopy,
+        std::size_t deltaBottomCopy,
+        std::size_t deltaLeftCopy,
+        std::size_t deltaRightCopy
+    );
+    void crop(
+        std::size_t deltaTop,
+        std::size_t deltaBottom,
+        std::size_t deltaLeft,
+        std::size_t deltaRight
+    );
 };
 }  // namespace Platformer
 

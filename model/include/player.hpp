@@ -84,7 +84,7 @@ public:
     bool isStanding();
     bool canJump();
 
-    bool contains(sf::Vector2i position);
+    [[nodiscard]] bool contains(sf::Vector2i position) const;
 
     friend observers::PhysicsObserver;
 };

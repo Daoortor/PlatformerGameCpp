@@ -10,12 +10,14 @@
 namespace Platformer {
 
 class Board {
-    int height = 0;
-    int width = 0;
+    std::size_t height = 0;
+    std::size_t width = 0;
     std::vector<std::vector<std::unique_ptr<Block>>> board;
 
 public:
     Board() = default;
+    Board &operator=(const Board &other);
+    Board(const Board &other);
     explicit Board(std::vector<std::vector<std::unique_ptr<Block>>> board_);
     explicit Board(const std::vector<std::vector<std::string>> &blockMap);
 
@@ -23,8 +25,13 @@ public:
         return board;
     }
 
-    [[nodiscard]] sf::Vector2i getSize() const {
+    [[nodiscard]] sf::Vector2<std::size_t> getSize() const {
         return {width, height};
+    }
+
+    void setSize(std::size_t newHeight, std::size_t newWidth) {
+        height = newHeight;
+        width = newWidth;
     }
 
     const std::unique_ptr<Block> &getBlock(sf::Vector2i pos);

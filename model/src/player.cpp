@@ -256,7 +256,7 @@ bool Player::canJump() {
     );
 }
 
-bool Player::contains(sf::Vector2i position) {
+bool Player::contains(sf::Vector2i position) const {
     int top = pos.y - height / 2;
     int bottom = pos.y + height / 2;
     int left = pos.x - width / 2;

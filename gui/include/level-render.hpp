@@ -32,7 +32,9 @@ getInGameCoordinates(sf::Vector2f pos, std::unique_ptr<Platformer::Game> &game);
 );
 [[maybe_unused]] std::vector<std::vector<sf::Sprite>> makeBlockSprites(
     Game &game,
-    std::map<std::string, std::unique_ptr<sf::Texture>> &blockTextures
+    std::map<std::string, std::unique_ptr<sf::Texture>> &blockTextures,
+    sf::Vector2<std::size_t> renderAreaTopLeftCorner = {0, 0},
+    sf::Vector2<std::size_t> renderAreaBottomRightCorner = {0, 0}
 );
 std::unique_ptr<sf::Texture> makeBlockTexture(const std::string &type);
 
@@ -84,6 +86,7 @@ class LevelEditor : public LevelWindow {
     control::LevelPerformer *levelPerformerPtr;
     control::MenuPerformer *menuPerformerPtr;
     std::unique_ptr<Game> game;
+    std::unique_ptr<Game> gameFullCopy;
     interface::Scrollbar blockSelectionBar;
     sf::RectangleShape levelBorder;
     std::string blockChosen;
@@ -94,6 +97,8 @@ class LevelEditor : public LevelWindow {
     interface::ButtonWithImage levelEndButton;
     interface::RectangleButton backToMenuButton;
     interface::RectangleButton resetButton;
+    interface::RectangleButton plusButton;
+    interface::RectangleButton minusButton;
 
 public:
     LevelEditor(

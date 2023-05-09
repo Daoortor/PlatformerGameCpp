@@ -41,6 +41,26 @@ Board::Board(const std::vector<std::vector<std::string>> &blockMap) {
     }
 }
 
+Board &Board::operator=(const Platformer::Board &other) {
+    if (this == &other) {
+        return *this;
+    }
+    height = other.height;
+    width = other.width;
+    board = std::vector<std::vector<std::unique_ptr<Block>>>();
+    for (std::size_t row = 0; row < height; row++) {
+        board.emplace_back();
+        for (std::size_t col = 0; col < width; col++) {
+            board[row].push_back(makeBlock(other.board[row][col]->name()));
+        }
+    }
+    return *this;
+}
+
+Board::Board(const Platformer::Board &other) {
+    *this = other;
+}
+
 const std::unique_ptr<Block> &Board::getBlock(sf::Vector2i pos) {
     if (0 <= pos.x && pos.x < width && 0 <= pos.y && pos.y < height) {
         return board[pos.y][pos.x];

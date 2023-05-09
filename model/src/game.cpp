@@ -13,6 +13,22 @@ void Game::update() {
     player->notifyAll();
 }
 
+Game &Game::operator=(const Platformer::Game &other) {
+    if (this == &other) {
+        return *this;
+    }
+    player = std::make_unique<Player>();
+    timer = other.timer;
+    startPos = other.startPos;
+    endPos = other.endPos;
+    board = other.board;
+    return *this;
+}
+
+Game::Game(const Platformer::Game &other) {
+    *this = other;
+}
+
 Game::Game(
     std::vector<std::vector<std::unique_ptr<Block>>> board_,
     sf::Vector2i playerPos,
@@ -46,5 +62,83 @@ void Game::writeToFile(const std::string &name, const std::string &filepath) {
     levelData["endPos"] = {endPos.x, endPos.y};
     std::ofstream out(filepath + name + ".json");
     out << std::setw(4) << levelData << std::endl;
+}
+
+void Game::enlarge(
+    std::size_t deltaTop,
+    std::size_t deltaBottom,
+    std::size_t deltaLeft,
+    std::size_t deltaRight
+) {
+    std::vector<std::vector<std::unique_ptr<Block>>> newBoard;
+    for (std::size_t row = 0; row < board.getSize().y + deltaTop + deltaBottom;
+         row++) {
+        newBoard.emplace_back();
+        for (std::size_t col = 0;
+             col < board.getSize().x + deltaLeft + deltaRight; col++) {
+            if (deltaTop <= row && row < board.getSize().y + deltaTop &&
+                deltaLeft <= col && col < board.getSize().x + deltaLeft) {
+                newBoard[row].push_back(std::move(board.getBoard(
+                )[row - deltaTop][col - deltaLeft]));
+            } else {
+                newBoard[row].push_back(makeBlock("air"));
+            }
+        }
+    }
+    board.getBoard() = std::move(newBoard);
+    board.setSize(
+        board.getSize().y + deltaTop + deltaBottom,
+        board.getSize().x + deltaLeft + deltaRight
+    );
+    startPos +=
+        static_cast<sf::Vector2i>(sf::Vector2<std::size_t>(deltaLeft, deltaTop)
+        ) *
+        BLOCK_SIZE;
+    endPos +=
+        static_cast<sf::Vector2i>(sf::Vector2<std::size_t>(deltaLeft, deltaTop)
+        ) *
+        BLOCK_SIZE;
+}
+
+void Game::enlarge(
+    const std::unique_ptr<Game> &gameCopy,
+    std::size_t deltaTopCopy,
+    std::size_t deltaBottomCopy,
+    std::size_t deltaLeftCopy,
+    std::size_t deltaRightCopy
+) {
+    *this = *gameCopy;
+    this->crop(deltaTopCopy, deltaBottomCopy, deltaLeftCopy, deltaRightCopy);
+}
+
+void Game::crop(
+    std::size_t deltaTop,
+    std::size_t deltaBottom,
+    std::size_t deltaLeft,
+    std::size_t deltaRight
+) {
+    std::vector<std::vector<std::unique_ptr<Block>>> newBoard;
+    for (std::size_t row = 0; row < board.getSize().y - deltaTop - deltaBottom;
+         row++) {
+        newBoard.emplace_back();
+        for (std::size_t col = 0;
+             col < board.getSize().x - deltaLeft - deltaRight; col++) {
+            newBoard[row].push_back(std::move(board.getBoard(
+            )[row + deltaTop][col + deltaLeft]));
+        }
+    }
+    board.getBoard() = std::move(newBoard);
+    board.setSize(
+        board.getSize().y - deltaTop - deltaBottom,
+        board.getSize().x - deltaLeft - deltaRight
+    );
+    startPos -=
+        static_cast<sf::Vector2i>(sf::Vector2<std::size_t>(deltaLeft, deltaTop)
+        ) *
+        BLOCK_SIZE;
+    endPos -=
+        static_cast<sf::Vector2i>(sf::Vector2<std::size_t>(deltaLeft, deltaTop)
+        ) *
+        BLOCK_SIZE;
 }
 }  // namespace Platformer
