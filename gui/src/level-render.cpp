@@ -484,9 +484,13 @@ LevelEditor::LevelEditor(
       ) {
     for (std::size_t blockNum = 0; blockNum < levels::BLOCK_NAMES.size();
          blockNum++) {
+        std::string blockFullPath =
+            blockFilepath + levels::BLOCK_NAMES[blockNum] + ".png";
+        if (levels::BLOCK_NAMES[blockNum] == "air") {
+            blockFullPath = miscFilepath + "eraser.png";
+        }
         interface::ButtonWithImage newButton(
-            blockFilepath + levels::BLOCK_NAMES[blockNum] + ".png",
-            sf::RectangleShape({40, 40}), {0, 0}, {0, 0},
+            blockFullPath, sf::RectangleShape({40, 40}), {0, 0}, {0, 0},
             std::vector<sf::Color>(4, sf::Color::Transparent),
             [&, blockNum]() {
                 this->deactivateAll();

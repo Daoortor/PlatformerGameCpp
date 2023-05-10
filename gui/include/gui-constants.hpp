@@ -6,9 +6,8 @@
 #include <vector>
 
 namespace Platformer::gui {
-const unsigned int WINDOW_WIDTH = sf::VideoMode::getDesktopMode().width * 2 / 5;
-const unsigned int WINDOW_HEIGHT =
-    sf::VideoMode::getDesktopMode().height * 11 / 20;
+const unsigned int WINDOW_HEIGHT = 600;
+const unsigned int WINDOW_WIDTH = WINDOW_HEIGHT * 4 / 3;
 
 namespace levels {
 const unsigned int LEVEL_HEIGHT = WINDOW_HEIGHT * 2 / 3;
