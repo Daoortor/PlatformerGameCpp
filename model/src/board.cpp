@@ -61,7 +61,7 @@ Board::Board(const Platformer::Board &other) {
     *this = other;
 }
 
-const std::unique_ptr<Block> &Board::getBlock(sf::Vector2i pos) {
+const std::unique_ptr<Block> &Board::getBlock(sf::Vector2<std::size_t> pos) {
     if (0 <= pos.x && pos.x < width && 0 <= pos.y && pos.y < height) {
         return board[pos.y][pos.x];
     }
@@ -70,12 +70,16 @@ const std::unique_ptr<Block> &Board::getBlock(sf::Vector2i pos) {
 
 const std::unique_ptr<Block> &Board::getBlockByCoordinates(sf::Vector2i pos) {
     return getBlock(
-        {utilities::divide(pos.x, BLOCK_SIZE),
-         utilities::divide(pos.y, BLOCK_SIZE)}
+        {static_cast<std::size_t>(
+             utilities::divide(static_cast<int>(pos.x), BLOCK_SIZE)
+         ),
+         static_cast<std::size_t>(
+             utilities::divide(static_cast<int>(pos.y), BLOCK_SIZE)
+         )}
     );
 }
 
-void Board::addBlock(sf::Vector2u pos, const std::string &name) {
+void Board::setBlock(sf::Vector2<std::size_t> pos, const std::string &name) {
     board.at(pos.y).at(pos.x) = makeBlock(name);
 }
 

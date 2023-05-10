@@ -34,9 +34,9 @@ public:
         width = newWidth;
     }
 
-    const std::unique_ptr<Block> &getBlock(sf::Vector2i pos);
+    const std::unique_ptr<Block> &getBlock(sf::Vector2<std::size_t> pos);
     const std::unique_ptr<Block> &getBlockByCoordinates(sf::Vector2i pos);
-    void addBlock(sf::Vector2u pos, const std::string &name);
+    void setBlock(sf::Vector2<std::size_t> pos, const std::string &name);
     std::vector<std::vector<std::string>> getBlockMap();
 };
 

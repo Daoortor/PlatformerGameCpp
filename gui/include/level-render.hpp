@@ -113,7 +113,7 @@ public:
         const sf::Font &font
     );
     void loadInWindow(sf::RenderWindow &window, sf::Event event);
-    void addBlock(sf::Vector2u pos, const std::string &name);
+    void setBlock(sf::Vector2<std::size_t> pos, const std::string &name);
     void setStartPos(sf::Vector2i pos);
     void setEndPos(sf::Vector2i pos);
     void deactivateAll();

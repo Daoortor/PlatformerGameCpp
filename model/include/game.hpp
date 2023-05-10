@@ -80,6 +80,11 @@ public:
         std::size_t deltaLeft,
         std::size_t deltaRight
     );
+    void partialCopy(
+        const std::unique_ptr<Game> &other,
+        std::size_t deltaTop,
+        std::size_t deltaLeft
+    );
 };
 }  // namespace Platformer
 

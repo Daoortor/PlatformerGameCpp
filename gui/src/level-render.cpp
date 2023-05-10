@@ -429,8 +429,14 @@ LevelEditor::LevelEditor(
                   (static_cast<float>(levels::LEVEL_WIDTH) /
                    static_cast<float>(levels::LEVEL_HEIGHT))
               );
-              if (gameFullCopy->getBoardObject().getSize().y < levelSize.y) {
+              auto copySize = gameFullCopy->getBoardObject().getSize();
+              if (copySize.y < levelSize.y) {
                   this->gameFullCopy = std::make_unique<Game>(*game);
+              } else {
+                  this->gameFullCopy->partialCopy(
+                      game, (copySize.y - levelSize.y) / 2,
+                      (copySize.x - levelSize.x) / 2
+                  );
               }
               this->game->crop(
                   levelSize.y - newHeight, levelSize.y - newHeight,
@@ -505,8 +511,11 @@ LevelEditor::LevelEditor(
     levelBorder.setOutlineColor(sf::Color::White);
 }
 
-void LevelEditor::addBlock(sf::Vector2u pos, const std::string &name) {
-    game->getBoardObject().addBlock(pos, name);
+void LevelEditor::setBlock(
+    sf::Vector2<std::size_t> pos,
+    const std::string &name
+) {
+    game->getBoardObject().setBlock(pos, name);
     sf::Vector2f coordinates = {
         getTopLeftCorner(game).x +
             getBlockSize(game) * static_cast<float>(pos.x),
@@ -548,7 +557,9 @@ void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
                 window.mapPixelToCoords(sf::Mouse::getPosition(window)), game
             );
             if (blockPos != sf::Vector2i(-1, -1)) {
-                addBlock(static_cast<sf::Vector2u>(blockPos), blockChosen);
+                setBlock(
+                    static_cast<sf::Vector2<std::size_t>>(blockPos), blockChosen
+                );
             }
         } else if (state == EditorState::StartPosChosen) {
             if (inGamePos.x >= 0 &&

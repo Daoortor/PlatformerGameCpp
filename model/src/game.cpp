@@ -141,4 +141,20 @@ void Game::crop(
         ) *
         BLOCK_SIZE;
 }
+
+void Game::partialCopy(
+    const std::unique_ptr<Game> &other,
+    std::size_t deltaTop,
+    std::size_t deltaLeft
+) {
+    auto copySize = other->board.getSize();
+    for (std::size_t row = deltaTop; row < deltaTop + copySize.y; row++) {
+        for (std::size_t col = deltaLeft; col < deltaLeft + copySize.x; col++) {
+            board.setBlock(
+                {col, row},
+                other->board.getBoard()[row - deltaTop][col - deltaLeft]->name()
+            );
+        }
+    }
+}
 }  // namespace Platformer
