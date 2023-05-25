@@ -7,8 +7,9 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "button.hpp"
-#include "level-render.hpp"
+#include "elements/button.hpp"
+#include "level-editor.hpp"
+#include "level-play.hpp"
 #include "performer.hpp"
 
 namespace interface {

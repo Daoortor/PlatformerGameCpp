@@ -1,4 +1,4 @@
-#include "scrollbar.hpp"
+#include "elements/scrollbar.hpp"
 #include "gui-constants.hpp"
 
 namespace interface {

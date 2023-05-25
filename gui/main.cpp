@@ -2,9 +2,7 @@
 #include <SFML/Window.hpp>
 #include "../tools/json.hpp"
 #include "include/gui-constants.hpp"
-#include "include/level-render.hpp"
-#include "include/menu.hpp"
-#include "include/performer.hpp"
+#include "windows/menu.hpp"
 
 using json = nlohmann::json;
 

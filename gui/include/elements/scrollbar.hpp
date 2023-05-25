@@ -3,7 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
-#include "button.hpp"
+#include "elements/button.hpp"
 
 namespace interface {
 
