@@ -138,14 +138,16 @@ ButtonWithImage::ButtonWithImage(
         border.setOutlineColor(sf::Color(255, 255, 255));
     }
     imageTexture.loadFromFile(imageFilename);
-    float imageScaleX = static_cast<float>(shape.getSize().x) /
-                        static_cast<float>(imageTexture.getSize().x);
-    float imageScaleY = static_cast<float>(shape.getSize().y) /
-                        static_cast<float>(imageTexture.getSize().y);
+    float imageScaleX =
+        static_cast<float>(shape.getSize().x - 2 * newIndent.x) /
+        static_cast<float>(imageTexture.getSize().x);
+    float imageScaleY =
+        static_cast<float>(shape.getSize().y - 2 * newIndent.y) /
+        static_cast<float>(imageTexture.getSize().y);
     float imageScale = std::min(imageScaleX, imageScaleY);
     imageSprite.setTexture(imageTexture);
     imageSprite.setScale(imageScale, imageScale);
-    imageSprite.setPosition(newPosition);
+    imageSprite.setPosition(newPosition + newIndent);
 }
 
 void ButtonWithImage::drawInWindow(sf::RenderWindow &window) {

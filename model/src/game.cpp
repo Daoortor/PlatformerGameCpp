@@ -1,5 +1,7 @@
 #include "game.hpp"
+#include <filesystem>
 #include <fstream>
+#include <system_error>
 #include <utility>
 #include "../../tools/json.hpp"
 #include "player.hpp"
@@ -7,6 +9,10 @@
 using json = nlohmann::json;
 
 namespace Platformer {
+const char *FileNotFoundError::what() const noexcept {
+    return message.c_str();
+}
+
 Game::~Game() = default;
 
 void Game::update() {
@@ -41,6 +47,9 @@ Game::Game(
 
 Game::Game(const std::string &filename) {
     std::ifstream f(filename);
+    if (!f.is_open()) {
+        throw FileNotFoundError(filename);
+    }
     json levelData = json::parse(f);
     std::vector<std::vector<std::string>> blockMap = levelData["blockMap"];
     sf::Vector2i playerPos = {

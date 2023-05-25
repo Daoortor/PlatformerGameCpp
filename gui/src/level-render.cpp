@@ -338,17 +338,38 @@ LevelEditor::LevelEditor(
           {10, 10},
           13
       ),
+      loadButton(
+          sf::RectangleShape({60, 40}),
+          colors::BUTTON_COLORS_LIST[0],
+          colors::BUTTON_COLORS_LIST[1],
+          colors::BUTTON_COLORS_LIST[2],
+          colors::BUTTON_COLORS_LIST[3],
+          sf::Text("Load", font, 20),
+          {10, 10},
+          {540, 520},
+          [this, levelsFilepath, miscFilepath] {
+              try {
+                  game = std::make_unique<Game>(
+                      levelsFilepath + levelNameTextbox.getText() + ".json"
+                  );
+                  updateAll(game, miscFilepath);
+              } catch (const Platformer::FileNotFoundError &) {
+                  levelNameTextbox.setText("not found");
+              }
+          }
+      ),
       saveButton(
-          sf::RectangleShape({100, 40}),
+          sf::RectangleShape({60, 40}),
           colors::BUTTON_COLORS_LIST[0],
           colors::BUTTON_COLORS_LIST[1],
           colors::BUTTON_COLORS_LIST[2],
           colors::BUTTON_COLORS_LIST[3],
           sf::Text("Save", font, 20),
           {10, 10},
-          {540, 520},
+          {620, 520},
           [&, levelsFilepath]() {
               game->writeToFile(levelNameTextbox.getText(), levelsFilepath);
+              levelNameTextbox.setText("");
           }
       ),
       startPosButton(
@@ -534,6 +555,8 @@ void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
     loadLevel(window, game);
     blockSelectionBar.loadInWindow(window, event);
     levelNameTextbox.loadInWindow(window, event);
+    loadButton.drawInWindow(window);
+    loadButton.update(window, event);
     saveButton.drawInWindow(window);
     saveButton.update(window, event);
     window.draw(levelBorder);

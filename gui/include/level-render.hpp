@@ -87,12 +87,13 @@ class LevelEditor : public LevelWindow {
     control::MenuPerformer *menuPerformerPtr;
     std::unique_ptr<Game> game;
     std::unique_ptr<Game> gameFullCopy;
-    interface::Scrollbar blockSelectionBar;
+    interface::ImageButtonScrollbar blockSelectionBar;
     sf::RectangleShape levelBorder;
     std::string blockChosen;
     EditorState state;
     interface::Textbox levelNameTextbox;
     interface::RectangleButton saveButton;
+    interface::RectangleButton loadButton;
     interface::ButtonWithImage startPosButton;
     interface::ButtonWithImage levelEndButton;
     interface::RectangleButton backToMenuButton;

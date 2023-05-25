@@ -36,7 +36,7 @@ public:
     void loadBackgroundInWindow(sf::RenderWindow &window);
     void loadRectangleButtonsInWindow(sf::RenderWindow &window);
     void updateButtons(sf::RenderWindow &window, sf::Event event);
-    void loadInWindow(sf::RenderWindow &window, sf::Event event);
+    virtual void loadInWindow(sf::RenderWindow &window, sf::Event event);
     void
     bindButton(const std::string &label_string, std::function<void()> func);
     void addNewButton(
@@ -44,7 +44,7 @@ public:
         int number,
         const sf::Font &font,
         int fontSize,
-        std::vector<sf::Color> &buttonColorsList,
+        const std::vector<sf::Color> &buttonColorsList,
         int buttonDistance,
         sf::Vector2f startingButtonPosition,
         sf::Vector2f buttonIndent
@@ -67,6 +67,9 @@ public:
 };
 
 struct LevelSelectionMenu : Menu {
+    Scrollbar<interface::RectangleButton> buttonScrollbar;
+    ButtonWithImage refreshButton;
+
 public:
     LevelSelectionMenu(
         unsigned int windowWidth,
@@ -76,9 +79,20 @@ public:
         int buttonDistance,
         const std::string &BackgroundTextureFilepath,
         const std::string &LevelFilePath,
+        const std::string &miscFilepath,
         control::MenuPerformer &menuPerformer,
         control::LevelPerformer &levelPerformer,
         Platformer::gui::LevelGameplayWindow &levelWindow
+    );
+    void loadInWindow(sf::RenderWindow &window, sf::Event event) override;
+    void update(
+        const std::string &LevelFilePath,
+        const sf::Font &font,
+        int fontSize,
+        control::MenuPerformer &menuPerformer,
+        control::LevelPerformer &levelPerformer,
+        Platformer::gui::LevelGameplayWindow &levelWindow,
+        unsigned int windowHeight
     );
 };
 

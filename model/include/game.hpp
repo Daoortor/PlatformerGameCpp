@@ -1,6 +1,7 @@
 #ifndef PLATFORMERGAMECPP_GAME_HPP_
 #define PLATFORMERGAMECPP_GAME_HPP_
 
+#include <exception>
 #include <memory>
 #include <vector>
 #include "../../tools/utilities.hpp"
@@ -9,6 +10,15 @@
 #include "player_fwd.hpp"
 
 namespace Platformer {
+
+class FileNotFoundError : public std::exception {
+    std::string message;
+
+public:
+    explicit FileNotFoundError(std::string filename)
+        : message("Level " + std::move(filename) + " not found"){};
+    [[nodiscard]] const char *what() const noexcept override;
+};
 
 class Game {
     Board board;

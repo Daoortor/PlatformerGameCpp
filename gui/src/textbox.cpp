@@ -101,4 +101,11 @@ void Textbox::loadInWindow(sf::RenderWindow &window, sf::Event &event) {
 std::string Textbox::getText() {
     return text.getString();
 }
+
+void Textbox::setText(const std::string &text_) {
+    if (text_.size() <= capacity) {
+        text.setString(text_);
+    }
+    text.setString(text_.substr(0, capacity));
+}
 }  // namespace interface

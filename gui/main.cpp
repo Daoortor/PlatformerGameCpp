@@ -33,7 +33,7 @@ int main() {
     auto levelGameplayWindow = Platformer::gui::LevelGameplayWindow(
         windowHeight, "../gui/assets/textures/interface/level-background.png",
         "../gui/assets/textures/player", "../gui/assets/textures/misc/",
-        "../model/levels/t02-hard-jumps.json", &levelPerformer
+        "../model/levels/deathbox.json", &levelPerformer
     );
 
     auto levelEditor = Platformer::gui::LevelEditor(
@@ -53,7 +53,8 @@ int main() {
     auto loadMenu = interface::LevelSelectionMenu(
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/level-selection-menu-background.png",
-        "../model/levels/", menuPerformer, levelPerformer, levelGameplayWindow
+        "../model/levels/", "../gui/assets/textures/misc/", menuPerformer,
+        levelPerformer, levelGameplayWindow
     );
 
     auto pauseMenu = interface::PauseMenu(

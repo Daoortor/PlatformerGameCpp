@@ -37,6 +37,7 @@ public:
         std::size_t capacity_
     );
     std::string getText();
+    void setText(const std::string &text_);
     void loadInWindow(sf::RenderWindow &window, sf::Event &event);
     void update(sf::RenderWindow &window, sf::Event &event);
 };
