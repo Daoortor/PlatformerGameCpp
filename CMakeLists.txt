@@ -18,6 +18,10 @@ add_executable(game
         gui/src/elements/button.cpp
         gui/src/windows/menu.cpp
         gui/src/performer.cpp
-        model/src/board.cpp gui/src/elements/scrollbar.cpp gui/src/elements/textbox.cpp gui/src/windows/level-play.cpp gui/src/windows/level-editor.cpp)
+        model/src/board.cpp
+        gui/src/elements/scrollbar.cpp
+        gui/src/elements/textbox.cpp
+        gui/src/windows/level-play.cpp
+        gui/src/windows/level-editor.cpp)
 
 target_link_libraries(game sfml-graphics)
