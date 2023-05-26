@@ -3,6 +3,7 @@
 #include <google/protobuf/util/json_util.h>
 #include <grpcpp/grpcpp.h>
 #include <string>
+#include "source.hpp"
 
 using grpc::Channel;
 using grpc::ClientContext;
@@ -14,21 +15,48 @@ using json_file_exchange::ActionRequest;
 
 
 class LevelClient {
+private:
+    std::string level_dir_path = "../levels-client/"; // TODO: is needed?
 public:
     LevelClient(const std::shared_ptr<Channel> &channel)
-        : stub_(LevelClient::Act(channel)) {}
+        : stub_(json_file_exchange::Act::NewStub(channel)) {} // TODO: is safe to make explicit?
+
+    ActionReply add_level(const std::string& level_name) {
+        ActionRequest request;
+        request.set_action("add");
+        request.set_level_name(level_name);
+        json_file_exchange::LevelContent level_content;
+        google::protobuf::util::JsonStringToMessage(file_content_string(level_name), &level_content);
+        request.set_allocated_level_content(&level_content);
+        return sendRequest(request); // TODO: pass by ref? What do?
+    }
+
+    ActionReply check_level_existence(const std::string& level_name) {
+        // TODO: refactor repeated code in add, check, get, delete
+        ActionRequest request;
+        request.set_action("check");
+        request.set_level_name(level_name);
+        return sendRequest(request);
+    }
+
+    ActionReply get_level(const std::string& level_name) {
+        // TODO: refactor repeated code in add, check, get, delete// TODO: refactor repeated code in add, check, delete
+        ActionRequest request;
+        request.set_action("get");
+        request.set_level_name(level_name);
+        return sendRequest(request);
+    }
+
+    ActionReply delete_level(const std::string& level_name) {
+        // TODO: refactor repeated code in add, check, get, delete
+        ActionRequest request;
+        request.set_action("delete");
+        request.set_level_name(level_name);
+        return sendRequest(request); // TODO: look into message constructors
+    }
 
     // takes as input 3 strings; json file must be read into string using ifstream beforehand
-    ActionReply sendRequest(std::string action, std::string level_name, const std::string &level_content_json_string = "") {
-        ActionRequest request;
-        request.set_action(action);
-        request.set_level_name(level_name);
-        LevelContent level_content;
-        google::protobuf::util::JsonParseOptions options_parse;
-        JsonStringToMessage(level_content_json_string, &level_content, options_parse);
-        request.set_level_content(level_content);
-        // TODO: list  pros and cons using message LevelContent over simple string, specifically with this functionality
-
+    ActionReply sendRequest(const ActionRequest& request) {
         ActionReply reply;
 
         ClientContext context;
@@ -38,9 +66,10 @@ public:
         if (status.ok()) {
             return reply;
         } else {
+            reply.set_result(false);
             std::cerr << "Procedure call failed\n";
             std::cerr << status.error_code() << ": " << status.error_message() << std::endl;
-            return "fail";// TODO: what to do?
+            return reply;
         }
     }
 
@@ -60,10 +89,17 @@ void RunClient() {
     std::string level_content_json_string;
     level_file >> level_content_json_string;
 
-    ActionReply reply = client.sendRequest(action, level_name, level_content_json_string);
-    auto result = reply.result();
-    // TODO: now I should parse reply.level_content() into file
-}
+    ActionReply reply = client.add_level("t01-box-with-bladders.json");
+    if (reply.is_successful()) {
+        std::cout << "Request succeeded.\n";
+
+        std::string level_in_json;
+        google::protobuf::util::MessageToJsonString(reply.level_content(), &level_in_json);
+        // TODO: now I should parse reply.level_content() into file
+    } else {
+        std::cout << "Request failed\n";
+    }
+} // TODO: clear this function
 
 int main(int argc, char *argv[]) {
     RunClient();

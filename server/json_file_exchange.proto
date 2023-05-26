@@ -6,43 +6,42 @@ service Act {
     rpc sendRequest(ActionRequest) returns (ActionReply) {}
 }
 
-message ActionRequest {
-    string action = 1;// add, check, get, delete
-    string level_name = 2;
-    LevelContent level_content = 3;
-}
-
 // Level content: needs multiple message structs to implement arrays
-message Block {
-    string type = 1;
-}
-
-message BlockRow {
-    repeated Block row = 1;
-}
-
-message IntPair {
-    int32 x = 1;
-    int32 y = 2;
-}
 
 message LevelContent {
-    string level_name = 1;// naming conventions are strange
+    message Block {
+        string type = 1;
+    }
+    message BlockRow {
+        repeated Block row = 1;
+    }
+
+    message IntPair {
+        int32 x = 1;
+        int32 y = 2;
+    }
+
+    string level_name = 1;// naming conventions for messages are strange
     int32 width = 2;
     int32 height = 3;
     repeated BlockRow block_map = 4;
-    IntPair player_start_pos = 5;// TODO: check whether it will work
-    IntPair end_pos = 6;         // TODO: -/-
+    IntPair player_start_pos = 5;
+    IntPair end_pos = 6;
 }// TODO: field naming convention? Coordinate with current .json level files
 
-// Action reply: contains action status and possible content of recovered level
-// Request status
-message RequestReply {
-    bool is_successful = 1;
-    string message = 2;
-}// TODO: is needed? Apparently not
+message ActionRequest {
+    string action = 1; // add, check, get, delete
+    string level_name = 2; // LevelContent contains the same info,
+    // but I want to be able to pass empty LevelContent for check/delete requests
+    LevelContent level_content = 3;
+    // TODO: maybe change LevelContent to simple string? Do I really need to be able to address parts of level json?
+}
 
+// TODO: big TODO: protobuf message string field shenanigans - figure out
+
+// Action reply: contains action result and possible content of recovered level
 message ActionReply {
-    bool result = 1;
-    LevelContent level_content = 2;
+    bool is_successful = 1; // TODO: is is_successful needed given we have sendRequest Status?
+    bool result = 2;
+    LevelContent level_content = 3;
 }// LevelContent can be empty if something is wrong
