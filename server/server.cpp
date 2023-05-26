@@ -1,8 +1,8 @@
-#include "json_file_exchange.grpc.pb.h"
+#include <grpcpp/grpcpp.h>
 #include <filesystem>
 #include <fstream>
-#include <grpcpp/grpcpp.h>
 #include <string>
+#include "json_file_exchange.grpc.pb.h"
 #include "source.hpp"
 
 using grpc::Server;
@@ -29,20 +29,26 @@ public:
 class incomplete_level_file : public file_handling_exception {
 public:
     explicit incomplete_level_file(const std::string &level_name)
-        : file_handling_exception("missing crucial info for level file creation/overwrite: " + level_name){};
-}; // TODO: is needed at all?
+        : file_handling_exception(
+              "missing crucial info for level file creation/overwrite: " +
+              level_name
+          ){};
+};  // TODO: is needed at all?
 
 // Server Implementation
 class ReverseServiceImplementation final : public Act::Service {
 private:
     std::string level_dir_path = "../levels-server/";
-public:
-    Status sendRequest(ServerContext *context, const ActionRequest *request,
-                       ActionReply *reply) override {
 
-        auto & action = request->action();
+public:
+    Status sendRequest(
+        ServerContext *context,
+        const ActionRequest *request,
+        ActionReply *reply
+    ) override {
+        auto &action = request->action();
         std::string level_file_path = level_dir_path + request->level_name();
-        auto & level_content = request->level_content();
+        auto &level_content = request->level_content();
 
         std::cout << "Requested action: " << action << '\n';
         std::cout << "Level name: " << level_file_path << '\n';
@@ -50,18 +56,27 @@ public:
         try {
             if (action == "add") {
                 std::string level_in_json;
-                google::protobuf::util::MessageToJsonString(level_content, &level_in_json);
+                google::protobuf::util::MessageToJsonString(
+                    level_content, &level_in_json
+                );
                 add_or_replace_json_file(level_file_path, level_in_json);
-                // TODO: confirmation checkbox "Such file already exists. Do you wish to overwrite it?"
+                // TODO: confirmation checkbox "Such file already exists. Do you
+                // wish to overwrite it?"
             } else if (action == "delete") {
-                if (!file_exists(level_file_path)) throw no_such_file(level_file_path);
+                if (!file_exists(level_file_path))
+                    throw no_such_file(level_file_path);
                 delete_file(level_file_path);
             } else if (action == "get") {
-                // TODO: add actions: get string by ifstream via request.level_name(),
+                // TODO: add actions: get string by ifstream via
+                // request.level_name(),
                 //  save to reply.level_content() by JsonStringToMessage()
-                if (!file_exists(level_file_path)) throw no_such_file(level_file_path);
+                if (!file_exists(level_file_path))
+                    throw no_such_file(level_file_path);
                 json_file_exchange::LevelContent requested_level_content;
-                google::protobuf::util::JsonStringToMessage(file_content_string(level_file_path), &requested_level_content);
+                google::protobuf::util::JsonStringToMessage(
+                    file_content_string(level_file_path),
+                    &requested_level_content
+                );
                 reply->set_allocated_level_content(&requested_level_content);
                 reply->set_result(true);
             } else if (action == "check") {
@@ -75,6 +90,7 @@ public:
         }
         return Status::OK;
     }
+
     // TODO: move different actions to different private methods
 };
 
