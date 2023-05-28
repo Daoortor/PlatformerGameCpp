@@ -123,6 +123,8 @@ LevelEditor::LevelEditor(
           {10, 10},
           {30, 520},
           [this]() {
+              deactivateAll();
+              state = EditorState::Idle;
               levelPerformerPtr->exit();
               menuPerformerPtr->openMainMenu();
           }
@@ -214,8 +216,7 @@ LevelEditor::LevelEditor(
               this->updateAll(this->game, miscFilepath);
           }
       ) {
-    for (std::size_t blockNum = 0; blockNum < levels::BLOCK_NAMES.size();
-         blockNum++) {
+    for (int blockNum = 0; blockNum < levels::BLOCK_NAMES.size(); blockNum++) {
         std::string blockFullPath =
             blockFilepath + levels::BLOCK_NAMES[blockNum] + ".png";
         if (levels::BLOCK_NAMES[blockNum] == "air") {

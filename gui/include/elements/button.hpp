@@ -2,6 +2,7 @@
 #define PROJECTGAME_BUTTON_HPP
 
 #include <SFML/Graphics.hpp>
+#include <climits>
 #include <string>
 #include <utility>
 
@@ -49,6 +50,7 @@ protected:
     sf::Color colorAvailable;
     sf::Color colorChosen;
     sf::Color colorClicked;
+    int capacity;
 
 public:
     RectangleButton(
@@ -60,14 +62,21 @@ public:
         sf::Text newLabel,
         sf::Vector2f newIndent,
         sf::Vector2f newPosition,
-        std::function<void()> newAction = []() {}
+        std::function<void()> newAction = []() {},
+        int capacity_ = INT32_MAX
     )
         : shape(std::move(newShape)),
           colorUnavailable(newColorUnavailable),
           colorAvailable(newColorAvailable),
           colorChosen(newColorChosen),
-          colorClicked(newColorClicked) {
+          colorClicked(newColorClicked),
+          capacity(capacity_) {
         label = std::move(newLabel);
+        if (label.getString().getSize() > capacity - 3) {
+            label.setString(
+                label.getString().substring(0, capacity - 3) + "..."
+            );
+        }
         indent = newIndent;
         position = newPosition;
         currentState = ButtonState::Available;

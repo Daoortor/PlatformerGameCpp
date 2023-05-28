@@ -23,11 +23,11 @@ Game &Game::operator=(const Platformer::Game &other) {
     if (this == &other) {
         return *this;
     }
-    player = std::make_unique<Player>();
     timer = other.timer;
     startPos = other.startPos;
     endPos = other.endPos;
     board = other.board;
+    player = std::make_unique<Player>(this, startPos);
     return *this;
 }
 

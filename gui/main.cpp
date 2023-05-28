@@ -31,14 +31,14 @@ int main() {
     auto levelGameplayWindow = Platformer::gui::LevelGameplayWindow(
         windowHeight, "../gui/assets/textures/interface/level-background.png",
         "../gui/assets/textures/player", "../gui/assets/textures/misc/",
-        "../model/levels/deathbox.json", &levelPerformer
+        "../model/levels/level 2.json", &levelPerformer
     );
 
     auto levelEditor = Platformer::gui::LevelEditor(
         windowHeight, &levelPerformer, &menuPerformer,
         "../gui/assets/textures/interface/level-background.png",
         "../gui/assets/textures/blocks/", "../gui/assets/textures/misc/",
-        "../model/levels/" + Platformer::gui::levels::EMPTY_LEVEL_NAME,
+        "../model/" + Platformer::gui::levels::EMPTY_LEVEL_NAME,
         "../model/levels/", fontMario
     );
 

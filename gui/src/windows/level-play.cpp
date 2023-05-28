@@ -59,6 +59,13 @@ void LevelGameplayWindow::loadInWindow(sf::RenderWindow &window) {
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
             levelPerformerPtr->moveRight();
         }
+        if (!(sf::Keyboard::isKeyPressed(sf::Keyboard::Space) ||
+              sf::Keyboard::isKeyPressed(sf::Keyboard::Up) ||
+              sf::Keyboard::isKeyPressed(sf::Keyboard::Left) ||
+              sf::Keyboard::isKeyPressed(sf::Keyboard::Down) ||
+              sf::Keyboard::isKeyPressed(sf::Keyboard::Right))) {
+            levelPerformerPtr->stop();
+        }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
             levelPerformerPtr->pause();
         }

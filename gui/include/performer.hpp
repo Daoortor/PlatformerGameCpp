@@ -7,6 +7,7 @@
 #include <string>
 #include "../../model/include/game.hpp"
 #include "../../model/include/player.hpp"
+#include "../../tools/utilities.hpp"
 
 namespace control {
 enum class MenuState { MainMenu, LoadMenu, PauseMenu, Empty };
@@ -32,11 +33,8 @@ public:
         sf::RenderWindow &window_,
         const std::string &levels_directory
     )
-        : Performer(window_) {
-        // TODO: same meaning as LoadMenu constructor; should trim one of two
-        for (const auto &entry :
-             std::filesystem::directory_iterator(levels_directory))
-            level_paths.push_back(entry.path().string());
+        : Performer(window_),
+          level_paths(Platformer::utilities::getLevelPaths(levels_directory)) {
     }
 
     MenuState getState();
@@ -65,6 +63,7 @@ public:
     [[maybe_unused]] void moveRight();
     [[maybe_unused]] void moveDown();
     void jump();
+    void stop();
     [[maybe_unused]] void exit();
     void setLevel(std::unique_ptr<Platformer::Game> game_);
 

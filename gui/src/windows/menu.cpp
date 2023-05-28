@@ -1,4 +1,5 @@
 #include "windows/menu.hpp"
+#include <algorithm>
 #include <filesystem>
 #include <utility>
 #include "gui-constants.hpp"
@@ -126,8 +127,8 @@ MainMenu::MainMenu(
     );
 
     std::vector<std::string> buttonStringLabels = {
-        "Start game",  "Load game", "Level editor", "Settings",
-        "Author info", "Feedback",  "Quit"};
+        "Start game",  "Select level", "Level editor", "Settings",
+        "Author info", "Feedback",     "Quit"};
     auto colorsList = std::vector{
         sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
         sf::Color(0, 209, 255, 192), sf::Color(255, 95, 0, 192)};
@@ -151,7 +152,7 @@ MainMenu::MainMenu(
         menuPerformer.setState(control::MenuState::Empty);
         levelPerformer.setState(control::LevelState::Editor);
     });
-    bindButton("Load game", [&]() { menuPerformer.openLoadLevelMenu(); });
+    bindButton("Select level", [&]() { menuPerformer.openLoadLevelMenu(); });
     bindButton("Quit", [&]() { menuPerformer.closeWindow(); });
 }
 
@@ -162,7 +163,7 @@ LevelSelectionMenu::LevelSelectionMenu(
     int fontSize,
     int buttonDistance,
     const std::string &BackgroundTextureFilepath,
-    const std::string &LevelFilePath,
+    const std::string &levelFilePath,
     const std::string &miscFilepath,
     control::MenuPerformer &menuPerformer,
     control::LevelPerformer &levelPerformer,
@@ -186,7 +187,7 @@ LevelSelectionMenu::LevelSelectionMenu(
           {470, 150},
           Platformer::gui::colors::BUTTON_COLORS_LIST,
           [this,
-           LevelFilePath,
+           levelFilePath,
            &font,
            fontSize,
            &menuPerformer,
@@ -194,7 +195,7 @@ LevelSelectionMenu::LevelSelectionMenu(
            &levelWindow,
            windowHeight] {
               update(
-                  LevelFilePath, font, fontSize, menuPerformer, levelPerformer,
+                  levelFilePath, font, fontSize, menuPerformer, levelPerformer,
                   levelWindow, windowHeight
               );
           },
@@ -210,9 +211,12 @@ LevelSelectionMenu::LevelSelectionMenu(
         "Return", 0, font, fontSize, colorsList, buttonDistance, {340, 150},
         {10, 10}
     );
-    bindButton("Return", [&]() { menuPerformer.openMainMenu(); });
+    bindButton("Return", [&]() {
+        buttonScrollbar.reset();
+        menuPerformer.openMainMenu();
+    });
     update(
-        LevelFilePath, font, fontSize, menuPerformer, levelPerformer,
+        levelFilePath, font, fontSize, menuPerformer, levelPerformer,
         levelWindow, windowHeight
     );
 }
@@ -228,7 +232,7 @@ void LevelSelectionMenu::loadInWindow(
 }
 
 void LevelSelectionMenu::update(
-    const std::string &LevelFilePath,
+    const std::string &levelFilePath,
     const sf::Font &font,
     int fontSize,
     control::MenuPerformer &menuPerformer,
@@ -238,18 +242,13 @@ void LevelSelectionMenu::update(
 ) {
     buttonScrollbar.clear();
     auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
-    for (auto &p : std::filesystem::directory_iterator(std::filesystem::path{
-             LevelFilePath})) {
-        const std::string levelPath = p.path();
-        std::string levelName = levelPath.substr(LevelFilePath.size());
-        const int capacity = 16;
-        if (levelName.size() > capacity) {
-            levelName = levelName.substr(0, capacity - 3) + "...";
-        }
+    auto filenames = Platformer::utilities::getLevelNames(levelFilePath);
+    for (auto &levelName : filenames) {
+        const std::string levelPath = levelFilePath + levelName + ".json";
         interface::RectangleButton newButton(
             sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
             colorsList[2], colorsList[3], sf::Text(levelName, font, fontSize),
-            {10, 5}, {340, 250},
+            {10, 10}, {340, 250},
             [&, levelPath]() {
                 menuPerformer.loadLevel(levelPerformer);
                 levelWindow = Platformer::gui::LevelGameplayWindow(
@@ -259,7 +258,8 @@ void LevelSelectionMenu::update(
                     "../gui/assets/textures/misc/", levelPath, &levelPerformer
                 );
                 // TODO: implementation above is due to rewrite
-            }
+            },
+            18
         );
         buttonScrollbar.addItem(newButton);
     }

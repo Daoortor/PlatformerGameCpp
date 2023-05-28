@@ -1,14 +1,18 @@
 #include "elements/scrollbar.hpp"
-#include "gui-constants.hpp"
 
 namespace interface {
-void ImageButtonScrollbar::chooseItem(std::size_t item) {
-    items[itemChosen]->deactivate();
+void ImageButtonScrollbar::chooseItem(int item) {
+    if (itemChosen != -1) {
+        items[itemChosen]->deactivate();
+    }
     itemChosen = item;
     items[item]->activate();
 }
 
 void ImageButtonScrollbar::deactivate() {
-    items[itemChosen]->deactivate();
+    if (itemChosen != -1) {
+        items[itemChosen]->deactivate();
+        itemChosen = -1;
+    }
 }
 }  // namespace interface

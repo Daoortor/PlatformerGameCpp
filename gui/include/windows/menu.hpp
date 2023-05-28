@@ -79,7 +79,7 @@ public:
         int fontSize,
         int buttonDistance,
         const std::string &BackgroundTextureFilepath,
-        const std::string &LevelFilePath,
+        const std::string &levelFilePath,
         const std::string &miscFilepath,
         control::MenuPerformer &menuPerformer,
         control::LevelPerformer &levelPerformer,
@@ -87,7 +87,7 @@ public:
     );
     void loadInWindow(sf::RenderWindow &window, sf::Event event) override;
     void update(
-        const std::string &LevelFilePath,
+        const std::string &levelFilePath,
         const sf::Font &font,
         int fontSize,
         control::MenuPerformer &menuPerformer,

@@ -117,6 +117,14 @@ public:
         }
     };
 
+    virtual void reset() {
+        sf::Vector2f moveVector(0, (itemSize.y + itemMargin) * offset);
+        for (const auto &item : items) {
+            item->setPosition(item->getPosition() + moveVector);
+        }
+        offset = 0;
+    }
+
     virtual void clear() {
         offset = 0;
         items.clear();
@@ -125,7 +133,7 @@ public:
 
 class ImageButtonScrollbar : public Scrollbar<ButtonWithImage> {
 protected:
-    std::size_t itemChosen = 0;
+    int itemChosen = -1;
 
 public:
     ImageButtonScrollbar(
@@ -150,7 +158,7 @@ public:
               itemChosenColor_,
               iconFilepath
           ){};
-    void chooseItem(std::size_t item);
+    void chooseItem(int item);
     void deactivate();
 };
 }  // namespace interface

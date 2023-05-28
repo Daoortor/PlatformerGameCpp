@@ -4,20 +4,22 @@
 namespace Platformer {
 
 namespace observers {
-PhysicsObserver::PhysicsObserver(Player *player_) : player(player_) {
-}
-
 void PhysicsObserver::updateCollision() {
     if ((player->isStanding() && player->speed.y > 0)) {
-        player->speed = {player->speed.x, 0};
-    } else if (!player->canJump()) {
+        player->speed = {
+            player->speed.x,
+            static_cast<int>(
+                static_cast<float>(-player->speed.y) * player->getBounce()
+            )};
+    }
+    if (!player->canJump()) {
         int newSpeed = -static_cast<int>(
-            static_cast<float>(player->speed.y) * BOUNCE_COEFFICIENT
+            static_cast<float>(player->speed.y) * WALL_BOUNCE_COEFFICIENT
         );
         player->speed = {player->speed.x, newSpeed};
     }
     if ((player->distLeft() == 0 && player->speed.x < 0) ||
-        (player->distRight() == 0 && player->speed.x > 0)) {  // Hitting walls
+        (player->distRight() == 0 && player->speed.x > 0)) {
         player->speed = {0, player->speed.y};
     }
 }
@@ -36,9 +38,19 @@ void PhysicsObserver::updateMovement() {
 }
 
 void PhysicsObserver::update() {
-    updateGravity();
     updateCollision();
+    updateGravity();
     updateMovement();
+}
+
+void DeathObserver::updateKillerDeath() {
+    if (player->isDying()) {
+        player->reset();
+    }
+}
+
+void DeathObserver::update() {
+    updateKillerDeath();
 }
 }  // namespace observers
 
@@ -48,11 +60,16 @@ Player::Player(Game *game_) : game(game_) {
 Player::Player(Game *game_, sf::Vector2i pos_) {
     game = game_;
     pos = pos_;
-    auto physObs =
-        std::unique_ptr<observers::Observer>(new observers::PhysicsObserver(this
-        ));
-    observerCollection = std::vector<std::unique_ptr<observers::Observer>>();
+    auto physObs = std::unique_ptr<observers::PlayerObserver>(
+        new observers::PhysicsObserver(this)
+    );
+    auto deathObs = std::unique_ptr<observers::PlayerObserver>(
+        new observers::DeathObserver(this)
+    );
+    observerCollection =
+        std::vector<std::unique_ptr<observers::PlayerObserver>>();
     observerCollection.push_back(std::move(physObs));
+    observerCollection.push_back(std::move(deathObs));
 }
 
 Player::Player(Game *game_, sf::Vector2i pos_, int width_, int height_)
@@ -86,6 +103,13 @@ void Player::moveDown() {
     }
 }
 
+void Player::stop() {
+    if (ownSpeed != 0) {
+        speed.x -= ownSpeed;
+        ownSpeed = 0;
+    }
+}
+
 void Player::move(sf::Vector2i delta) {
     int deltaX, deltaY;
     if (delta.x > 0) {
@@ -93,12 +117,13 @@ void Player::move(sf::Vector2i delta) {
     } else {
         deltaX = std::max(delta.x, -distLeft());
     }
+    pos += {deltaX, 0};
     if (delta.y > 0) {
         deltaY = std::min(delta.y, distBelow());
     } else {
         deltaY = std::max(delta.y, -distAbove());
     }
-    pos += {deltaX, deltaY};
+    pos += {0, deltaY};
 }
 
 void Player::notifyAll() {
@@ -107,7 +132,7 @@ void Player::notifyAll() {
     }
 }
 
-std::vector<sf::Vector2i> Player::coordsAbove() {
+std::vector<sf::Vector2i> Player::coordsAbove() const {
     std::vector<sf::Vector2i> result;
     sf::Vector2i currentVector{pos.x - width / 2 + 1, pos.y - height / 2 - 2};
     while (currentVector.x <= pos.x + width / 2 + 1) {
@@ -120,7 +145,7 @@ std::vector<sf::Vector2i> Player::coordsAbove() {
     return result;
 }
 
-std::vector<sf::Vector2i> Player::coordsBelow() {
+std::vector<sf::Vector2i> Player::coordsBelow() const {
     std::vector<sf::Vector2i> result;
     sf::Vector2i currentVector{pos.x - width / 2 + 1, pos.y + height / 2};
     while (currentVector.x <= pos.x + width / 2 + 1) {
@@ -132,9 +157,33 @@ std::vector<sf::Vector2i> Player::coordsBelow() {
     return result;
 }
 
+std::vector<sf::Vector2i> Player::coordsLeft() const {
+    std::vector<sf::Vector2i> result;
+    sf::Vector2i currentVector{pos.x - width / 2 - 1, pos.y - height / 2};
+    while (currentVector.y <= pos.y + height / 2) {
+        result.push_back(currentVector);
+        currentVector += {0, BLOCK_SIZE};
+    }
+    sf::Vector2i upperRightCorner{pos.x - width / 2 - 1, pos.y + height / 2};
+    result.push_back(upperRightCorner);
+    return result;
+}
+
+std::vector<sf::Vector2i> Player::coordsRight() const {
+    std::vector<sf::Vector2i> result;
+    sf::Vector2i currentVector{pos.x + width / 2 + 1, pos.y - height / 2};
+    while (currentVector.y <= pos.y + height / 2) {
+        result.push_back(currentVector);
+        currentVector += {0, BLOCK_SIZE};
+    }
+    sf::Vector2i upperRightCorner{pos.x + width / 2 + 1, pos.y + height / 2};
+    result.push_back(upperRightCorner);
+    return result;
+}
+
 std::vector<const Block *> Player::blocksAbove() {
     auto coords = coordsAbove();
-    std::vector<const Block *> result(coordsBelow().size());
+    std::vector<const Block *> result(coordsAbove().size());
     std::transform(
         coords.begin(), coords.end(), result.begin(),
         [this](sf::Vector2i position) {
@@ -149,6 +198,30 @@ std::vector<const Block *> Player::blocksAbove() {
 std::vector<const Block *> Player::blocksBelow() {
     auto coords = coordsBelow();
     std::vector<const Block *> result(coordsBelow().size());
+    std::transform(
+        coords.begin(), coords.end(), result.begin(),
+        [this](sf::Vector2i position) {
+            return game->getBoardObject().getBlockByCoordinates(position).get();
+        }
+    );
+    return result;
+}
+
+std::vector<const Block *> Player::blocksLeft() {
+    auto coords = coordsLeft();
+    std::vector<const Block *> result(coordsLeft().size());
+    std::transform(
+        coords.begin(), coords.end(), result.begin(),
+        [this](sf::Vector2i position) {
+            return game->getBoardObject().getBlockByCoordinates(position).get();
+        }
+    );
+    return result;
+}
+
+std::vector<const Block *> Player::blocksRight() {
+    auto coords = coordsRight();
+    std::vector<const Block *> result(coordsRight().size());
     std::transform(
         coords.begin(), coords.end(), result.begin(),
         [this](sf::Vector2i position) {
@@ -232,6 +305,15 @@ int Player::distRight() {
     );
 }
 
+float Player::getBounce() {
+    auto blocksBelow_ = blocksBelow();
+    float result = 0;
+    for (auto &block : blocksBelow_) {
+        result = std::max(result, block->getFallBounceCoefficient());
+    }
+    return result;
+}
+
 bool Player::isHanging() {
     auto blocksBelow_ = blocksBelow();
     return std::any_of(
@@ -256,6 +338,25 @@ bool Player::canJump() {
     );
 }
 
+bool Player::isDying() {
+    std::vector<const Block *> blocks;
+    for (auto &block : blocksAbove()) {
+        blocks.push_back(block);
+    }
+    for (auto &block : blocksBelow()) {
+        blocks.push_back(block);
+    }
+    for (auto &block : blocksLeft()) {
+        blocks.push_back(block);
+    }
+    for (auto &block : blocksRight()) {
+        blocks.push_back(block);
+    }
+    return std::any_of(blocks.begin(), blocks.end(), [](const Block *block) {
+        return block->isDeadly();
+    });
+}
+
 bool Player::contains(sf::Vector2i position) const {
     int top = pos.y - height / 2;
     int bottom = pos.y + height / 2;
@@ -263,5 +364,12 @@ bool Player::contains(sf::Vector2i position) const {
     int right = pos.x + width / 2;
     return top <= position.y && position.y <= bottom && left <= position.x &&
            position.x <= right;
+}
+
+void Player::reset() {
+    *this = Player(game, game->getStartPos());
+    for (auto &observer : observerCollection) {
+        observer->setPlayer(this);
+    }
 }
 }  // namespace Platformer
