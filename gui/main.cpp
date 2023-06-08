@@ -39,7 +39,7 @@ int main() {
         "../gui/assets/textures/interface/level-background.png",
         "../gui/assets/textures/blocks/", "../gui/assets/textures/misc/",
         "../model/" + Platformer::gui::levels::EMPTY_LEVEL_NAME,
-        "../model/levels/", fontMario
+        "../model/levels/", fontMario, {45, 0}
     );
 
     auto mainMenu = interface::MainMenu(

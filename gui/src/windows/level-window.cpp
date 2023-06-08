@@ -98,7 +98,8 @@ sf::Sprite makeBlockSprite(
 
 std::vector<std::vector<sf::Sprite>> makeBlockSprites(
     std::unique_ptr<Platformer::Game> &game,
-    std::map<std::string, std::unique_ptr<sf::Texture>> &blockTextures
+    std::map<std::string, std::unique_ptr<sf::Texture>> &blockTextures,
+    sf::Vector2f offset = {0, 0}
 ) {
     auto boardSize = game->getBoardObject().getSize();
     std::size_t boardWidth = boardSize.x;
@@ -118,9 +119,12 @@ std::vector<std::vector<sf::Sprite>> makeBlockSprites(
     for (std::size_t row = 0; row < boardHeight; row++) {
         for (std::size_t col = 0; col < boardWidth; col++) {
             std::string blockName = board[row][col]->name();
-            sf::Vector2f pos = {
-                topLeftCorner.x + blockSize * static_cast<float>(col),
-                topLeftCorner.y + blockSize * static_cast<float>(row)};
+            sf::Vector2f pos =
+                offset +
+                sf::Vector2f(
+                    topLeftCorner.x + blockSize * static_cast<float>(col),
+                    topLeftCorner.y + blockSize * static_cast<float>(row)
+                );
             spriteMatrix[row][col] =
                 makeBlockSprite(blockTextures[blockName], blockSize, pos);
         }
@@ -140,8 +144,10 @@ LevelWindow::LevelWindow(
     unsigned int windowHeight,
     const std::string &backgroundTextureFilepath,
     const std::string &miscFilepath,
-    const std::string &levelFilepath = ""
-) {
+    const std::string &levelFilepath = "",
+    sf::Vector2f offset_
+)
+    : offset(offset_) {
     backgroundTexture.loadFromFile(backgroundTextureFilepath);
     sf::Vector2u textureSize = backgroundTexture.getSize();
     float backgroundScale =
@@ -178,9 +184,10 @@ void LevelWindow::updateAll(
     std::unique_ptr<Platformer::Game> &game,
     const std::string &miscFilepath
 ) {
-    sf::Vector2f offset =
+    sf::Vector2f startEndOffset =
         sf::Vector2f(getBlockSize(game) / 4, getBlockSize(game) / 4);
-    boardSprites = Platformer::gui::makeBlockSprites(game, blockTextures);
+    boardSprites =
+        Platformer::gui::makeBlockSprites(game, blockTextures, offset);
     levelBeginTexture.loadFromFile(miscFilepath + "level-begin.png");
     float levelBeginEndScale =
         static_cast<float>(getBlockSize(game)) / 2 /
@@ -188,12 +195,12 @@ void LevelWindow::updateAll(
     levelBeginSprite.setTexture(levelBeginTexture);
     levelBeginSprite.setScale(levelBeginEndScale, levelBeginEndScale);
     sf::Vector2f levelBeginPos = getCoordinates(game->getStartPos(), game);
-    levelBeginSprite.setPosition(levelBeginPos - offset);
+    levelBeginSprite.setPosition(levelBeginPos + offset - startEndOffset);
 
     levelEndTexture.loadFromFile(miscFilepath + "level-end.png");
     levelEndSprite.setTexture(levelEndTexture);
     levelEndSprite.setScale(levelBeginEndScale, levelBeginEndScale);
     sf::Vector2f levelEndPos = getCoordinates(game->getEndPos(), game);
-    levelEndSprite.setPosition(levelEndPos - offset);
+    levelEndSprite.setPosition(levelEndPos + offset - startEndOffset);
 }
 }  // namespace Platformer::gui

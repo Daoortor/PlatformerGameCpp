@@ -35,7 +35,8 @@ public:
         const std::string &miscFilepath,
         const std::string &emptyLevelFilepath,
         const std::string &levelsFilepath,
-        const sf::Font &font
+        const sf::Font &font,
+        sf::Vector2f offset
     );
     void loadInWindow(sf::RenderWindow &window, sf::Event event);
     void setBlock(sf::Vector2<std::size_t> pos, const std::string &name);

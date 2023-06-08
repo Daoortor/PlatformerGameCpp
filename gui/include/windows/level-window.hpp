@@ -49,13 +49,15 @@ protected:
     sf::Sprite levelBeginSprite;
     sf::Texture levelEndTexture;
     sf::Sprite levelEndSprite;
+    sf::Vector2f offset;
 
 public:
     LevelWindow(
         unsigned int windowHeight,
         const std::string &backgroundTextureFilepath,
         const std::string &miscFilepath,
-        const std::string &levelFilepath
+        const std::string &levelFilepath,
+        sf::Vector2f offset_ = {0, 0}
     );
     void loadLevel(sf::RenderWindow &window, std::unique_ptr<Game> &game);
     void updateAll(

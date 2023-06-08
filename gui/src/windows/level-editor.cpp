@@ -10,20 +10,22 @@ LevelEditor::LevelEditor(
     const std::string &miscFilepath,
     const std::string &emptyLevelFilepath,
     const std::string &levelsFilepath,
-    const sf::Font &font
+    const sf::Font &font,
+    sf::Vector2f offset
 )
     : LevelWindow(
           windowHeight,
           backgroundTextureFilepath,
           miscFilepath,
-          emptyLevelFilepath
+          emptyLevelFilepath,
+          offset
       ),
       levelPerformerPtr(levelPerformerPtr_),
       menuPerformerPtr(menuPerformerPtr_),
       game(std::make_unique<Game>(emptyLevelFilepath)),
       gameFullCopy(std::make_unique<Game>(*game)),
       blockSelectionBar(
-          {30, getTopLeftCorner(game).y},
+          {75, getTopLeftCorner(game).y},
           {40, 40},
           {10, 20},
           20,
@@ -45,7 +47,7 @@ LevelEditor::LevelEditor(
           colors::TEXTBOX_COLORS_LIST[3],
           colors::TEXTBOX_COLORS_LIST[4],
           colors::TEXTBOX_COLORS_LIST[5],
-          {370, 520},
+          {415, 520},
           {10, 10},
           13
       ),
@@ -57,7 +59,7 @@ LevelEditor::LevelEditor(
           colors::BUTTON_COLORS_LIST[3],
           sf::Text("Load", font, 20),
           {10, 10},
-          {540, 520},
+          {585, 520},
           [this, levelsFilepath, miscFilepath] {
               try {
                   game = std::make_unique<Game>(
@@ -77,7 +79,7 @@ LevelEditor::LevelEditor(
           colors::BUTTON_COLORS_LIST[3],
           sf::Text("Save", font, 20),
           {10, 10},
-          {620, 520},
+          {665, 520},
           [&, levelsFilepath]() {
               game->writeToFile(levelNameTextbox.getText(), levelsFilepath);
               levelNameTextbox.setText("");
@@ -87,7 +89,7 @@ LevelEditor::LevelEditor(
           miscFilepath + "level-begin.png",
           sf::RectangleShape({40, 40}),
           {0, 0},
-          {40, 348},
+          {85, 348},
           std::vector<sf::Color>(4, sf::Color::Transparent),
           [this]() {
               this->state = EditorState::StartPosChosen;
@@ -102,7 +104,7 @@ LevelEditor::LevelEditor(
           miscFilepath + "level-end.png",
           sf::RectangleShape({40, 40}),
           {0, 0},
-          {40, 430},
+          {85, 430},
           std::vector<sf::Color>(4, sf::Color::Transparent),
           [this]() {
               this->state = EditorState::EndPosChosen;
@@ -121,7 +123,7 @@ LevelEditor::LevelEditor(
           colors::BUTTON_COLORS_LIST[3],
           sf::Text("Back to menu", font, 20),
           {10, 10},
-          {30, 520},
+          {75, 520},
           [this]() {
               deactivateAll();
               state = EditorState::Idle;
@@ -137,7 +139,7 @@ LevelEditor::LevelEditor(
           colors::BUTTON_COLORS_LIST[3],
           sf::Text("Reset", font, 20),
           {10, 10},
-          {185, 520},
+          {230, 520},
           [this, emptyLevelFilepath, miscFilepath]() {
               this->game = std::make_unique<Game>(emptyLevelFilepath);
               this->updateAll(this->game, miscFilepath);
@@ -151,7 +153,7 @@ LevelEditor::LevelEditor(
           colors::BUTTON_COLORS_LIST[3],
           sf::Text("+", font, 20),
           {10, 10},
-          {270, 520},
+          {315, 520},
           [this, miscFilepath]() {
               auto levelSize = this->game->getBoardObject().getSize();
               if (levelSize.y == levels::INITIAL_LEVEL_BLOCK_HEIGHT) {
@@ -187,7 +189,7 @@ LevelEditor::LevelEditor(
           colors::BUTTON_COLORS_LIST[3],
           sf::Text("-", font, 20),
           {10, 10},
-          {320, 520},
+          {365, 520},
           [this, miscFilepath]() {
               auto levelSize = this->game->getBoardObject().getSize();
               auto deltaHeight = 1;
@@ -240,8 +242,11 @@ LevelEditor::LevelEditor(
          static_cast<float>(levels::LEVEL_HEIGHT)}
     );
     levelBorder.setPosition(
-        {(static_cast<float>(WINDOW_WIDTH) - levelBorder.getSize().x) / 2,
-         (static_cast<float>(WINDOW_HEIGHT) - levelBorder.getSize().y) / 2}
+        sf::Vector2f(
+            (static_cast<float>(WINDOW_WIDTH) - levelBorder.getSize().x) / 2,
+            (static_cast<float>(WINDOW_HEIGHT) - levelBorder.getSize().y) / 2
+        ) +
+        offset
     );
     levelBorder.setFillColor(sf::Color::Transparent);
     levelBorder.setOutlineThickness(1.f);
@@ -253,11 +258,13 @@ void LevelEditor::setBlock(
     const std::string &name
 ) {
     game->getBoardObject().setBlock(pos, name);
-    sf::Vector2f coordinates = {
-        getTopLeftCorner(game).x +
-            getBlockSize(game) * static_cast<float>(pos.x),
-        getTopLeftCorner(game).y +
-            getBlockSize(game) * static_cast<float>(pos.y)};
+    auto coordinates =
+        offset + sf::Vector2f(
+                     getTopLeftCorner(game).x +
+                         getBlockSize(game) * static_cast<float>(pos.x),
+                     getTopLeftCorner(game).y +
+                         getBlockSize(game) * static_cast<float>(pos.y)
+                 );
     boardSprites.at(pos.y).at(pos.x) =
         makeBlockSprite(blockTextures[name], getBlockSize(game), coordinates);
 }
@@ -286,14 +293,18 @@ void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
     minusButton.update(window, event);
     if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) {
         sf::Vector2f mousePos =
-            window.mapPixelToCoords(sf::Mouse::getPosition(window));
+            window.mapPixelToCoords(sf::Mouse::getPosition(window)) - offset;
         sf::Vector2i inGamePos = static_cast<sf::Vector2i>(
             (mousePos - getTopLeftCorner(game)) / getBlockSize(game) *
             static_cast<float>(BLOCK_SIZE)
         );
         if (state == EditorState::BlockChosen) {
             sf::Vector2i blockPos = getInGameCoordinates(
-                window.mapPixelToCoords(sf::Mouse::getPosition(window)), game
+                window.mapPixelToCoords(
+                    sf::Mouse::getPosition(window) -
+                    static_cast<sf::Vector2i>(offset)
+                ),
+                game
             );
             if (blockPos != sf::Vector2i(-1, -1)) {
                 setBlock(
@@ -301,13 +312,23 @@ void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
                 );
             }
         } else if (state == EditorState::StartPosChosen) {
-            if (inGamePos.x >= 0 &&
-                inGamePos.y < game->getBoardObject().getSize().y * BLOCK_SIZE) {
+            if (0 <= inGamePos.x &&
+                inGamePos.x <=
+                    game->getBoardObject().getSize().x * BLOCK_SIZE &&
+                inGamePos.y <=
+                    static_cast<int>(
+                        game->getBoardObject().getSize().y * BLOCK_SIZE
+                    )) {
                 setStartPos(inGamePos);
             }
         } else if (state == EditorState::EndPosChosen) {
-            if (inGamePos.x >= 0 &&
-                inGamePos.y < game->getBoardObject().getSize().y * BLOCK_SIZE) {
+            if (0 <= inGamePos.x &&
+                inGamePos.x <=
+                    game->getBoardObject().getSize().x * BLOCK_SIZE &&
+                inGamePos.y <=
+                    static_cast<int>(
+                        game->getBoardObject().getSize().y * BLOCK_SIZE
+                    )) {
                 setEndPos(inGamePos);
             }
         }
@@ -316,16 +337,20 @@ void LevelEditor::loadInWindow(sf::RenderWindow &window, sf::Event event) {
 }
 
 void LevelEditor::setStartPos(sf::Vector2i pos) {
-    sf::Vector2f offset =
+    sf::Vector2f circleOffset =
         sf::Vector2f(getBlockSize(game) / 4, getBlockSize(game) / 4);
-    levelBeginSprite.setPosition(getCoordinates(pos, game) - offset);
+    levelBeginSprite.setPosition(
+        getCoordinates(pos, game) - circleOffset + offset
+    );
     game->setStartPos(pos);
 }
 
 void LevelEditor::setEndPos(sf::Vector2i pos) {
-    sf::Vector2f offset =
+    sf::Vector2f circleOffset =
         sf::Vector2f(getBlockSize(game) / 4, getBlockSize(game) / 4);
-    levelEndSprite.setPosition(getCoordinates(pos, game) - offset);
+    levelEndSprite.setPosition(
+        getCoordinates(pos, game) - circleOffset + offset
+    );
     game->setEndPos(pos);
 }
 

@@ -49,8 +49,18 @@ void DeathObserver::updateKillerDeath() {
     }
 }
 
+void DeathObserver::updateFallDeath() {
+    const std::size_t levelHeight =
+        static_cast<std::size_t>(BLOCK_SIZE) *
+        player->getGame()->getBoardObject().getSize().y;
+    if (player->getPos().y >= BOTTOM_DEATH_BORDER + levelHeight) {
+        player->reset();
+    }
+}
+
 void DeathObserver::update() {
     updateKillerDeath();
+    updateFallDeath();
 }
 }  // namespace observers
 
@@ -367,9 +377,6 @@ bool Player::contains(sf::Vector2i position) const {
 }
 
 void Player::reset() {
-    *this = Player(game, game->getStartPos());
-    for (auto &observer : observerCollection) {
-        observer->setPlayer(this);
-    }
+    setPos(game->getStartPos());
 }
 }  // namespace Platformer

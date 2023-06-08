@@ -43,6 +43,7 @@ public:
 
 class DeathObserver : public PlayerObserver {
     void updateKillerDeath();
+    void updateFallDeath();
 
 public:
     explicit DeathObserver(Player *player_) : PlayerObserver(player_){};
@@ -84,6 +85,10 @@ public:
         return pos;
     }
 
+    void setPos(sf::Vector2i pos_) {
+        pos = pos_;
+    }
+
     [[nodiscard]] sf::Vector2i getSpeed() const {
         return speed;
     }
@@ -94,6 +99,10 @@ public:
 
     [[nodiscard]] sf::Vector2i getSize() const {
         return {width, height};
+    }
+
+    [[nodiscard]] Game *getGame() const {
+        return game;
     }
 
     void moveLeft();
