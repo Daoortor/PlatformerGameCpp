@@ -53,7 +53,8 @@ void DeathObserver::updateFallDeath() {
     const std::size_t levelHeight =
         static_cast<std::size_t>(BLOCK_SIZE) *
         player->getGame()->getBoardObject().getSize().y;
-    if (player->getPos().y >= BOTTOM_DEATH_BORDER + levelHeight) {
+    if (player->getPos().y >=
+        BOTTOM_DEATH_BORDER + static_cast<int>(levelHeight)) {
         player->reset();
     }
 }

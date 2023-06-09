@@ -27,6 +27,10 @@ public:
     void setPlayer(Player *player_) {
         player = player_;
     }
+
+    Player *getPlayer() {
+        return player;
+    }
 };
 
 class PhysicsObserver : public PlayerObserver {
@@ -103,6 +107,12 @@ public:
 
     [[nodiscard]] Game *getGame() const {
         return game;
+    }
+
+    [[nodiscard]] const std::vector<
+        std::unique_ptr<observers::PlayerObserver>> &
+    getObservers() {
+        return observerCollection;
     }
 
     void moveLeft();

@@ -14,14 +14,24 @@ add_executable(game
         model/src/game.cpp
         model/src/observers.cpp
         model/src/player.cpp
+        model/src/board.cpp
         tools/utilities.cpp
         gui/src/elements/button.cpp
         gui/src/windows/menu.cpp
         gui/src/performer.cpp
-        model/src/board.cpp
         gui/src/elements/scrollbar.cpp
         gui/src/elements/textbox.cpp
         gui/src/windows/level-play.cpp
         gui/src/windows/level-editor.cpp)
+
+add_executable(test
+        model/src/block.cpp
+        model/src/game.cpp
+        model/src/observers.cpp
+        model/src/player.cpp
+        model/src/board.cpp
+        tools/utilities.cpp
+        tests/tests.cpp
+        tests/doctest_main.cpp)
 
 target_link_libraries(game sfml-graphics)
