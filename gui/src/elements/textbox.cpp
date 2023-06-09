@@ -15,9 +15,11 @@ Textbox::Textbox(
     sf::Color colorActive_,
     sf::Vector2f position,
     sf::Vector2f indent,
-    std::size_t capacity_
+    std::size_t capacity_,
+    std::size_t cooldown_
 )
-    : shape(std::move(shape_)),
+    : cooldown(cooldown_),
+      shape(std::move(shape_)),
       colorUnavailable(colorUnavailable_),
       colorAvailable(colorAvailable_),
       colorChosen(colorChosen_),
@@ -46,7 +48,6 @@ void Textbox::update(sf::RenderWindow &window, sf::Event &event) {
             currentState = TextboxState::Available;
         }
     }
-
     if (event.type == sf::Event::MouseButtonPressed) {
         if (mouseInsideTextbox && currentState == TextboxState::Chosen) {
             currentState = TextboxState::Active;
@@ -62,14 +63,18 @@ void Textbox::update(sf::RenderWindow &window, sf::Event &event) {
                 text.getString() + static_cast<char>(event.text.unicode)
             );
         }
-    } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Backspace) &&
-               currentState == TextboxState::Active &&
-               !text.getString().isEmpty()) {
-        text.setString(
-            text.getString().substring(0, text.getString().getSize() - 1)
-        );
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Backspace) &&
+        currentState == TextboxState::Active && !text.getString().isEmpty()) {
+        if (ticksSinceLastErase >= cooldown) {
+            text.setString(
+                text.getString().substring(0, text.getString().getSize() - 1)
+            );
+            ticksSinceLastErase = 0;
+        }
     }
     updateColor();
+    ticksSinceLastErase++;
 }
 
 void Textbox::updateColor() {

@@ -18,6 +18,8 @@ class Textbox {
     sf::RectangleShape shape;
     TextboxState currentState;
     std::size_t capacity;
+    std::size_t cooldown;
+    std::size_t ticksSinceLastErase = 0;
     void updateColor();
 
 public:
@@ -34,7 +36,8 @@ public:
         sf::Color colorActive_,
         sf::Vector2f position,
         sf::Vector2f indent,
-        std::size_t capacity_
+        std::size_t capacity_,
+        std::size_t cooldown_ = 4
     );
     std::string getText();
     void setText(const std::string &text_);
