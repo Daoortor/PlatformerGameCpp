@@ -39,6 +39,7 @@ LevelGameplayWindow::LevelGameplayWindow(
 
 void LevelGameplayWindow::loadInWindow(sf::RenderWindow &window) {
     window.clear();
+    loadLevel(window, levelPerformerPtr->getLevel());
     if (levelPerformerPtr->getLevel()->getPlayer()->contains(
             levelPerformerPtr->getLevel()->getEndPos()
         )) {
@@ -82,9 +83,6 @@ void LevelGameplayWindow::loadInWindow(sf::RenderWindow &window) {
         // TODO: some kind of timer to check there is no loop pause-resume,
         //  as is right now; or should actually rewrite button to isKeyReleased
     }
-    backgroundSprite.setTexture(backgroundTexture);
-    // TODO: resolve texture loss that occurs after removing line above
-    loadLevel(window, levelPerformerPtr->getLevel());
     levelPerformerPtr->getLevel()->update();
     sf::Vector2f playerCoordinates =
         getPlayerCoordinates(levelPerformerPtr->getLevel());

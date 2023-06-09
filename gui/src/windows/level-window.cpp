@@ -149,12 +149,7 @@ LevelWindow::LevelWindow(
 )
     : offset(offset_) {
     backgroundTexture.loadFromFile(backgroundTextureFilepath);
-    sf::Vector2u textureSize = backgroundTexture.getSize();
-    float backgroundScale =
-        static_cast<float>(windowHeight) / static_cast<float>(textureSize.y);
     backgroundSprite.setTexture(backgroundTexture);
-    backgroundSprite.setScale(backgroundScale, backgroundScale);
-
     for (const std::string &blockType : levels::BLOCK_NAMES) {
         blockTextures[blockType] = Platformer::gui::makeBlockTexture(blockType);
     }
