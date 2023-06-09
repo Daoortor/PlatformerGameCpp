@@ -9,31 +9,24 @@ service Act {
 // Level content: needs multiple message structs to implement arrays
 
 message LevelContent {
-    message Block {
-        string type = 1;
-    }
     message BlockRow {
-        repeated Block row = 1;
+        repeated string row = 1;
     }
 
-    message IntPair {
-        int32 x = 1;
-        int32 y = 2;
-    }
-
-    string level_name = 1;// naming conventions for messages are strange
+    string levelName = 1;// naming conventions for messages are strange
     int32 width = 2;
     int32 height = 3;
-    repeated BlockRow block_map = 4;
-    IntPair player_start_pos = 5;
-    IntPair end_pos = 6;
-}// TODO: field naming convention? Coordinate with current .json level files
+    repeated BlockRow blockMap = 4;
+    repeated int32 playerStartPos = 5; // TODO: better than custom {x, y} struct, but need to assert "size=2"
+    repeated int32 endPos = 6; // TODO: same as above
+}// TODO: field naming convention? Coordinate with current .json level file
 
 message ActionRequest {
     string action = 1; // add, check, get, delete
     string level_name = 2; // LevelContent contains the same info,
     // but I want to be able to pass empty LevelContent for check/delete requests
     LevelContent level_content = 3;
+    int32 signature = 4;
     // TODO: maybe change LevelContent to simple string? Do I really need to be able to address parts of level json?
 }
 
