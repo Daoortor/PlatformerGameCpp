@@ -13,12 +13,12 @@ message LevelContent {
         repeated string row = 1;
     }
 
-    string levelName = 1;// naming conventions for messages are strange
+    string levelName = 1; // naming conventions for messages are strange
     int32 width = 2;
     int32 height = 3;
     repeated BlockRow blockMap = 4;
     repeated int32 playerStartPos = 5; // TODO: better than custom {x, y} struct, but need to assert "size=2"
-    repeated int32 endPos = 6; // TODO: same as above
+    repeated int32 endPos = 6;
 }// TODO: field naming convention? Coordinate with current .json level file
 
 message ActionRequest {

@@ -18,13 +18,18 @@ class LevelClient {
 private:
     std::string level_dir_path = "../levels-client/";
     int32_t signature;
+    void send_request_util(const std::string & action_name,
+                           const std::string & level_name,
+                           const std::string & level_content="") {
+
+    }
 public:
-    LevelClient(const std::shared_ptr<Channel> &channel)
+    explicit LevelClient(const std::shared_ptr<Channel> &channel)
         : stub_(json_file_exchange::Act::NewStub(channel)) {
         signature = get_unique_key();
     } // TODO: is safe to make explicit?
 
-    ActionReply add_level(const std::string& level_name) {
+    ActionReply send_request_add_level(const std::string& level_name) {
         if (!file_exists(level_dir_path + level_name)) {
             throw no_such_file(level_dir_path + level_name);
         }
@@ -32,14 +37,11 @@ public:
         request.set_action("add");
         request.set_level_name(level_name);
         json_file_exchange::LevelContent level_content;
-        auto fcs_debug = file_content_string(level_dir_path + level_name);
-        std::cout << "fcs_debug: " << fcs_debug << '\n';
-        google::protobuf::util::JsonStringToMessage(fcs_debug, &level_content); // TODO: why does it fail?
-        std::cout << "add_level debug: level_content message content: " << level_content.DebugString() << '\n';
+        google::protobuf::util::JsonStringToMessage(file_content_string(level_dir_path + level_name), &level_content);
+        std::cout << "send_request_add_level debug: level_content message content: " << level_content.DebugString() << '\n';
         // TODO: learn to throw incomplete_level_file
-        request.set_allocated_level_content(&level_content);
-        return sendRequest(request); // TODO: pass by ref? What do?
-        // TODO: big TODO: .json fields naming & its usage in client code - CHECK!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        request.mutable_level_content()->Swap(&level_content);
+        return sendRequest(request);
     } // TODO: rewrite level_dir_path usage
 
     ActionReply check_level_existence(const std::string& level_name) {
@@ -52,7 +54,7 @@ public:
     }
 
     ActionReply get_level(const std::string& level_name) {
-        // TODO: refactor repeated code in add, check, get, delete// TODO: refactor repeated code in add, check, delete
+        // TODO: refactor repeated code in add, check, get, delete
         ActionRequest request;
         request.set_action("get");
         request.set_level_name(level_name);
@@ -101,8 +103,8 @@ void RunClient() {
     LevelClient client(grpc::CreateChannel(target_address,
                                            grpc::InsecureChannelCredentials())); // TODO: credentials usage
     try {
-        // ActionReply reply = client.add_level("t01-box-with-ladder.json");
-        // ActionReply reply = client.delete_level("t01-box-with-ladder.json");
+        // ActionReply reply = client.send_request_add_level("test.json");
+        // ActionReply reply = client.delete_level("test.json");
         // ActionReply reply = client.check_level_existence("t01-box-with-ladder.json");
         ActionReply reply = client.get_level("test.json");
         if (reply.is_successful()) {
@@ -123,33 +125,7 @@ void RunClient() {
         return;
     }
 
-
-    json_file_exchange::LevelContent level_content;
-
-    level_content.set_levelname(std::string("Test"));
-    level_content.set_width(100);
-    level_content.set_height(100);
-
-    json_file_exchange::LevelContent_BlockRow block_row;
-    std::string block_data[] = {"air", "stone", "air"};
-    block_row.ParseFromArray(block_data, 3);
-    level_content.mutable_blockmap()->Add()->CopyFrom(block_row); // AddAllocated(&block_row);
-
-    level_content.mutable_playerstartpos()->Add(50);//set_x(50);
-    level_content.mutable_playerstartpos()->Add(50);
-    level_content.mutable_endpos()->Add(60);
-    level_content.mutable_endpos()->Add(60);
-
-    std::string level_in_json = file_content_string("../levels-client/test.json");
-    google::protobuf::util::JsonStringToMessage(level_in_json, &level_content);
-    google::protobuf::util::MessageToJsonString(level_content, &level_in_json); // TODO: does it work?
-    google::protobuf::util::JsonStringToMessage(level_in_json, &level_content);
-    google::protobuf::util::MessageToJsonString(level_content, &level_in_json); // TODO: does it work?
-    // add_or_replace_json_file("../levels-client/test.json", level_in_json);
-    std::cout << level_in_json;
-
-
-} // TODO: clear this function
+} // TODO: clear this function during project integration
 
 int main(int argc, char *argv[]) {
     RunClient();
