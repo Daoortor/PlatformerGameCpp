@@ -51,7 +51,12 @@ Game::Game(const std::string &filename) {
         throw FileNotFoundError(filename);
     }
     json levelData = json::parse(f);
-    std::vector<std::vector<std::string>> blockMap = levelData["blockMap"];
+    std::vector<std::vector<std::string>> blockMap(levelData["blockMap"].size()
+    );
+    for (std::size_t rowIndex = 0; rowIndex < levelData["blockMap"].size();
+         rowIndex++) {
+        blockMap[rowIndex] = levelData["blockMap"][rowIndex]["row"];
+    }
     sf::Vector2i playerPos = {
         levelData["playerStartPos"][0], levelData["playerStartPos"][1]};
     auto *playerObject = new Player(this, playerPos);
@@ -66,7 +71,14 @@ void Game::writeToFile(const std::string &name, const std::string &filepath) {
     levelData["levelName"] = name;
     levelData["width"] = board.getSize().x;
     levelData["height"] = board.getSize().y;
-    levelData["blockMap"] = board.getBlockMap();
+    auto blockMap = board.getBlockMap();
+    levelData["blockMap"] =
+        std::vector<std::map<std::string, std::vector<std::string>>>(
+            blockMap.size()
+        );
+    for (std::size_t rowIndex = 0; rowIndex < blockMap.size(); rowIndex++) {
+        levelData["blockMap"][rowIndex]["row"] = blockMap[rowIndex];
+    }
     levelData["playerStartPos"] = {startPos.x, startPos.y};
     levelData["endPos"] = {endPos.x, endPos.y};
     std::ofstream out(filepath + name + ".json");

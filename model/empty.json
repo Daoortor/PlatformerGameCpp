@@ -3,11 +3,57 @@
   "width": 7,
   "height": 5,
   "blockMap": [
-    ["air", "air", "air", "air", "air", "air", "air"],
-    ["air", "air", "air", "air", "air", "air", "air"],
-    ["air", "air", "air", "air", "air", "air", "air"],
-    ["air", "air", "air", "air", "air", "air", "air"],
-    ["air", "air", "air", "air", "air", "air", "air"]
+    {
+      "row" : [
+        "air",
+        "air",
+        "air",
+        "air",
+        "air",
+        "air",
+        "air"]
+    },
+    {
+      "row" : [
+        "air",
+        "air",
+        "air",
+        "air",
+        "air",
+        "air",
+        "air"]
+    },
+    {
+      "row" : [
+        "air",
+        "air",
+        "air",
+        "air",
+        "air",
+        "air",
+        "air"]
+    },
+    {
+      "row" : [
+        "air",
+        "air",
+        "air",
+        "air",
+        "air",
+        "air",
+        "air"]
+    },
+    {
+      "row": [
+        "air",
+        "air",
+        "air",
+        "air",
+        "air",
+        "air",
+        "air"
+      ]
+    }
   ],
   "playerStartPos": [3500, 3250],
   "endPos": [500, -750]
