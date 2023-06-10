@@ -12,16 +12,30 @@ using grpc::Status;
 using json_file_exchange::Act;
 using json_file_exchange::ActionReply;
 using json_file_exchange::ActionRequest;
+using json_file_exchange::LevelContent;
+using google::protobuf::util::JsonStringToMessage;
+using google::protobuf::util::MessageToJsonString;
 
 
 class LevelClient {
 private:
     std::string level_dir_path = "../levels-client/";
     int32_t signature;
-    void send_request_util(const std::string & action_name,
-                           const std::string & level_name,
-                           const std::string & level_content="") {
-
+    ActionReply send_request_util_and_get_reply(const std::string & action_name,
+                                                const std::string & level_name) {
+        ActionRequest request;
+        request.set_action(action_name);
+        request.set_level_name(level_name);
+        request.set_signature(signature);
+        if (action_name == "add") {
+            LevelContent level_content;
+            JsonStringToMessage(file_content_string(level_dir_path + level_name), &level_content);
+            std::cout << "send_request_add_level debug: level_content message content: "
+                      << level_content.DebugString() << '\n';
+            // TODO: learn to throw incomplete_level_file
+            request.mutable_level_content()->Swap(&level_content);
+        }
+        return sendRequest(request);
     }
 public:
     explicit LevelClient(const std::shared_ptr<Channel> &channel)
@@ -33,34 +47,15 @@ public:
         if (!file_exists(level_dir_path + level_name)) {
             throw no_such_file(level_dir_path + level_name);
         }
-        ActionRequest request;
-        request.set_action("add");
-        request.set_level_name(level_name);
-        json_file_exchange::LevelContent level_content;
-        google::protobuf::util::JsonStringToMessage(file_content_string(level_dir_path + level_name), &level_content);
-        std::cout << "send_request_add_level debug: level_content message content: " << level_content.DebugString() << '\n';
-        // TODO: learn to throw incomplete_level_file
-        request.mutable_level_content()->Swap(&level_content);
-        return sendRequest(request);
+        return send_request_util_and_get_reply("add", level_name);
     } // TODO: rewrite level_dir_path usage
 
     ActionReply check_level_existence(const std::string& level_name) {
-        // TODO: refactor repeated code in add, check, get, delete
-        ActionRequest request;
-        request.set_action("check");
-        request.set_level_name(level_name);
-        request.set_signature(signature);
-        return sendRequest(request);
+        return send_request_util_and_get_reply("check", level_name);
     }
 
     ActionReply get_level(const std::string& level_name) {
-        // TODO: refactor repeated code in add, check, get, delete
-        ActionRequest request;
-        request.set_action("get");
-        request.set_level_name(level_name);
-        request.set_signature(signature);
-        return sendRequest(request);
-        // TODO: this doesn't do much, does it? For future usage
+        return send_request_util_and_get_reply("get", level_name);
     }
 
     ActionReply delete_level(const std::string& level_name) {
@@ -103,15 +98,15 @@ void RunClient() {
     LevelClient client(grpc::CreateChannel(target_address,
                                            grpc::InsecureChannelCredentials())); // TODO: credentials usage
     try {
-        // ActionReply reply = client.send_request_add_level("test.json");
+        ActionReply reply = client.send_request_add_level("t01-box-with-ladder.json");
         // ActionReply reply = client.delete_level("test.json");
         // ActionReply reply = client.check_level_existence("t01-box-with-ladder.json");
-        ActionReply reply = client.get_level("test.json");
+        // ActionReply reply = client.get_level("test.json");
         if (reply.is_successful()) {
             std::cout << "Request succeeded.\n";
             std::cout << "Request result: result=" << reply.result() << ", is_successful=" <<reply.is_successful() << '\n';
             std::string level_in_json;
-            google::protobuf::util::MessageToJsonString(reply.level_content(), &level_in_json);
+            MessageToJsonString(reply.level_content(), &level_in_json);
             std::cout << level_in_json;
             // TODO: TODO
         } else {

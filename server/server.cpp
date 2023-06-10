@@ -13,8 +13,10 @@ using grpc::Status;
 using json_file_exchange::Act;
 using json_file_exchange::ActionReply;
 using json_file_exchange::ActionRequest;
+using json_file_exchange::LevelContent;
+using google::protobuf::util::JsonStringToMessage;
+using google::protobuf::util::MessageToJsonString;
 
-// Server Implementation
 class LevelManagementServer final : public Act::Service {
 private:
     std::string level_dir_path = "../levels-server/";
@@ -22,8 +24,8 @@ public:
     static void handleRequestAdd(const json_file_exchange::LevelContent& level_content,
                                  const std::string & level_file_path) {
         std::string level_in_json;
-        google::protobuf::util::MessageToJsonString(level_content, &level_in_json); // TODO: does it work?
-        std::cout << "\nAdding a level " << level_file_path
+        MessageToJsonString(level_content, &level_in_json);
+        std::cout << "Adding a level " << level_file_path
                   << " with content:\n-----\n" << level_in_json
                   << "-----\n";
         add_or_replace_json_file(level_file_path, level_in_json);
@@ -31,27 +33,22 @@ public:
     }
     static void handleRequestDelete(const std::string & level_file_path) {
         if (!file_exists(level_file_path)) throw no_such_file(level_file_path);
-        std::cout << "\nDeleting a level " << level_file_path << '\n';
+        std::cout << "Deleting a level " << level_file_path << '\n';
         delete_file(level_file_path);
     }
     static void handleRequestGet(ActionReply *reply, const std::string & level_file_path) {
         if (!file_exists(level_file_path)) throw no_such_file(level_file_path);
-        std::cout << "\nGetting a level " << level_file_path
+        std::cout << "Getting a level " << level_file_path
                   << " with content:\n-----\n" << file_content_string(level_file_path)
                   << "\n-----\n";
-        json_file_exchange::LevelContent requested_level_content; // TODO: use sendRequest' own level_content, then swap?
-        google::protobuf::util::JsonStringToMessage(file_content_string(level_file_path), &requested_level_content);
+        LevelContent requested_level_content; // TODO: use sendRequest' own level_content, then swap?
+        JsonStringToMessage(file_content_string(level_file_path), &requested_level_content);
         std::cout << "LevelContent looks like:\n++++++++++\n" << requested_level_content.DebugString() << "\n++++++++++\n";
-        /*
-        std::string json_debug_string;
-        google::protobuf::util::MessageToJsonString(requested_level_content, &json_debug_string);
-        std::cout << "Level string: " << json_debug_string;
-         */
         reply->mutable_level_content()->Swap(&requested_level_content);
         reply->set_result(true);
     }
     static void handleRequestCheck(ActionReply *reply, const std::string & level_file_path) {
-        std::cout << "\nChecking existence of level " << level_file_path << '\n';
+        std::cout << "Checking existence of level " << level_file_path << '\n';
         std::cout << "Check result: " << file_exists(level_file_path) << '\n';
         reply->set_result(file_exists(level_file_path));
     }
@@ -62,7 +59,7 @@ public:
         std::string level_file_path = level_dir_path + request->level_name();
         auto & level_content = request->level_content(); // TODO: is it correct type?
 
-        std::cout << "===========\nNew request:\n"
+        std::cout << "=========================\nNew request:\n"
                   << "Requested action: " << action << '\n'
                   << "Level name: " << level_file_path << '\n'
                   << "Request signature: " << request->signature() << '\n';
@@ -84,7 +81,7 @@ public:
         } catch (const std::runtime_error & error) {
             std::cerr << error.what();
             return Status::CANCELLED;
-        } // TODO: expand on error handling
+        } // TODO: expand on error handling: at least return to client what's going on
         return Status::OK;
     }
 };
