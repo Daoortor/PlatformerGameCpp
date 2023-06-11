@@ -56,9 +56,6 @@ private:
         const std::string &fileContent,
         int32_t creatorID
     ) {
-        if (file_exists(fileName)) {
-            throw file_already_exists();
-        }  // TODO: that is not this class' job!
         m_Creator = creatorID;
         m_WhoCanEdit = Who::Author;  // TODO: implement?
         add_or_replace_json_file(fileName, fileContent);
@@ -69,7 +66,7 @@ private:
             throw action_not_allowed(m_Name);
         }  // TODO: that is not this class' job!
         add_or_replace_json_file(m_Name, newFileContent);
-    }
+    }  // TODO: what to do with this class? Not too bare-boned?
     friend class LevelManagementServer;
 };
 
@@ -97,25 +94,29 @@ private:
         return Status::CANCELLED;
     }
 
-    // TODO: update function to collect added by hand levels
+    // TODO: write update function to collect added by hand levels;
+    // creator=admin
 public:
-    void handleRequestAdd(
+    void collect_present_levels() {
+    }
+
+    void handleRequestAddOrReplace(
         int32_t authorID,
         const json_file_exchange::LevelContent &level_content,
         const std::string &level_file_path
     ) {
-        if (file_exists(level_file_path)) {
-            throw file_already_exists();
+        if (Levels.count(level_file_path) &&
+            Levels.at(level_file_path).m_Creator != authorID) {
+            throw action_not_allowed(level_file_path);
         }
         std::string level_in_json;
         MessageToJsonString(level_content, &level_in_json);
-        std::cout << "Adding a level " << level_file_path
+        std::cout << "Adding/updating a level " << level_file_path
                   << " with content:\n-----\n"
-                  << level_in_json << "-----\n";
-        Levels.insert(std::make_pair(
+                  << level_in_json << "\n-----\n";
+        Levels.insert_or_assign(
             level_file_path, LevelFile(level_file_path, level_in_json, authorID)
-        ));
-        // add_or_replace_json_file(level_file_path, level_in_json);
+        );
         // TODO: confirmation checkbox "Such file already exists. Do you wish to
         // overwrite it?"
     }
@@ -140,8 +141,11 @@ public:
             throw no_such_file(level_file_path);
         }
         std::cout << "Getting a level " << level_file_path
-                  << " with content:\n-----\n"
-                  << file_content_string(level_file_path) << "\n-----\n";
+                  << " with content:\n"
+                     "-----\n"
+                  << file_content_string(level_file_path)
+                  << "\n"
+                     "-----\n";
         LevelContent requested_level_content;  // TODO: use sendRequest' own
                                                // level_content, then swap?
         JsonStringToMessage(
@@ -152,7 +156,7 @@ public:
         reply->mutable_level_content()->Swap(&requested_level_content);
         reply->set_result(true);
         // TODO: do I even need to write this method through Levels map? Seems
-        // obsolete, but other variant - inconsistent
+        // obsolete, but other variant is inconsistent
     }
 
     void
@@ -174,7 +178,8 @@ public:
             request->level_content();  // TODO: is it correct type?
         auto author_id = request->signature();
 
-        std::cout << "=========================\nNew request:\n"
+        std::cout << "=========================\n"
+                     "New request:\n"
                   << "Requested action: " << action << '\n'
                   << "Level name: " << level_file_path << '\n'
                   << "Request signature: " << author_id << '\n';
@@ -182,7 +187,9 @@ public:
         std::string additional_info;
         try {
             if (action == "add") {
-                handleRequestAdd(author_id, level_content, level_file_path);
+                handleRequestAddOrReplace(
+                    author_id, level_content, level_file_path
+                );
             } else if (action == "delete") {
                 handleRequestDelete(author_id, level_file_path);
             } else if (action == "get") {
@@ -192,32 +199,16 @@ public:
             }
             reply->set_is_successful(true);
         } catch (const file_handling_exception &file_exception) {
-            std::cerr << file_exception.what();
-            additional_info = file_exception.what();
-            reply->set_is_successful(false);
-            std::cout << "Failure debug: reply is\n"
-                      << reply->DebugString() << '\n';
-            return Status::CANCELLED;
-        } catch (const level_exception &file_exception) {
-            std::cerr << file_exception.what();
-            additional_info = file_exception.what();
-            reply->set_is_successful(false);
-            std::cout << "Failure debug: reply is\n"
-                      << reply->DebugString() << '\n';
-            return Status::CANCELLED;
+            return return_failure(reply, file_exception.what());
+        } catch (const level_handling_exception &level_exception) {
+            return return_failure(reply, level_exception.what());
         } catch (const std::runtime_error &error) {
-            std::cerr << error.what();
-            additional_info = error.what();
-            reply->set_is_successful(false);
-            std::cout << "Failure debug: reply is\n"
-                      << reply->DebugString() << '\n';
-            return Status::CANCELLED;
+            return return_failure(reply, error.what());
         }
         // TODO: expand on error handling: at least return to client what's
         // going on
-        // TODO: naming!!!!!!!!
-        // TODO: repeated code
         // TODO: resolve additional info causing double free
+        // TODO: naming!!!!!!!!
         return Status::OK;
     }
 };

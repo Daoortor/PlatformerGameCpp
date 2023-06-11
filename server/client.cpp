@@ -54,22 +54,22 @@ public:
         signature = newSignature;
     }  // TODO: delete this placeholder and create real login system
 
-    ActionReply send_request_add_level(const std::string &level_name) {
+    ActionReply sendRequestAddOrReplaceLevel(const std::string &level_name) {
         if (!file_exists(level_dir_path + level_name)) {
             throw no_such_file(level_dir_path + level_name);
         }
         return send_request_util_and_get_reply("add", level_name);
     }  // TODO: rewrite level_dir_path usage
 
-    ActionReply check_level_existence(const std::string &level_name) {
+    ActionReply sendRequestCheckLevelExistence(const std::string &level_name) {
         return send_request_util_and_get_reply("check", level_name);
     }
 
-    ActionReply get_level(const std::string &level_name) {
+    ActionReply sendRequestGetLevel(const std::string &level_name) {
         return send_request_util_and_get_reply("get", level_name);
     }
 
-    ActionReply delete_level(const std::string &level_name) {
+    ActionReply sendRequestDeleteLevel(const std::string &level_name) {
         return send_request_util_and_get_reply("delete", level_name);
     }
 
@@ -112,10 +112,12 @@ void RunClient() {
     validate_key_file_existence("../key_directory/");
     client.setSignature(get_key("../key_directory/"));
     try {
-        // ActionReply reply = client.send_request_add_level("test.json");
-        ActionReply reply = client.delete_level("test.json");
-        // ActionReply reply = client.check_level_existence("test.json");
-        // ActionReply reply = client.get_level("test.json");
+        ActionReply reply =
+            client.sendRequestAddOrReplaceLevel("t01-box-with-ladder.json");
+        // ActionReply reply = client.sendRequestDeleteLevel("test.json");
+        // ActionReply reply =
+        // client.sendRequestCheckLevelExistence("test.json"); ActionReply reply
+        // = client.sendRequestGetLevel("test.json");
         if (reply.is_successful()) {
             std::cout << "Request succeeded.\n";
             std::cout << "Request result: result=" << reply.result()
