@@ -6,8 +6,6 @@ service Act {
     rpc sendRequest(ActionRequest) returns (ActionReply) {}
 }
 
-// Level content: needs multiple message structs to implement arrays
-
 message LevelContent {
     message BlockRow {
         repeated string row = 1;
@@ -27,14 +25,14 @@ message ActionRequest {
     // but I want to be able to pass empty LevelContent for check/delete requests
     LevelContent level_content = 3;
     int32 signature = 4;
-    // TODO: maybe change LevelContent to simple string? Do I really need to be able to address parts of level json?
 }
 
 // TODO: big TODO: protobuf message string field shenanigans - figure out
 
-// Action reply: contains action result and possible content of recovered level
+// Action reply: contains action result and possible content of received level
 message ActionReply {
     bool is_successful = 1; // TODO: is is_successful needed given we have sendRequest Status?
     bool result = 2;
     LevelContent level_content = 3;
-}// LevelContent can be empty if something is wrong
+    string additional_info = 4;
+}
