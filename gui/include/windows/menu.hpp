@@ -7,8 +7,9 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "button.hpp"
-#include "level-render.hpp"
+#include "elements/button.hpp"
+#include "level-editor.hpp"
+#include "level-play.hpp"
 #include "performer.hpp"
 
 namespace interface {
@@ -36,7 +37,7 @@ public:
     void loadBackgroundInWindow(sf::RenderWindow &window);
     void loadRectangleButtonsInWindow(sf::RenderWindow &window);
     void updateButtons(sf::RenderWindow &window, sf::Event event);
-    void loadInWindow(sf::RenderWindow &window, sf::Event event);
+    virtual void loadInWindow(sf::RenderWindow &window, sf::Event event);
     void
     bindButton(const std::string &label_string, std::function<void()> func);
     void addNewButton(
@@ -44,7 +45,7 @@ public:
         int number,
         const sf::Font &font,
         int fontSize,
-        std::vector<sf::Color> &buttonColorsList,
+        const std::vector<sf::Color> &buttonColorsList,
         int buttonDistance,
         sf::Vector2f startingButtonPosition,
         sf::Vector2f buttonIndent
@@ -62,11 +63,14 @@ public:
         const std::string &BackgroundTextureFilepath,
         control::MenuPerformer &menuPerformer,
         control::LevelPerformer &levelPerformer,
-        Platformer::gui::LevelWindow &levelWindow
+        Platformer::gui::LevelGameplayWindow &levelWindow
     );
 };
 
 struct LevelSelectionMenu : Menu {
+    Scrollbar<interface::RectangleButton> buttonScrollbar;
+    ButtonWithImage refreshButton;
+
 public:
     LevelSelectionMenu(
         unsigned int windowWidth,
@@ -75,10 +79,21 @@ public:
         int fontSize,
         int buttonDistance,
         const std::string &BackgroundTextureFilepath,
-        const std::string &LevelFilePath,
+        const std::string &levelFilePath,
+        const std::string &miscFilepath,
         control::MenuPerformer &menuPerformer,
         control::LevelPerformer &levelPerformer,
-        Platformer::gui::LevelWindow &levelWindow
+        Platformer::gui::LevelGameplayWindow &levelWindow
+    );
+    void loadInWindow(sf::RenderWindow &window, sf::Event event) override;
+    void update(
+        const std::string &levelFilePath,
+        const sf::Font &font,
+        int fontSize,
+        control::MenuPerformer &menuPerformer,
+        control::LevelPerformer &levelPerformer,
+        Platformer::gui::LevelGameplayWindow &levelWindow,
+        unsigned int windowHeight
     );
 };
 

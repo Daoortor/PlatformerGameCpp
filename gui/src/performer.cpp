@@ -1,4 +1,5 @@
-#include "../include/performer.hpp"
+#include "performer.hpp"
+#include <memory>
 
 namespace control {
 [[maybe_unused]] void MenuPerformer::openMainMenu() {
@@ -46,10 +47,7 @@ void MenuPerformer::closeWindow() {
 }
 
 [[maybe_unused]] void LevelPerformer::reset() {
-    game = std::move(std::make_unique<Platformer::Game>(
-        "../model/levels/t02-hard-jumps.json"
-    ));
-    // TODO: redo
+    game->getPlayer()->reset();
 }
 
 [[maybe_unused]] void LevelPerformer::moveLeft() {
@@ -66,6 +64,10 @@ void MenuPerformer::closeWindow() {
 
 void LevelPerformer::jump() {
     game->getPlayer()->jump();
+}
+
+void LevelPerformer::stop() {
+    game->getPlayer()->stop();
 }
 
 [[maybe_unused]] void LevelPerformer::exit() {

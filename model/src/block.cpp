@@ -1,4 +1,4 @@
-#include "../include/block.hpp"
+#include "block.hpp"
 #include <memory>
 
 namespace Platformer {
@@ -13,8 +13,12 @@ std::unique_ptr<Block> makeBlock(const std::string &name) {
         return std::make_unique<Stone>();
     } else if (name == "ladder") {
         return std::make_unique<Ladder>();
+    } else if (name == "killer") {
+        return std::make_unique<Killer>();
+    } else if (name == "trampoline") {
+        return std::make_unique<Trampoline>();
     } else {
         throw UnknownBlockType(name);
     }
-};
+}
 }  // namespace Platformer

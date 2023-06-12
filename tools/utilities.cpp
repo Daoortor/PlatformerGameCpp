@@ -1,46 +1,8 @@
 #include "utilities.hpp"
-#include <cmath>
+#include <algorithm>
+#include <filesystem>
 
 namespace Platformer::utilities {
-Vector::Vector(int x_, int y_) : x(x_), y(y_) {
-}
-
-Vector Vector::operator+(Vector other) const {
-    return {x + other.x, y + other.y};
-}
-
-Vector Vector::operator+=(Vector other) {
-    x += other.x;
-    y += other.y;
-    return *this;
-}
-
-Vector Vector::operator-(Vector other) const {
-    return {x - other.x, y - other.y};
-}
-
-Vector Vector::operator-=(Vector other) {
-    x -= other.x;
-    y -= other.y;
-    return *this;
-}
-
-Vector Vector::operator*(float k) const {
-    return {
-        static_cast<int>(std::lrint(static_cast<float>(x) * k)),
-        static_cast<int>(std::lrint(static_cast<float>(y) * k))};
-}
-
-Vector Vector::operator*=(float k) {
-    x = static_cast<int>(std::lrint(static_cast<float>(x) * k));
-    y = static_cast<int>(std::lrint(static_cast<float>(y) * k));
-    return *this;
-}
-
-std::ostream &operator<<(std::ostream &os, const Vector &vec) {
-    os << "(" << vec.x << ", " << vec.y << ")";
-    return os;
-}
 
 int divide(int a, unsigned int b) {  // Always rounded down
     if (a < 0 && a % b != 0) {
@@ -56,5 +18,52 @@ int sign(int n) {
         return 0;
     }
     return -1;
+}
+
+std::string getExtension(const std::string &filename) {
+    std::size_t pos = filename.find_last_of('.');
+    if (pos == std::string::npos) {
+        return "";
+    }
+    return filename.substr(pos);
+}
+
+std::string removeExtension(const std::string &filename) {
+    return filename.substr(0, filename.size() - getExtension(filename).size());
+}
+
+std::vector<std::string> getLevelPaths(const std::string &levelFilePath) {
+    std::vector<std::pair<std::string, std::string>> filenames;
+    for (auto &fileIt : std::filesystem::directory_iterator(
+             std::filesystem::path{levelFilePath}
+         )) {
+        const std::string levelPath = fileIt.path();
+        std::string levelName = levelPath.substr(levelFilePath.size());
+        if (Platformer::utilities::getExtension(levelName) != ".json") {
+            continue;
+        }
+        filenames.emplace_back(
+            Platformer::utilities::removeExtension(levelName), levelPath
+        );
+    }
+    std::sort(filenames.begin(), filenames.end());
+    std::vector<std::string> paths;
+    paths.reserve(filenames.size());
+    for (auto &filename : filenames) {
+        paths.push_back(std::move(filename.second));
+    }
+    return paths;
+}
+
+std::vector<std::string> getLevelNames(const std::string &levelFilePath) {
+    auto paths = getLevelPaths(levelFilePath);
+    std::vector<std::string> result;
+    result.reserve(paths.size());
+    for (auto &path : paths) {
+        result.push_back(
+            removeExtension(std::move(path).substr(levelFilePath.size()))
+        );
+    }
+    return result;
 }
 }  // namespace Platformer::utilities

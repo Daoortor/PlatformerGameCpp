@@ -1,5 +1,5 @@
-#include "../include/board.hpp"
-#include "../include/model-constants.hpp"
+#include "board.hpp"
+#include "model-constants.hpp"
 
 namespace Platformer {
 Board::Board(std::vector<std::vector<std::unique_ptr<Block>>> board_)
@@ -41,19 +41,57 @@ Board::Board(const std::vector<std::vector<std::string>> &blockMap) {
     }
 }
 
-const std::unique_ptr<Block> &Board::getBlock(utilities::Vector pos) {
-    if (0 <= pos.get_x() && pos.get_x() < width && 0 <= pos.get_y() &&
-        pos.get_y() < height) {
-        return board[pos.get_y()][pos.get_x()];
+Board &Board::operator=(const Platformer::Board &other) {
+    if (this == &other) {
+        return *this;
+    }
+    height = other.height;
+    width = other.width;
+    board = std::vector<std::vector<std::unique_ptr<Block>>>();
+    for (std::size_t row = 0; row < height; row++) {
+        board.emplace_back();
+        for (std::size_t col = 0; col < width; col++) {
+            board[row].push_back(makeBlock(other.board[row][col]->name()));
+        }
+    }
+    return *this;
+}
+
+Board::Board(const Platformer::Board &other) {
+    *this = other;
+}
+
+const std::unique_ptr<Block> &Board::getBlock(sf::Vector2<std::size_t> pos) {
+    if (0 <= pos.x && pos.x < width && 0 <= pos.y && pos.y < height) {
+        return board[pos.y][pos.x];
     }
     return AIR_BLOCK;
 }
 
-const std::unique_ptr<Block> &Board::getBlockByCoordinates(utilities::Vector pos
-) {
+const std::unique_ptr<Block> &Board::getBlockByCoordinates(sf::Vector2i pos) {
     return getBlock(
-        {utilities::divide(pos.get_x(), BLOCK_SIZE),
-         utilities::divide(pos.get_y(), BLOCK_SIZE)}
+        {static_cast<std::size_t>(
+             utilities::divide(static_cast<int>(pos.x), BLOCK_SIZE)
+         ),
+         static_cast<std::size_t>(
+             utilities::divide(static_cast<int>(pos.y), BLOCK_SIZE)
+         )}
     );
+}
+
+void Board::setBlock(sf::Vector2<std::size_t> pos, const std::string &name) {
+    board.at(pos.y).at(pos.x) = makeBlock(name);
+}
+
+std::vector<std::vector<std::string>> Board::getBlockMap() {
+    std::vector<std::vector<std::string>> map(
+        height, std::vector<std::string>(width)
+    );
+    for (int row = 0; row < height; row++) {
+        for (int col = 0; col < width; col++) {
+            map[row][col] = board[row][col]->name();
+        }
+    }
+    return map;
 }
 }  // namespace Platformer

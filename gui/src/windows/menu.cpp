@@ -1,6 +1,8 @@
-#include "../include/menu.hpp"
+#include "windows/menu.hpp"
+#include <algorithm>
 #include <filesystem>
 #include <utility>
+#include "gui-constants.hpp"
 
 namespace interface {
 std::unique_ptr<RectangleButton> &interface::Menu::addRectangleButton(
@@ -83,7 +85,7 @@ void Menu::addNewButton(
     int number,
     const sf::Font &font,
     int fontSize,
-    std::vector<sf::Color> &buttonColorsList,
+    const std::vector<sf::Color> &buttonColorsList,
     int buttonDistance,
     sf::Vector2f startingButtonPosition,
     sf::Vector2f buttonIndent
@@ -95,7 +97,7 @@ void Menu::addNewButton(
     sf::RectangleShape buttonShape({buttonWidth, buttonHeight});
     std::function<void()> action = [label_string]() {
         std::cout << "<" << label_string << "> was pressed\n";
-    };  // Placeholders for still not implemented buttons
+    };  // Placeholders for still not implemented buttonScrollbar
     interface::RectangleButton button(
         buttonShape, buttonColorsList[0], buttonColorsList[1],
         buttonColorsList[2], buttonColorsList[3], buttonText, buttonIndent,
@@ -115,18 +117,18 @@ MainMenu::MainMenu(
     const std::string &BackgroundTextureFilepath,
     control::MenuPerformer &menuPerformer,
     control::LevelPerformer &levelPerformer,
-    Platformer::gui::LevelWindow &levelWindow
+    Platformer::gui::LevelGameplayWindow &levelWindow
 ) {
     // TODO: window Width & Height dependency
-    sf::Vector2f startingButtonPosition = {340, 250};
+    sf::Vector2f startingButtonPosition = {340, 150};
     sf::Vector2f buttonIndent = {10, 5};
     loadBackgroundSpriteFromTextureFile(
         BackgroundTextureFilepath, 255, 255, 255, 255, windowWidth, windowHeight
     );
 
-    std::vector<std::string> buttonStringLabels = {"Start game", "Load game",
-                                                   "Settings",   "Author info",
-                                                   "Feedback",   "Quit"};
+    std::vector<std::string> buttonStringLabels = {
+        "Start game",  "Select level", "Level editor", "Settings",
+        "Author info", "Feedback",     "Quit"};
     auto colorsList = std::vector{
         sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
         sf::Color(0, 209, 255, 192), sf::Color(255, 95, 0, 192)};
@@ -138,15 +140,19 @@ MainMenu::MainMenu(
     }
     bindButton("Start game", [&]() {
         menuPerformer.loadLevel(levelPerformer);
-        levelWindow = Platformer::gui::LevelWindow(
+        levelWindow = Platformer::gui::LevelGameplayWindow(
             windowHeight,
             "../gui/assets/textures/interface/level-background.png",
-            "../gui/assets/textures/player", "../gui/assets/textures/misc",
+            "../gui/assets/textures/player", "../gui/assets/textures/misc/",
             menuPerformer.getLevelFilePath(0), &levelPerformer
         );
         // TODO: big rewrite of levelPerformer-levelWindow relationship
     });
-    bindButton("Load game", [&]() { menuPerformer.openLoadLevelMenu(); });
+    bindButton("Level editor", [&]() {
+        menuPerformer.setState(control::MenuState::Empty);
+        levelPerformer.setState(control::LevelState::Editor);
+    });
+    bindButton("Select level", [&]() { menuPerformer.openLoadLevelMenu(); });
     bindButton("Quit", [&]() { menuPerformer.closeWindow(); });
 }
 
@@ -157,43 +163,105 @@ LevelSelectionMenu::LevelSelectionMenu(
     int fontSize,
     int buttonDistance,
     const std::string &BackgroundTextureFilepath,
-    const std::string &LevelFilePath,
+    const std::string &levelFilePath,
+    const std::string &miscFilepath,
     control::MenuPerformer &menuPerformer,
     control::LevelPerformer &levelPerformer,
-    Platformer::gui::LevelWindow &levelWindow
-) {
+    Platformer::gui::LevelGameplayWindow &levelWindow
+)
+    : buttonScrollbar(
+          {340, static_cast<float>(150 + buttonDistance)},
+          {150, 40},
+          {10, 20},
+          20,
+          40,
+          3,
+          Platformer::gui::colors::BUTTON_COLORS_LIST,
+          Platformer::gui::colors::ITEM_CHOSEN_COLOR,
+          miscFilepath
+      ),
+      refreshButton(
+          miscFilepath + "refresh.png",
+          sf::RectangleShape({40, 40}),
+          {10, 10},
+          {470, 150},
+          Platformer::gui::colors::BUTTON_COLORS_LIST,
+          [this,
+           levelFilePath,
+           &font,
+           fontSize,
+           &menuPerformer,
+           &levelPerformer,
+           &levelWindow,
+           windowHeight] {
+              update(
+                  levelFilePath, font, fontSize, menuPerformer, levelPerformer,
+                  levelWindow, windowHeight
+              );
+          },
+          false
+      ) {
     auto colorsList = std::vector{
         sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
         sf::Color(178, 160, 53, 192), sf::Color(255, 95, 0, 192)};
     loadBackgroundSpriteFromTextureFile(
         BackgroundTextureFilepath, 255, 255, 255, 128, windowWidth, windowHeight
     );
-    int count = 0;
-    for ([[maybe_unused]] auto &p : std::filesystem::directory_iterator(
-             std::filesystem::path{LevelFilePath}
-         )) {
-        count++;
-    }
     addNewButton(
-        "Return", 0, font, fontSize, colorsList, buttonDistance, {340, 250},
-        {10, 5}
+        "Return", 0, font, fontSize, colorsList, buttonDistance, {340, 150},
+        {10, 10}
     );
-    bindButton("Return", [&]() { menuPerformer.openMainMenu(); });
-    for (int i = 1; i <= count; i++) {
-        addNewButton(
-            "Level " + std::to_string(i), i, font, fontSize, colorsList,
-            buttonDistance, {340, 250}, {10, 5}
+    bindButton("Return", [&]() {
+        buttonScrollbar.reset();
+        menuPerformer.openMainMenu();
+    });
+    update(
+        levelFilePath, font, fontSize, menuPerformer, levelPerformer,
+        levelWindow, windowHeight
+    );
+}
+
+void LevelSelectionMenu::loadInWindow(
+    sf::RenderWindow &window,
+    sf::Event event
+) {
+    Menu::loadInWindow(window, event);
+    buttonScrollbar.loadInWindow(window, event);
+    refreshButton.drawInWindow(window);
+    refreshButton.update(window, event);
+}
+
+void LevelSelectionMenu::update(
+    const std::string &levelFilePath,
+    const sf::Font &font,
+    int fontSize,
+    control::MenuPerformer &menuPerformer,
+    control::LevelPerformer &levelPerformer,
+    Platformer::gui::LevelGameplayWindow &levelWindow,
+    unsigned int windowHeight
+) {
+    buttonScrollbar.clear();
+    auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
+    auto filenames = Platformer::utilities::getLevelNames(levelFilePath);
+    for (auto &levelName : filenames) {
+        const std::string levelPath = levelFilePath + levelName + ".json";
+        interface::RectangleButton newButton(
+            sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
+            colorsList[2], colorsList[3], sf::Text(levelName, font, fontSize),
+            {10, 10}, {340, 250},
+            [&, levelPath]() {
+                menuPerformer.loadLevel(levelPerformer);
+                levelWindow = Platformer::gui::LevelGameplayWindow(
+                    windowHeight,
+                    "../gui/assets/textures/interface/level-background.png",
+                    "../gui/assets/textures/player",
+                    "../gui/assets/textures/misc/", levelPath, &levelPerformer
+                );
+                // TODO: implementation above is due to rewrite
+            },
+            18
         );
-        bindButton("Level " + std::to_string(i), [&, i]() {
-            menuPerformer.loadLevel(levelPerformer);
-            levelWindow = Platformer::gui::LevelWindow(
-                windowHeight,
-                "../gui/assets/textures/interface/level-background.png",
-                "../gui/assets/textures/player", "../gui/assets/textures/misc",
-                menuPerformer.getLevelFilePath(i - 1), &levelPerformer
-            );
-            // TODO: implementation above is due to rewrite
-        });
+        buttonScrollbar.addItem(newButton);
     }
 }
 
@@ -209,9 +277,6 @@ PauseMenu::PauseMenu(
 ) {
     sf::Vector2f startingButtonPosition = {340, 250};
     sf::Vector2f buttonIndent = {10, 5};
-    auto colorsList = std::vector{
-        sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
-        sf::Color(178, 160, 53, 192), sf::Color(255, 95, 0, 192)};
     loadBackgroundSpriteFromTextureFile(
         BackgroundTextureFilepath, 255, 255, 255, 0, windowWidth, windowHeight
     );
@@ -219,8 +284,9 @@ PauseMenu::PauseMenu(
         "Resume", "Back to title screen"};
     for (int number = 0; number < buttonStringLabels.size(); number++) {
         addNewButton(
-            buttonStringLabels[number], number, font, fontSize, colorsList,
-            buttonDistance, startingButtonPosition, buttonIndent
+            buttonStringLabels[number], number, font, fontSize,
+            Platformer::gui::colors::BUTTON_COLORS_LIST, buttonDistance,
+            startingButtonPosition, buttonIndent
         );
     }
     bindButton("Resume", [&]() {

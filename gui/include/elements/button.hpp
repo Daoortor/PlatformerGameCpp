@@ -2,6 +2,7 @@
 #define PROJECTGAME_BUTTON_HPP
 
 #include <SFML/Graphics.hpp>
+#include <climits>
 #include <string>
 #include <utility>
 
@@ -37,18 +38,19 @@ public:
     [[maybe_unused]] void setIndent(sf::Vector2f newIndent);
     sf::Vector2f getPosition() const;
 
-    [[maybe_unused]] void setPosition(sf::Vector2f newPosition);
+    [[maybe_unused]] virtual void setPosition(sf::Vector2f newPosition);
 
     void bind(std::function<void()> func);
 };
 
 class RectangleButton : public Button {
-private:
+protected:
     sf::RectangleShape shape;
     sf::Color colorUnavailable;
     sf::Color colorAvailable;
     sf::Color colorChosen;
     sf::Color colorClicked;
+    int capacity;
 
 public:
     RectangleButton(
@@ -60,14 +62,21 @@ public:
         sf::Text newLabel,
         sf::Vector2f newIndent,
         sf::Vector2f newPosition,
-        std::function<void()> newAction = []() {}
+        std::function<void()> newAction = []() {},
+        int capacity_ = INT32_MAX
     )
         : shape(std::move(newShape)),
           colorUnavailable(newColorUnavailable),
           colorAvailable(newColorAvailable),
           colorChosen(newColorChosen),
-          colorClicked(newColorClicked) {
+          colorClicked(newColorClicked),
+          capacity(capacity_) {
         label = std::move(newLabel);
+        if (label.getString().getSize() > capacity - 3) {
+            label.setString(
+                label.getString().substring(0, capacity - 3) + "..."
+            );
+        }
         indent = newIndent;
         position = newPosition;
         currentState = ButtonState::Available;
@@ -76,8 +85,35 @@ public:
 
     sf::RectangleShape *getCurrentShape();
     sf::Color getCurrentColor();
-    void drawInWindow(sf::RenderWindow &window);
+    virtual void drawInWindow(sf::RenderWindow &window);
     void update(sf::RenderWindow &window, sf::Event &event);
+};
+
+class ButtonWithImage : public RectangleButton {
+private:
+    sf::Sprite imageSprite;
+    sf::Texture imageTexture;
+    sf::RectangleShape border;
+    float borderMargin;
+    sf::Color colorActive;
+
+public:
+    ButtonWithImage(
+        const std::string &imageFilename,
+        sf::RectangleShape newShape,
+        sf::Vector2f newIndent,
+        sf::Vector2f newPosition,
+        const std::vector<sf::Color> &buttonColorsList,
+        std::function<void()> newAction = []() {},
+        bool hasBorder = true,
+        float borderMargin = 0,
+        sf::Color colorActive_ = sf::Color::Transparent
+    );
+    void drawInWindow(sf::RenderWindow &window) override;
+    void setPosition(sf::Vector2f newPosition) override;
+    void setBackgroundColor(sf::Color color);
+    void activate();
+    void deactivate();
 };
 
 }  // namespace interface
