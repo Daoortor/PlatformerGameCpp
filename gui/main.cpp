@@ -23,8 +23,12 @@ int main() {
     );
     window.setPosition(sf::Vector2i(200, 50));
     window.setFramerateLimit(60);
+
     control::MenuPerformer menuPerformer(window, "../model/levels/");
     control::LevelPerformer levelPerformer(window);
+    control::ServerPerformer serverPerformer(window, "0.0.0.0:50051",
+                                             "../server/client_test_directory/",
+                                             "../model/levels/"); // TODO: redo
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/lofi.ttf");
 
@@ -59,6 +63,13 @@ int main() {
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/transparent.jpg", menuPerformer,
         levelPerformer
+    );
+
+    auto serverMenu = interface::ServerMenu(
+        windowWidth, windowHeight, fontMario, 20, 50,
+        "../gui/assets/textures/interface/level-selection-menu-background.png",
+        "../model/levels/", "../gui/assets/textures/misc/", menuPerformer,
+        levelPerformer, serverPerformer, levelGameplayWindow
     );
 
     while (window.isOpen()) {
@@ -100,6 +111,9 @@ int main() {
                 break;
             case control::MenuState::PauseMenu:
                 pauseMenu.loadInWindow(window, event);
+                break;
+            case control::MenuState::ServerMenu:
+                serverMenu.loadInWindow(window, event);
                 break;
             case control::MenuState::Empty:
                 break;

@@ -7,6 +7,7 @@
 #include <mutex>
 #include "source.hpp"
 #include "server_source.hpp"
+
 namespace server {
     using grpc::Server;
     using grpc::ServerBuilder;
@@ -33,7 +34,7 @@ namespace server {
     private:
         std::string m_Name;
         int32_t m_Creator;
-        Who m_WhoCanEdit;
+        Who m_WhoCanEdit; // TODO: use or delete
         // TODO: file path should be handled from outside, but how?
         // TODO: mutex
         LevelFile(const std::string &fileName,
@@ -48,7 +49,7 @@ namespace server {
 
     class LevelManagementServer final : public Act::Service {
     private:
-        std::string level_dir_path = "../levels-server/";
+        std::string level_dir_path = "../server/server_test_directory/";
         std::map<std::string, LevelFile> Levels;
         std::map<std::string, std::mutex> LevelMutexes;
         void printDebug() {
@@ -68,9 +69,24 @@ namespace server {
         }
 
     public:
-        void collect_present_levels() {
-            // TODO: write update function to collect added by hand levels; creator=admin
-        }
+        std::vector<std::string> collect_present_levels() {
+            std::vector<std::string> filenames;
+            for (const auto & level_file : std::filesystem::directory_iterator(level_dir_path)) {
+                const std::string levelPath = level_file.path();
+                std::cout << "Collecting present levels: there is level with path " << levelPath << '\n';
+                if (server::get_file_extension(levelPath) != ".json") {
+                    continue;
+                }
+                if (!Levels.count(levelPath)) {
+                    Levels.insert_or_assign(levelPath, LevelFile(levelPath, support::file_content_string(levelPath), server::AdminID));
+                }
+                auto levelName = std::filesystem::path(level_file).filename(); // TODO: chop off file extension
+                filenames.emplace_back(levelName);
+            }
+            std::sort(filenames.begin(), filenames.end());
+            return std::move(filenames);
+        } // TODO: utilities.cpp overlap - resolve!!!!
+
         void handleRequestAddOrReplace(
                 int32_t authorID,
                 const json_file_exchange::LevelContent &level_content,
@@ -128,6 +144,14 @@ namespace server {
             reply->set_result(result);
         }
 
+        void handleRequestGetAllNames(ActionReply *reply) {
+            std::cout << "Sending all available level names to client\n";
+            auto presented_level_names = collect_present_levels();
+            reply->mutable_possible_level_list()->Add(presented_level_names.begin(), presented_level_names.end());
+            bool result = true;
+            reply->set_result(result);
+        }
+
         Status sendRequest(ServerContext *context, const ActionRequest *request,
                            ActionReply *reply) override {
             try {
@@ -152,6 +176,8 @@ namespace server {
                     handleRequestGet(reply, level_file_path);
                 } else if (action == "check") {
                     handleRequestCheck(reply, level_file_path);
+                } else if (action == "get_all_names") {
+                    handleRequestGetAllNames(reply);
                 }
                 reply->set_is_successful(true);
             } catch (const support::file_handling_exception &file_exception) {

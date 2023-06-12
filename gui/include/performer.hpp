@@ -5,12 +5,14 @@
 #include <SFML/Window.hpp>
 #include <filesystem>
 #include <string>
-#include "../../model/include/game.hpp"
-#include "../../model/include/player.hpp"
+#include "game.hpp"
+#include "player.hpp"
 #include "../../tools/utilities.hpp"
 
+#include "client.hpp"
+
 namespace control {
-enum class MenuState { MainMenu, LoadMenu, PauseMenu, Empty };
+enum class MenuState { MainMenu, LoadMenu, PauseMenu, ServerMenu, Empty };
 enum class LevelState { Empty, Running, Paused, Won, Editor };
 
 struct Performer {
@@ -71,6 +73,23 @@ public:
 
     LevelState getState();
     void setState(LevelState newState);
+};
+
+class ServerPerformer : Performer {
+private:
+    client::LevelClient client;
+    std::string level_dir_path; // TODO: resolve inconsistency with MenuPerformer
+public:
+    explicit ServerPerformer(sf::RenderWindow &window_,
+                             const std::string &address,
+                             const std::string &key_directory,
+                             std::string  level_dir_path_);
+    bool getLevel(const std::string & level_name);
+    bool sendLevel(const std::string & level_name);
+    bool deleteLevel(const std::string & level_name);
+    bool checkLevel(const std::string & level_name); // TODO: do we even need it?
+    std::vector<std::string> loadAllAvailableLevelNames();
+    void updateLocalLevelsList();
 };
 }  // namespace control
 

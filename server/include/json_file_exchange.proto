@@ -35,4 +35,5 @@ message ActionReply {
     bool result = 2;
     LevelContent level_content = 3;
     string additional_info = 4;
+    repeated string possible_level_list = 5; // optional as all other fields
 }

@@ -110,6 +110,30 @@ public:
         control::LevelPerformer &levelPerformer
     );
 };
+
+struct ServerMenu : Menu {
+private:
+    Scrollbar<interface::RectangleButton> localLevelsScrollbar;
+    Scrollbar<interface::RectangleButton> serverLevelsScrollbar;
+    ButtonWithImage refreshLocalButton;
+    ButtonWithImage refreshServerButton;
+public:
+    ServerMenu(
+        unsigned int windowWidth,
+        unsigned int windowHeight,
+        const sf::Font &font,
+        int fontSize,
+        int buttonDistance,
+        const std::string &BackgroundTextureFilepath,
+        const std::string &levelFilePath,
+        const std::string &miscFilepath,
+        control::MenuPerformer &menuPerformer,
+        control::LevelPerformer &levelPerformer,
+        control::ServerPerformer &serverPerformer,
+        Platformer::gui::LevelGameplayWindow &levelWindow
+    );
+    void loadInWindow(sf::RenderWindow &window, sf::Event event) override;
+};
 }  // namespace interface
 
 #endif  // PLATFORMERGAMECPP_MENU_HPP

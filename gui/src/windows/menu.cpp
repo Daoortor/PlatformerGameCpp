@@ -127,7 +127,7 @@ MainMenu::MainMenu(
     );
 
     std::vector<std::string> buttonStringLabels = {
-        "Start game",  "Select level", "Level editor", "Settings",
+        "Start game",  "Select level", "Level editor", "Connect to server",
         "Author info", "Feedback",     "Quit"};
     auto colorsList = std::vector{
         sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
@@ -153,6 +153,10 @@ MainMenu::MainMenu(
         levelPerformer.setState(control::LevelState::Editor);
     });
     bindButton("Select level", [&]() { menuPerformer.openLoadLevelMenu(); });
+    bindButton("Connect to server", [&]() {
+        menuPerformer.setState(control::MenuState::ServerMenu);
+        // TODO: add openServerMenu method
+    });
     bindButton("Quit", [&]() { menuPerformer.closeWindow(); });
 }
 
@@ -297,5 +301,144 @@ PauseMenu::PauseMenu(
         levelPerformer.exit();
         menuPerformer.openMainMenu();
     });
+}
+
+ServerMenu::ServerMenu(
+    unsigned int windowWidth,
+    unsigned int windowHeight,
+    const sf::Font &font,
+    int fontSize,
+    int buttonDistance,
+    const std::string &BackgroundTextureFilepath,
+    const std::string &levelFilePath,
+    const std::string &miscFilepath,
+    control::MenuPerformer &menuPerformer,
+    control::LevelPerformer &levelPerformer,
+    control::ServerPerformer &serverPerformer,
+    Platformer::gui::LevelGameplayWindow &levelWindow
+) : localLevelsScrollbar(
+    {40, static_cast<float>(10 + buttonDistance)},
+    {150, 40},
+    {10, 20},
+    20,
+    40,
+    6,
+    Platformer::gui::colors::BUTTON_COLORS_LIST,
+    Platformer::gui::colors::ITEM_CHOSEN_COLOR,
+    miscFilepath
+    ),
+      serverLevelsScrollbar(
+          {590, static_cast<float>(10 + buttonDistance)},
+          {150, 40},
+          {10, 20},
+          20,
+          40,
+          6,
+          Platformer::gui::colors::BUTTON_COLORS_LIST,
+          Platformer::gui::colors::ITEM_CHOSEN_COLOR,
+          miscFilepath
+      ),
+    refreshLocalButton(
+        miscFilepath + "refresh.png",
+        sf::RectangleShape({40, 40}),
+        {10, 10},
+        {215, static_cast<float>(10 + buttonDistance)},
+        Platformer::gui::colors::BUTTON_COLORS_LIST,
+        [this,
+         levelFilePath,
+         &font,
+         fontSize] {
+              localLevelsScrollbar.clear();
+              auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
+              auto filenames = Platformer::utilities::getLevelNames(levelFilePath);
+              for (auto &levelName : filenames) {
+                  const std::string levelPath = levelFilePath + levelName + ".json";
+                  interface::RectangleButton newButton(
+                      sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
+                      colorsList[2], colorsList[3], sf::Text(levelName, font, fontSize),
+                      {10, 10}, {340, 250},
+                      [&, levelPath]() {
+                        std::cout << "Something happened <:-()\n";
+                      },
+                      18
+                  );
+                  localLevelsScrollbar.addItem(newButton);
+              }
+        },
+        false
+    ),
+      refreshServerButton(
+          miscFilepath + "refresh.png",
+          sf::RectangleShape({40, 40}),
+          {10, 10},
+          {545, static_cast<float>(10 + buttonDistance)},
+          Platformer::gui::colors::BUTTON_COLORS_LIST,
+          [this,
+           levelFilePath,
+           &font,
+           fontSize, &serverPerformer] {
+              serverLevelsScrollbar.clear();
+              auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
+              auto serverLevels = serverPerformer.loadAllAvailableLevelNames();
+              for (auto &levelPath : serverLevels) {
+                  // std::string levelName = // TODO: cut level name from path
+                  interface::RectangleButton newButton(
+                      sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
+                      colorsList[2], colorsList[3], sf::Text(levelPath, font, fontSize),
+                      {10, 10}, {340, 250},
+                      [&, levelPath]() {
+                          std::cout << "pressed level " << levelPath << '\n';
+                      },
+                      18
+                  );
+                  serverLevelsScrollbar.addItem(newButton);
+              }
+              // TODO: move to an outside function and use at the end of contructor
+          },
+          false
+      )
+{
+    loadBackgroundSpriteFromTextureFile(
+        BackgroundTextureFilepath, 255, 255, 255, 0, windowWidth, windowHeight
+    );
+    // TODO: too much code repetition & intersection with LevelSelectionMenu; REDO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    auto colorsList = std::vector{
+        sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
+        sf::Color(178, 160, 53, 192), sf::Color(255, 95, 0, 192)
+    };
+    auto labelColorsList = std::vector{
+        sf::Color(255, 0, 48, 192), sf::Color(255, 0, 48, 192),
+        sf::Color(255, 0, 48, 192), sf::Color(255, 0, 48, 192)
+    };
+    addNewButton(
+        "Return", 0, font, fontSize, colorsList, buttonDistance, {360, 150},
+        {10, 10}
+    );
+    bindButton("Return", [&]() {
+        localLevelsScrollbar.reset();
+        menuPerformer.openMainMenu();
+    });
+    addNewButton(
+        "Local Levels", 0, font, fontSize, labelColorsList, buttonDistance, {40, 10},
+        {10, 10}
+    );
+    addNewButton(
+        "Available Levels", 0, font, fontSize, labelColorsList, buttonDistance, {590, 10},
+        {10, 10}
+    );
+    // TODO: remove "... was pressed" message from addNewButton method as labels should not do anything when pressed on
+}
+
+void ServerMenu::loadInWindow(
+    sf::RenderWindow &window,
+    sf::Event event
+) {
+    Menu::loadInWindow(window, event);
+    localLevelsScrollbar.loadInWindow(window, event);
+    serverLevelsScrollbar.loadInWindow(window, event);
+    refreshLocalButton.drawInWindow(window);
+    refreshLocalButton.update(window, event);
+    refreshServerButton.drawInWindow(window);
+    refreshServerButton.update(window, event);
 }
 }  // namespace interface
