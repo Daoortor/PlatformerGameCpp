@@ -23,9 +23,10 @@ leading_dots_in_file_name::leading_dots_in_file_name(const std::string &level_na
 bool file_exists(const std::string &file_name) {
     return std::filesystem::exists(file_name);
 } // TODO: is it needed at all? Excessive dependency on this file by client_source.hpp because of it, and no code length advantages
+// TODO: update TODO above
 
 void add_or_replace_json_file(const std::string &file_name, const std::string &file_content) {
-    std::ofstream file(file_name, std::ios::trunc);// TODO: file prefix move here?
+    std::ofstream file(file_name, std::ios::trunc);
     file << file_content;         // TODO: validity check?
     file.close();
 }
@@ -39,5 +40,5 @@ std::string file_content_string(const std::string &file_name) {
 
 void delete_file(const std::string &file_name) {
     std::filesystem::remove(file_name);
-}
+} // TODO: is needed at all? no code length advantages
 }

@@ -89,7 +89,7 @@ public:
     bool deleteLevel(const std::string & level_name);
     bool checkLevel(const std::string & level_name); // TODO: do we even need it?
     std::vector<std::string> loadAllAvailableLevelNames();
-    void updateLocalLevelsList();
+    void updateLocalLevelsList(); // TODO: do I even need it?
 };
 }  // namespace control
 
