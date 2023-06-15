@@ -51,7 +51,7 @@ ActionReply LevelClient::send_request_util_and_get_reply(
     if (action_name == "add") {
         LevelContent level_content;
         JsonStringToMessage(
-            support::file_content_string(level_dir_path + level_name),
+            support::file_content_string(level_dir_path + level_name + ".json"),
             &level_content
         );
         std::cout
@@ -61,6 +61,7 @@ ActionReply LevelClient::send_request_util_and_get_reply(
         request.mutable_level_content()->Swap(&level_content);
     }
     return sendRequest(request);
+    // TODO: ".json" extension is hardcoded
 }
 
 ActionReply LevelClient::sendRequest(const ActionRequest &request) {
@@ -90,15 +91,17 @@ void LevelClient::setSignature(int32_t newSignature) {
 ActionReply LevelClient::sendRequestAddOrReplaceLevel(
     const std::string &level_name
 ) {
-    if (!support::file_exists(level_dir_path + level_name)) {
-        throw support::no_such_file(level_dir_path + level_name);
+    if (!support::file_exists(level_dir_path + level_name + ".json")) {
+        throw support::no_such_file(level_dir_path + level_name + ".json");
     }
     if (level_name.length() >= 2 && level_name[0] == '.' &&
         level_name[1] == '.') {
         throw support::leading_dots_in_file_name(level_name);
     }
     return send_request_util_and_get_reply("add", level_name);
-}  // TODO: rewrite level_dir_path usage
+}
+// TODO: rewrite level_dir_path usage
+// TODO: ".json is hardcoded, is it bad?
 
 ActionReply LevelClient::sendRequestCheckLevelExistence(
     const std::string &level_name

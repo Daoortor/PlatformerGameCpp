@@ -5,6 +5,7 @@
 #include <SFML/Window.hpp>
 #include <filesystem>
 #include <string>
+#include <set>
 #include "game.hpp"
 #include "player.hpp"
 #include "../../tools/utilities.hpp"
@@ -79,6 +80,9 @@ class ServerPerformer : Performer {
 private:
     client::LevelClient client;
     std::string level_dir_path; // TODO: resolve inconsistency with MenuPerformer
+    std::set<std::string> chosen_local_levels;
+    std::set<std::string> chosen_global_levels;
+
 public:
     explicit ServerPerformer(sf::RenderWindow &window_,
                              const std::string &address,
@@ -87,9 +91,18 @@ public:
     bool getLevel(const std::string & level_name);
     bool sendLevel(const std::string & level_name);
     bool deleteLevel(const std::string & level_name);
-    bool checkLevel(const std::string & level_name); // TODO: do we even need it?
+    bool checkLevel(const std::string & level_name); // TODO: do I even need it?
     std::vector<std::string> loadAllAvailableLevelNames();
-    void updateLocalLevelsList(); // TODO: do I even need it?
+    void updateLocalLevelsList(); // TODO: do I even need it here?
+
+    void switch_in_local_set(const std::string & name);
+    void switch_in_global_set(const std::string & name);
+
+    void sendSelectedToServer();
+    void getSelectedFromServer();
+
+    void debug_local_set();
+    void debug_global_set();
 };
 }  // namespace control
 

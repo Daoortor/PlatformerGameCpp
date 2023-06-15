@@ -347,23 +347,31 @@ ServerMenu::ServerMenu(
         [this,
          levelFilePath,
          &font,
-         fontSize] {
+         fontSize, &serverPerformer] {
+              /*
               localLevelsScrollbar.clear();
               auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
               auto filenames = Platformer::utilities::getLevelNames(levelFilePath);
               for (auto &levelName : filenames) {
-                  const std::string levelPath = levelFilePath + levelName + ".json";
                   interface::RectangleButton newButton(
                       sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
                       colorsList[2], colorsList[3], sf::Text(levelName, font, fontSize),
                       {10, 10}, {340, 250},
-                      [&, levelPath]() {
-                        std::cout << "Something happened <:-()\n";
+                      [&serverPerformer, levelName]() {
+                        serverPerformer.switch_in_local_set(levelName);
+                        serverPerformer.debug_local_set();
                       },
                       18
                   );
                   localLevelsScrollbar.addItem(newButton);
               }
+               */
+              refreshScrollbarButtonUtility(localLevelsScrollbar,
+                                            "local",
+                                            Platformer::utilities::getLevelNames(levelFilePath),
+                                            font,
+                                            fontSize,
+                                            serverPerformer);
         },
         false
     ),
@@ -377,23 +385,32 @@ ServerMenu::ServerMenu(
            levelFilePath,
            &font,
            fontSize, &serverPerformer] {
+              /*
               serverLevelsScrollbar.clear();
               auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
               auto serverLevels = serverPerformer.loadAllAvailableLevelNames();
               for (auto &levelPath : serverLevels) {
-                  // std::string levelName = // TODO: cut level name from path
+                  std::string levelName = std::filesystem::path(levelPath).stem(); // returns file name without extension, so "Level 1" and the like
                   interface::RectangleButton newButton(
                       sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
                       colorsList[2], colorsList[3], sf::Text(levelPath, font, fontSize),
                       {10, 10}, {340, 250},
-                      [&, levelPath]() {
-                          std::cout << "pressed level " << levelPath << '\n';
+                      [&serverPerformer, levelName]() {
+                          serverPerformer.switch_in_global_set(levelName);
+                          serverPerformer.debug_global_set();
                       },
                       18
                   );
                   serverLevelsScrollbar.addItem(newButton);
               }
               // TODO: move to an outside function and use at the end of contructor
+               */
+              refreshScrollbarButtonUtility(serverLevelsScrollbar,
+                                            "global",
+                                            serverPerformer.loadAllAvailableLevelNames(),
+                                            font,
+                                            fontSize,
+                                            serverPerformer);
           },
           false
       )
@@ -418,6 +435,24 @@ ServerMenu::ServerMenu(
         localLevelsScrollbar.reset();
         menuPerformer.openMainMenu();
     });
+
+    addNewButton(
+        "--->", 1, font, fontSize, colorsList, buttonDistance, {360, 150},
+        {10, 10}
+    );
+    bindButton("--->", [&]() {
+        serverPerformer.sendSelectedToServer();
+
+    });
+
+    addNewButton(
+        "<---", 2, font, fontSize, colorsList, buttonDistance, {360, 150},
+        {10, 10}
+    );
+    bindButton("<---", [&]() {
+        serverPerformer.getSelectedFromServer();
+    });
+
     addNewButton(
         "Local Levels", 0, font, fontSize, labelColorsList, buttonDistance, {40, 10},
         {10, 10}

@@ -108,7 +108,7 @@ ServerPerformer::ServerPerformer(sf::RenderWindow &window_,
     : Performer(window_),
       client(client::EstablishClient(address, key_directory)),
       level_dir_path(std::move(level_dir_path_)){
-}
+} // TODO: where is key? Every time says 'creating new key', yet key is the same
 
 // use inside try ... catch block
 bool ServerPerformer::getLevel(const std::string &level_name) {
@@ -117,9 +117,9 @@ bool ServerPerformer::getLevel(const std::string &level_name) {
         // TODO: validate file content
         std::string level_in_json;
         google::protobuf::util::MessageToJsonString(reply.level_content(), &level_in_json);
-        support::add_or_replace_json_file(level_dir_path+level_name, level_in_json);
+        support::add_or_replace_json_file(level_dir_path+level_name+".json", level_in_json);
     }
-    // TODO: save into folder
+    // TODO: ".json" is hard-coded: is bad?
     return true;
 }
 
@@ -132,14 +132,14 @@ bool ServerPerformer::sendLevel(const std::string &level_name) {
 
 // use inside try ... catch block
 bool ServerPerformer::deleteLevel(const std::string &level_name) {
-    client::ActionReply reply = client.sendRequestDeleteLevel("test.json");
+    client::ActionReply reply = client.sendRequestDeleteLevel(level_name);
     return reply.is_successful();
     // TODO: catch wrappings - where to put?
 }
 
 // use inside try ... catch block
 bool ServerPerformer::checkLevel(const std::string &level_name) {
-    client::ActionReply reply = client.sendRequestCheckLevelExistence("test.json");
+    client::ActionReply reply = client.sendRequestCheckLevelExistence(level_name);
     return reply.is_successful();
     // TODO: catch wrappings - where to put?
 }
@@ -155,6 +155,65 @@ std::vector<std::string> ServerPerformer::loadAllAvailableLevelNames() {
         return std::move(answer);
     }
     return {};
-} // TODO: implement space & time-efficient approach
+}
+
+void ServerPerformer::switch_in_local_set(const std::string & name)  {
+    if (chosen_local_levels.count(name)) {
+        chosen_local_levels.erase(name);
+    } else {
+        chosen_local_levels.insert(name);
+    }
+} // TODO: why can't use const ref to set?
+
+void ServerPerformer::switch_in_global_set(const std::string & name)  {
+    if (chosen_global_levels.count(name)) {
+        chosen_global_levels.erase(name);
+    } else {
+        chosen_global_levels.insert(name);
+    }
+}
+
+void ServerPerformer::debug_local_set() {
+    std::cout << "Debug message: levelPerformer chosen local levels:\n";
+    for (auto & levelFilePath : chosen_local_levels) {
+        std::cout << levelFilePath << '\n';
+    }
+}
+
+void ServerPerformer::debug_global_set() {
+    std::cout << "Debug message: levelPerformer chosen global levels:\n";
+    for (auto & levelFilePath : chosen_global_levels) {
+        std::cout << levelFilePath << '\n';
+    }
+}
+
+void ServerPerformer::sendSelectedToServer() {
+    try {
+        for (auto & levelFilePath : chosen_local_levels) {
+            sendLevel(levelFilePath);
+        }
+    } catch (const support::file_handling_exception & exception) {
+        std::cerr << exception.what();
+    }
+    // TODO: write catch block: into game log? & on-screen message
+    // TODO: why if first fails, others stop? Not fair! Redo.
+}
+
+void ServerPerformer::getSelectedFromServer() {
+    try {
+        for (auto & levelFilePath : chosen_global_levels) {
+            getLevel(levelFilePath);
+        }
+    } catch (const support::file_handling_exception & exception) {
+        std::cerr << exception.what();
+    }
+    // TODO: write catch block: into game log? & on-screen message
+} // TODO: declaration & definition orders are not the same with many files; is OK?
+
+// TODO: is repeated code OK here?
+
+// TODO: why can't use const ref to set?
+
+// TODO: implement space & time-efficient approach
 // TODO: catch wrappings - where to put?
 }  // namespace control

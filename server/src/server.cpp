@@ -80,7 +80,7 @@ namespace server {
                 if (!Levels.count(levelPath)) {
                     Levels.insert_or_assign(levelPath, LevelFile(levelPath, support::file_content_string(levelPath), server::AdminID));
                 }
-                auto levelName = std::filesystem::path(level_file).filename(); // TODO: chop off file extension
+                auto levelName = std::filesystem::path(level_file).stem();
                 filenames.emplace_back(levelName);
             }
             std::sort(filenames.begin(), filenames.end());
@@ -156,7 +156,7 @@ namespace server {
                            ActionReply *reply) override {
             try {
                 auto &action = request->action();
-                std::string level_file_path = level_dir_path + request->level_name();
+                std::string level_file_path = level_dir_path + request->level_name() + ".json";
                 auto &level_content = request->level_content();
                 auto author_id = request->signature();
 
@@ -213,5 +213,6 @@ namespace server {
 }
 int main(int argc, char **argv) {
     server::RunServer();
+    // TODO: when shutting down, remember level authors!
     return 0;
 }
