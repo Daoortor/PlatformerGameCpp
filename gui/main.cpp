@@ -55,6 +55,12 @@ int main() {
         levelPerformer
     );
 
+    auto wonMenu = interface::WonMenu(
+        windowWidth, windowHeight, fontMario, 20, 50,
+        "../gui/assets/textures/interface/transparent.jpg",
+        "../model/levels/", menuPerformer, levelPerformer, levelWindow
+    );
+
     while (window.isOpen()) {
         sf::Event event{};
         while (window.pollEvent(event)) {
@@ -78,8 +84,8 @@ int main() {
                 menuPerformer.openPauseMenu();
                 break;
             case control::LevelState::Won:
-                menuPerformer.openMainMenu();
-                levelPerformer.setState(control::LevelState::Empty);
+                menuPerformer.openWonMenu();
+                levelPerformer.setState(control::LevelState::Won);
                 levelPerformer.reset();
         }
         switch (menuPerformer.getState()) {
@@ -92,6 +98,8 @@ int main() {
             case control::MenuState::PauseMenu:
                 pauseMenu.loadInWindow(window, event);
                 break;
+            case control::MenuState::WonMenu:
+                wonMenu.loadInWindow(window, event);
             case control::MenuState::Empty:
                 break;
         }

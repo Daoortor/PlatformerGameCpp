@@ -232,4 +232,50 @@ PauseMenu::PauseMenu(
         menuPerformer.openMainMenu();
     });
 }
+
+WonMenu::WonMenu(
+    unsigned int windowWidth,
+    unsigned int windowHeight,
+    const sf::Font &font,
+    int fontSize,
+    int buttonDistance,
+    const std::string &BackgroundTextureFilepath,
+    const std::string &LevelFilePath,
+    control::MenuPerformer &menuPerformer,
+    control::LevelPerformer &levelPerformer,
+    Platformer::gui::LevelWindow &levelWindow
+) {
+    sf::Vector2f startingButtonPosition = {340, 250};
+    sf::Vector2f buttonIndent = {10, 5};
+    auto colorsList = std::vector{
+        sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
+        sf::Color(178, 160, 53, 192), sf::Color(255, 95, 0, 192)};
+    loadBackgroundSpriteFromTextureFile(
+        BackgroundTextureFilepath, 255, 255, 255, 0, windowWidth, windowHeight
+    );
+    std::vector<std::string> buttonStringLabels = {
+        "Resume", "Back to title screen"};
+    for (int number = 0; number < buttonStringLabels.size(); number++) {
+        addNewButton(
+            buttonStringLabels[number], number, font, fontSize, colorsList,
+            buttonDistance, startingButtonPosition, buttonIndent
+        );
+    }
+    bindButton("Back to title screen", [&]() {
+        levelPerformer.exit();
+        menuPerformer.openMainMenu();
+    });
+
+    std::vector<std::string> StatisticsStringText = {
+        "Death count: " + levelPerformer.getStatistics()->getTextTimer(),
+        "Time: " + std::to_string(levelPerformer.getStatistics()->getDeathCount()),
+        "Last respawn time:" + std::to_string(levelPerformer.getStatistics()->getLastRespawnTime())
+    };
+    for (int number = 0; number < buttonStringLabels.size(); number++) {
+        addNewButton(
+            buttonStringLabels[number], number, font, fontSize, colorsList,
+            buttonDistance, startingButtonPosition, buttonIndent
+        );
+    }
+}
 }  // namespace interface

@@ -95,6 +95,22 @@ public:
         control::LevelPerformer &levelPerformer
     );
 };
+
+struct WonMenu : Menu {
+public:
+    WonMenu(
+        unsigned int windowWidth,
+        unsigned int windowHeight,
+        const sf::Font &font,
+        int fontSize,
+        int buttonDistance,
+        const std::string &BackgroundTextureFilepath,
+        const std::string &LevelFilePath,
+        control::MenuPerformer &menuPerformer,
+        control::LevelPerformer &levelPerformer,
+        Platformer::gui::LevelWindow &levelWindow
+    );
+};
 }  // namespace interface
 
 #endif  // PLATFORMERGAMECPP_MENU_HPP

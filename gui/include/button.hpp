@@ -2,6 +2,7 @@
 #define PROJECTGAME_BUTTON_HPP
 
 #include <SFML/Graphics.hpp>
+#include <functional>
 #include <string>
 #include <utility>
 

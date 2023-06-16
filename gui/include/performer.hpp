@@ -7,9 +7,10 @@
 #include <string>
 #include "../../model/include/game.hpp"
 #include "../../model/include/player.hpp"
+#include "statistics.hpp"
 
 namespace control {
-enum class MenuState { MainMenu, LoadMenu, PauseMenu, Empty };
+enum class MenuState { MainMenu, LoadMenu, PauseMenu, Empty, WonMenu };
 enum class LevelState { Empty, Running, Paused, Won };
 
 struct Performer {
@@ -45,6 +46,7 @@ public:
     [[maybe_unused]] void loadLevel(LevelPerformer &levelPerformer);
     [[maybe_unused]] void openLoadLevelMenu();
     [[maybe_unused]] void openPauseMenu();
+    [[maybe_unused]] void openWonMenu();
     void closeCurrentMenu();
     void closeWindow();
     void setState(MenuState newState);
@@ -55,6 +57,8 @@ class LevelPerformer : Performer {
 private:
     std::unique_ptr<Platformer::Game> game = nullptr;
     LevelState state = LevelState::Empty;
+    std::unique_ptr<Platformer::Statistics> statistics =
+        std::make_unique<Platformer::Statistics>(Platformer::Statistics());
 
 public:
     explicit LevelPerformer(sf::RenderWindow &window_);
@@ -69,7 +73,7 @@ public:
     void setLevel(std::unique_ptr<Platformer::Game> game_);
 
     std::unique_ptr<Platformer::Game> &getLevel();
-
+    std::unique_ptr<Platformer::Statistics> &getStatistics();
     LevelState getState();
     void setState(LevelState newState);
 };

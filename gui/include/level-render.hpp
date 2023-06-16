@@ -9,6 +9,7 @@
 #include "../../model/include/game.hpp"
 #include "../../model/include/player.hpp"
 #include "performer.hpp"
+#include "statistics.hpp"
 
 namespace Platformer::gui {
 
@@ -34,6 +35,7 @@ class LevelWindow {
     sf::Sprite playerSprite;
     sf::Texture levelEndTexture;
     sf::Sprite levelEndSprite;
+    int DifTimer = 0;
 
 public:
     explicit LevelWindow(

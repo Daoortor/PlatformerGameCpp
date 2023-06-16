@@ -17,6 +17,10 @@ namespace control {
     state = MenuState::LoadMenu;
 }
 
+[[maybe_unused]] void MenuPerformer::openWonMenu() {
+    state = MenuState::WonMenu;
+}
+
 void MenuPerformer::openPauseMenu() {
     state = MenuState::PauseMenu;
 }
@@ -92,6 +96,10 @@ void LevelPerformer::setState(LevelState newState) {
 
 std::unique_ptr<Platformer::Game> &LevelPerformer::getLevel() {
     return game;
+}
+
+std::unique_ptr<Platformer::Statistics> &LevelPerformer::getStatistics() {
+    return statistics;
 }
 
 std::string MenuPerformer::getLevelFilePath(int num) {
