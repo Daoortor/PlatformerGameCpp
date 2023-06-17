@@ -109,9 +109,8 @@ public:
         return game;
     }
 
-    [[nodiscard]] const std::vector<
-        std::unique_ptr<observers::PlayerObserver>> &
-    getObservers() {
+    [[nodiscard]] const std::vector<std::unique_ptr<observers::PlayerObserver>>
+        &getObservers() {
         return observerCollection;
     }
 

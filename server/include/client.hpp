@@ -1,11 +1,11 @@
 #ifndef PLATFORMERGAMECPP_CLIENT_HPP
 #define PLATFORMERGAMECPP_CLIENT_HPP
 
-#include "json_file_exchange.grpc.pb.h"
-#include <fstream>
 #include <google/protobuf/util/json_util.h>
 #include <grpcpp/grpcpp.h>
+#include <fstream>
 #include <string>
+#include "json_file_exchange.grpc.pb.h"
 #include "source.hpp"
 
 namespace client {
@@ -23,7 +23,7 @@ using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
 
 namespace client {
-inline const int key_size = 100;// it's not actually key size! TODO: redo!
+inline const int key_size = 100;  // it's not actually key size! TODO: redo!
 inline const std::string key_file_name = "key";
 
 void create_key_file(const std::string &directory);
@@ -31,7 +31,7 @@ void create_key_file(const std::string &directory);
 void validate_key_file_existence(const std::string &directory);
 
 int32_t get_key(const std::string &directory);
-}
+}  // namespace client
 
 class LevelClient {
 private:
@@ -70,6 +70,6 @@ EstablishClient(const std::string &address, const std::string &key_directory);
 
 // example function to check workability of client class
 void RunClient();
-}
+}  // namespace client
 
 #endif  // PLATFORMERGAMECPP_CLIENT_HPP

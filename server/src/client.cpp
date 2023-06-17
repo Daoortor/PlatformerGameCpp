@@ -12,7 +12,8 @@ using json_file_exchange::ActionRequest;
 using json_file_exchange::LevelContent;
 
 using google::protobuf::util::JsonStringToMessage;
-using google::protobuf::util::MessageToJsonString; // TODO: move out of namespace?
+using google::protobuf::util::MessageToJsonString;  // TODO: move out of
+                                                    // namespace?
 
 namespace client {
 void create_key_file(const std::string &directory) {
@@ -32,13 +33,15 @@ void validate_key_file_existence(const std::string &directory) {
 
 int32_t get_key(const std::string &directory) {
     std::ifstream file(directory + key_file_name);
-    std::string content((std::istreambuf_iterator<char>(file)),
-                        (std::istreambuf_iterator<char>()));
+    std::string content(
+        (std::istreambuf_iterator<char>(file)),
+        (std::istreambuf_iterator<char>())
+    );
     std::hash<std::string> hasher;
     return static_cast<int32_t>(hasher(content));
 }
 
-}
+}  // namespace client
 
 ActionReply LevelClient::send_request_util_and_get_reply(
     const std::string &action_name,
@@ -100,6 +103,7 @@ ActionReply LevelClient::sendRequestAddOrReplaceLevel(
     }
     return send_request_util_and_get_reply("add", level_name);
 }
+
 // TODO: rewrite level_dir_path usage
 // TODO: ".json is hardcoded, is it bad?
 
@@ -140,9 +144,11 @@ EstablishClient(const std::string &address, const std::string &key_directory) {
 void RunClient() {
     LevelClient client = EstablishClient("0.0.0.0:50051", "../key_directory/");
     try {
-        // ActionReply reply = client.sendRequestAddOrReplaceLevel("t01-box-with-ladder.json");
+        // ActionReply reply =
+        // client.sendRequestAddOrReplaceLevel("t01-box-with-ladder.json");
         // ActionReply reply = client.sendRequestDeleteLevel("test.json");
-        // ActionReply reply = client.sendRequestCheckLevelExistence("test.json");
+        // ActionReply reply =
+        // client.sendRequestCheckLevelExistence("test.json");
         ActionReply reply = client.sendRequestGetLevel("../source.hpp");
         if (reply.is_successful()) {
             std::cout << "Request succeeded.\n";
@@ -167,4 +173,4 @@ void RunClient() {
         return;
     }
 }
-}
+}  // namespace client

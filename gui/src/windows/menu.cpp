@@ -348,24 +348,6 @@ ServerMenu::ServerMenu(
          levelFilePath,
          &font,
          fontSize, &serverPerformer] {
-              /*
-              localLevelsScrollbar.clear();
-              auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
-              auto filenames = Platformer::utilities::getLevelNames(levelFilePath);
-              for (auto &levelName : filenames) {
-                  interface::RectangleButton newButton(
-                      sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
-                      colorsList[2], colorsList[3], sf::Text(levelName, font, fontSize),
-                      {10, 10}, {340, 250},
-                      [&serverPerformer, levelName]() {
-                        serverPerformer.switch_in_local_set(levelName);
-                        serverPerformer.debug_local_set();
-                      },
-                      18
-                  );
-                  localLevelsScrollbar.addItem(newButton);
-              }
-               */
               refreshScrollbarButtonUtility(localLevelsScrollbar,
                                             "local",
                                             Platformer::utilities::getLevelNames(levelFilePath),
@@ -385,26 +367,6 @@ ServerMenu::ServerMenu(
            levelFilePath,
            &font,
            fontSize, &serverPerformer] {
-              /*
-              serverLevelsScrollbar.clear();
-              auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
-              auto serverLevels = serverPerformer.loadAllAvailableLevelNames();
-              for (auto &levelPath : serverLevels) {
-                  std::string levelName = std::filesystem::path(levelPath).stem(); // returns file name without extension, so "Level 1" and the like
-                  interface::RectangleButton newButton(
-                      sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
-                      colorsList[2], colorsList[3], sf::Text(levelPath, font, fontSize),
-                      {10, 10}, {340, 250},
-                      [&serverPerformer, levelName]() {
-                          serverPerformer.switch_in_global_set(levelName);
-                          serverPerformer.debug_global_set();
-                      },
-                      18
-                  );
-                  serverLevelsScrollbar.addItem(newButton);
-              }
-              // TODO: move to an outside function and use at the end of contructor
-               */
               refreshScrollbarButtonUtility(serverLevelsScrollbar,
                                             "global",
                                             serverPerformer.loadAllAvailableLevelNames(),
@@ -442,7 +404,6 @@ ServerMenu::ServerMenu(
     );
     bindButton("--->", [&]() {
         serverPerformer.sendSelectedToServer();
-
     });
 
     addNewButton(
@@ -461,7 +422,6 @@ ServerMenu::ServerMenu(
         "Available Levels", 0, font, fontSize, labelColorsList, buttonDistance, {590, 10},
         {10, 10}
     );
-    // TODO: remove "... was pressed" message from addNewButton method as labels should not do anything when pressed on
 }
 
 void ServerMenu::loadInWindow(
@@ -475,5 +435,38 @@ void ServerMenu::loadInWindow(
     refreshLocalButton.update(window, event);
     refreshServerButton.drawInWindow(window);
     refreshServerButton.update(window, event);
+}
+
+void ServerMenu::refreshScrollbarButtonUtility(
+    Scrollbar<interface::RectangleButton> &levelsScrollbar,
+    const std::string &scrollbarType,
+    const std::vector<std::string> &filenames,
+    const sf::Font &font,
+    int fontSize,
+    control::ServerPerformer &serverPerformer
+)  {
+    levelsScrollbar.clear();
+    auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
+    // auto filenames = Platformer::utilities::getLevelNames(levelFilePath);
+    for (auto &levelName : filenames) {
+        interface::RectangleButton newButton(
+            sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
+            colorsList[2], colorsList[3], sf::Text(levelName, font, fontSize),
+            {10, 10}, {340, 250},
+            [&serverPerformer, levelName, scrollbarType]() {
+                if (scrollbarType == "local") {
+                    serverPerformer.switch_in_local_set(levelName);
+                    serverPerformer.debug_local_set();
+                } else if (scrollbarType == "global") {
+                    serverPerformer.switch_in_global_set(levelName);
+                    serverPerformer.debug_global_set();
+                }
+                // TODO: refactor if-else above
+                // TODO: button colors switch
+            },
+            18
+        );
+        levelsScrollbar.addItem(newButton);
+    }
 }
 }  // namespace interface

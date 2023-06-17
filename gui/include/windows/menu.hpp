@@ -125,30 +125,7 @@ private:
         const sf::Font &font,
         int fontSize,
         control::ServerPerformer &serverPerformer
-        ) {
-        levelsScrollbar.clear();
-        auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
-        // auto filenames = Platformer::utilities::getLevelNames(levelFilePath);
-        for (auto &levelName : filenames) {
-            interface::RectangleButton newButton(
-                sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
-                colorsList[2], colorsList[3], sf::Text(levelName, font, fontSize),
-                {10, 10}, {340, 250},
-                [&serverPerformer, levelName, scrollbarType]() {
-                    if (scrollbarType == "local") {
-                        serverPerformer.switch_in_local_set(levelName);
-                        serverPerformer.debug_local_set();
-                    } else if (scrollbarType == "global") {
-                        serverPerformer.switch_in_global_set(levelName);
-                        serverPerformer.debug_global_set();
-                    }
-                    // TODO: refactor if-else above
-                },
-                18
-            );
-            levelsScrollbar.addItem(newButton);
-        }
-    }
+        );
 public:
     ServerMenu(
         unsigned int windowWidth,

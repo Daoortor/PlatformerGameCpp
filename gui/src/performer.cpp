@@ -188,10 +188,13 @@ void ServerPerformer::debug_global_set() {
 }
 
 void ServerPerformer::sendSelectedToServer() {
+    std::cout << "Sending selected files to server\n";
     try {
         for (auto & levelFilePath : chosen_local_levels) {
             sendLevel(levelFilePath);
+            std::cout << levelFilePath << " successfully sent to server\n";
         }
+        chosen_local_levels.clear();
     } catch (const support::file_handling_exception & exception) {
         std::cerr << exception.what();
     }
@@ -200,10 +203,13 @@ void ServerPerformer::sendSelectedToServer() {
 }
 
 void ServerPerformer::getSelectedFromServer() {
+    std::cout << "Downloading selected files from server\n";
     try {
         for (auto & levelFilePath : chosen_global_levels) {
             getLevel(levelFilePath);
+            std::cout << levelFilePath << " downloaded and saved to local\n";
         }
+        chosen_global_levels.clear();
     } catch (const support::file_handling_exception & exception) {
         std::cerr << exception.what();
     }
@@ -212,8 +218,5 @@ void ServerPerformer::getSelectedFromServer() {
 
 // TODO: is repeated code OK here?
 
-// TODO: why can't use const ref to set?
-
-// TODO: implement space & time-efficient approach
 // TODO: catch wrappings - where to put?
 }  // namespace control
