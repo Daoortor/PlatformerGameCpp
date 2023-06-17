@@ -93,7 +93,6 @@ public:
     bool deleteLevel(const std::string & level_name);
     bool checkLevel(const std::string & level_name); // TODO: do I even need it?
     std::vector<std::string> loadAllAvailableLevelNames();
-    void updateLocalLevelsList(); // TODO: do I even need it here?
 
     void switch_in_local_set(const std::string & name);
     void switch_in_global_set(const std::string & name);

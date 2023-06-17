@@ -127,14 +127,12 @@ bool ServerPerformer::getLevel(const std::string &level_name) {
 bool ServerPerformer::sendLevel(const std::string &level_name) {
     client::ActionReply reply = client.sendRequestAddOrReplaceLevel(level_name);
     return reply.is_successful();
-    // TODO: catch wrappings - where to put?
 }
 
 // use inside try ... catch block
 bool ServerPerformer::deleteLevel(const std::string &level_name) {
     client::ActionReply reply = client.sendRequestDeleteLevel(level_name);
     return reply.is_successful();
-    // TODO: catch wrappings - where to put?
 }
 
 // use inside try ... catch block
@@ -163,7 +161,7 @@ void ServerPerformer::switch_in_local_set(const std::string & name)  {
     } else {
         chosen_local_levels.insert(name);
     }
-} // TODO: why can't use const ref to set?
+}
 
 void ServerPerformer::switch_in_global_set(const std::string & name)  {
     if (chosen_global_levels.count(name)) {
@@ -218,5 +216,4 @@ void ServerPerformer::getSelectedFromServer() {
 
 // TODO: is repeated code OK here?
 
-// TODO: catch wrappings - where to put?
 }  // namespace control

@@ -15,7 +15,6 @@ incomplete_level_file::incomplete_level_file(const std::string &level_name)
           "missing crucial info for level file creation/overwrite: " +
           level_name
       ){};
-// TODO: is needed at all? Of course, but how to implement
 
 leading_dots_in_file_name::leading_dots_in_file_name(
     const std::string &level_name

@@ -16,7 +16,7 @@ std::unique_ptr<RectangleButton> &interface::Menu::addRectangleButton(
                          .getString()] =
         static_cast<int>(rectangleButtons.size() - 1);
     return rectangleButtons[rectangleButtons.size() - 1];
-}
+} // TODO: rewrite method to take different child classes of RectangleButton!!!
 
 void Menu::loadBackgroundSpriteFromTextureFile(
     const std::string &texturePath,
@@ -155,7 +155,7 @@ MainMenu::MainMenu(
     bindButton("Select level", [&]() { menuPerformer.openLoadLevelMenu(); });
     bindButton("Connect to server", [&]() {
         menuPerformer.setState(control::MenuState::ServerMenu);
-        // TODO: add openServerMenu method
+        // TODO: add openServerMenu method, same as similar others
     });
     bindButton("Quit", [&]() { menuPerformer.closeWindow(); });
 }

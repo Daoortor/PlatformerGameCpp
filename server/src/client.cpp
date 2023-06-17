@@ -105,7 +105,7 @@ ActionReply LevelClient::sendRequestAddOrReplaceLevel(
 }
 
 // TODO: rewrite level_dir_path usage
-// TODO: ".json is hardcoded, is it bad?
+// TODO: ".json" is hardcoded, is it bad?
 
 ActionReply LevelClient::sendRequestCheckLevelExistence(
     const std::string &level_name
