@@ -1,6 +1,8 @@
 #ifndef JSON_FILE_EXCHANGE_SERVER_SOURCE_HPP
 #define JSON_FILE_EXCHANGE_SERVER_SOURCE_HPP
 
+// TODO: rename to server.hpp?
+
 namespace server {
 const int32_t AdminID = 1443241;
 

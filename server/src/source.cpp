@@ -26,7 +26,7 @@ leading_dots_in_file_name::leading_dots_in_file_name(
 bool file_exists(const std::string &file_name) {
     return std::filesystem::exists(file_name);
 }  // TODO: is it needed at all? Excessive dependency on this file by
-   // client_source.hpp because of it, and no code length advantages
+   //  client_source.hpp because of it, and no code length advantages
 
 // TODO: update TODO above
 

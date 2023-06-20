@@ -24,33 +24,32 @@ using google::protobuf::util::MessageToJsonString;
 
 // TODO: big TODO: naming
 
-enum class Who { Everyone, Author, Admin };
-
 class LevelFile {
 private:
     std::string m_Name;
     int32_t m_Creator;
-    Who m_WhoCanEdit;  // TODO: use or delete
+    mutable std::mutex m_mutex;
 
-    // TODO: file path should be handled from outside, but how?
-    // TODO: mutex
+    friend class LevelManagementServer;
+
+public:
     LevelFile(
         const std::string &fileName,
         const std::string &fileContent,
         int32_t creatorID
-    ) {
-        m_Creator = creatorID;
-        m_WhoCanEdit = Who::Author;  // TODO: implement?
+    )
+        : m_Creator(creatorID) {
         support::add_or_replace_json_file(fileName, fileContent);
     }
-    friend class LevelManagementServer;
 };
 
 class LevelManagementServer final : public Act::Service {
 private:
     std::string level_dir_path = "../server/server_test_directory/";
     std::map<std::string, LevelFile> Levels;
-    std::map<std::string, std::mutex> LevelMutexes;
+    std::mutex unknown_level_mutex;  // is used when new level is added:
+
+    // safer to perform 1 operation of this kind at a time
 
     void printDebug() {
         std::cout << "Current Levels map looks like: \n";
@@ -68,12 +67,17 @@ private:
                   << reply->DebugString() << '\n';
         return Status::CANCELLED;
         // TODO: find out why reply->DebugString() is empty, yet actual reply
-        // properly contains false bools
+        //  properly contains false booleans
     }
 
 public:
     std::vector<std::string> collect_present_levels() {
+        // TODO: should I clean Levels map here to properly process levels
+        // manually deleted after server launch? once in a while probably yes:
+        // LevelFile constructor is not cheap
         std::vector<std::string> filenames;
+        // TODO: save level creators to some kind of list so this info is not
+        // lost when shutting server down
         for (const auto &level_file :
              std::filesystem::directory_iterator(level_dir_path)) {
             const std::string levelPath = level_file.path();
@@ -82,15 +86,15 @@ public:
             if (server::get_file_extension(levelPath) != ".json") {
                 continue;
             }
-            if (!Levels.count(levelPath)) {
-                Levels.insert_or_assign(
-                    levelPath,
-                    LevelFile(
-                        levelPath, support::file_content_string(levelPath),
-                        server::AdminID
-                    )
-                );
-            }
+            // I need to address 2 cases:
+            // 1. file was added, it is not in map. So I should add it to map
+            // 2. file was changed, but is already in map. Do I even need to do
+            // anything with it? Of course not!
+            Levels.try_emplace(
+                levelPath, levelPath, support::file_content_string(levelPath),
+                server::AdminID
+            );
+            // TODO: check correctness
             auto levelName = std::filesystem::path(level_file).stem();
             filenames.emplace_back(levelName);
         }
@@ -103,6 +107,16 @@ public:
         const json_file_exchange::LevelContent &level_content,
         const std::string &level_file_path
     ) {
+        // Mutex protection: if there is already such level on server,
+        // use its own mutex. If not,
+        // use special mutex for still-not-added levels
+        if (Levels.count(level_file_path)) {
+            std::unique_lock lock(Levels.at(level_file_path).m_mutex);
+        } else {
+            std::unique_lock lock(unknown_level_mutex);
+        }
+        // TODO: check mutex correctness
+
         if (Levels.count(level_file_path) &&
             Levels.at(level_file_path).m_Creator != authorID) {
             throw action_not_allowed(level_file_path);
@@ -113,12 +127,14 @@ public:
         std::cout << "Adding/updating a level " << level_file_path
                   << " with content:\n-----\n"
                   << level_in_json << "\n-----\n";
-        Levels.insert_or_assign(
-            level_file_path, LevelFile(level_file_path, level_in_json, authorID)
+        if (!Levels.count(level_file_path)) {
+            support::add_or_replace_json_file(level_file_path, level_in_json);
+        }
+        Levels.try_emplace(
+            level_file_path, level_file_path, level_in_json, authorID
         );
-
         // TODO: confirmation checkbox "Such file already exists. Do you wish to
-        // overwrite it?" is needed?
+        //  overwrite it?" is needed?
     }
 
     void
@@ -127,6 +143,10 @@ public:
         if (!Levels.count(level_file_path)) {
             throw support::no_such_file(level_file_path);
         }
+
+        std::unique_lock lock(Levels.at(level_file_path).m_mutex);
+        // TODO: check mutex correctness
+
         if (Levels.at(level_file_path).m_Creator != authorID) {
             throw action_not_allowed(level_file_path);
         }
@@ -140,7 +160,6 @@ public:
         if (!Levels.count(level_file_path)) {
             throw support::no_such_file(level_file_path);
         }
-        // std::unique_lock lock(LevelMutexes[level_file_path]);
         std::cout << "Getting a level " << level_file_path
                   << " with content:\n"
                      "-----\n"
@@ -170,6 +189,9 @@ public:
     }
 
     void handleRequestGetAllNames(ActionReply *reply) {
+        // TODO: is it OK to use this function without mutexes?
+        //  If server sends a file which will no longer be there next second,
+        //  client will just get an error. Seems fair to me
         std::cout << "Sending all available level names to client\n";
         auto presented_level_names = collect_present_levels();
         reply->mutable_possible_level_list()->Add(
@@ -221,7 +243,7 @@ public:
             return return_failure(reply, error.what());
         }
         // TODO: expand on error handling: at least return to client what's
-        // going on
+        //  going on
         // TODO: resolve additional info causing double free
         // TODO: naming!!!!!!!!
         return Status::OK;
