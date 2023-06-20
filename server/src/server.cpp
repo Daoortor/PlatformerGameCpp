@@ -23,6 +23,7 @@ using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
 
 // TODO: big TODO: naming
+// TODO: big TODO: server.hpp
 
 class LevelFile {
 private:

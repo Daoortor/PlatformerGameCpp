@@ -212,7 +212,23 @@ void ServerPerformer::getSelectedFromServer() {
         std::cerr << exception.what();
     }
     // TODO: write catch block: into game log? & on-screen message
-} // TODO: declaration & definition orders are not the same with many files; is OK?
+}
+
+void ServerPerformer::deleteSelectedFromServer() {
+    std::cout << "Deleting selected files from server\n";
+    try {
+        for (auto & levelFilePath : chosen_global_levels) {
+            deleteLevel(levelFilePath);
+            std::cout << levelFilePath << " successfully deleted from server\n";
+        }
+        chosen_global_levels.clear();
+    } catch (const support::file_handling_exception & exception) {
+        std::cerr << exception.what();
+    }
+    // TODO: write catch block: into game log? & on-screen message
+}
+
+// TODO: declaration & definition orders are not the same with many files; is OK?
 
 // TODO: is repeated code OK here?
 

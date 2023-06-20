@@ -415,6 +415,14 @@ ServerMenu::ServerMenu(
     });
 
     addNewButton(
+        "<delete>", 3, font, fontSize, colorsList, buttonDistance, {360, 150},
+        {10, 10}
+    );
+    bindButton("<delete>", [&]() {
+        serverPerformer.deleteSelectedFromServer();
+    });
+
+    addNewButton(
         "Local Levels", 0, font, fontSize, labelColorsList, buttonDistance, {40, 10},
         {10, 10}
     );

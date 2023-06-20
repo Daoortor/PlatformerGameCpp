@@ -99,6 +99,7 @@ public:
 
     void sendSelectedToServer();
     void getSelectedFromServer();
+    void deleteSelectedFromServer();
 
     void debug_local_set();
     void debug_global_set();
