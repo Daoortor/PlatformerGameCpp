@@ -38,6 +38,10 @@ void Button::bind(std::function<void()> func) {
     action = std::move(func);
 }
 
+void Button::act() {
+    action();
+}
+
 void RectangleButton::update(sf::RenderWindow &window, sf::Event &event) {
     bool mouseInsideButton = this->shape.getGlobalBounds().contains(
         window.mapPixelToCoords(sf::Mouse::getPosition(window))
@@ -54,8 +58,7 @@ void RectangleButton::update(sf::RenderWindow &window, sf::Event &event) {
     if (event.type == sf::Event::MouseButtonPressed) {
         if (mouseInsideButton && currentState == ButtonState::Chosen) {
             currentState = ButtonState::Clicked;
-            // TODO: rewrite next line?
-            action();
+            act();
         } else {
             currentState = ButtonState::Available;
         }
@@ -100,6 +103,15 @@ void RectangleButton::drawInWindow(sf::RenderWindow &window) {
 
 sf::RectangleShape *RectangleButton::getCurrentShape() {
     return &shape;
+}
+
+void SwitchRectangleButton::switchColors() {
+    std::swap(colorChosen, colorAvailable);
+}
+
+void SwitchRectangleButton::act() {
+    action();
+    switchColors();
 }
 
 ButtonWithImage::ButtonWithImage(

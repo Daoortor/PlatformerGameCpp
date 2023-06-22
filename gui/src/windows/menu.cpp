@@ -446,7 +446,7 @@ void ServerMenu::loadInWindow(
 }
 
 void ServerMenu::refreshScrollbarButtonUtility(
-    Scrollbar<interface::RectangleButton> &levelsScrollbar,
+    Scrollbar<interface::SwitchRectangleButton> &levelsScrollbar,
     const std::string &scrollbarType,
     const std::vector<std::string> &filenames,
     const sf::Font &font,
@@ -454,10 +454,10 @@ void ServerMenu::refreshScrollbarButtonUtility(
     control::ServerPerformer &serverPerformer
 )  {
     levelsScrollbar.clear();
+    // TODO: clear selection?
     auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
-    // auto filenames = Platformer::utilities::getLevelNames(levelFilePath);
     for (auto &levelName : filenames) {
-        interface::RectangleButton newButton(
+        interface::SwitchRectangleButton newButton(
             sf::RectangleShape({150, 40}), colorsList[0], colorsList[1],
             colorsList[2], colorsList[3], sf::Text(levelName, font, fontSize),
             {10, 10}, {340, 250},
@@ -470,7 +470,6 @@ void ServerMenu::refreshScrollbarButtonUtility(
                     serverPerformer.debug_global_set();
                 }
                 // TODO: refactor if-else above
-                // TODO: button colors switch
             },
             18
         );

@@ -113,13 +113,13 @@ public:
 
 struct ServerMenu : Menu {
 private:
-    Scrollbar<interface::RectangleButton> localLevelsScrollbar;
-    Scrollbar<interface::RectangleButton> serverLevelsScrollbar;
+    Scrollbar<interface::SwitchRectangleButton> localLevelsScrollbar;
+    Scrollbar<interface::SwitchRectangleButton> serverLevelsScrollbar;
     ButtonWithImage refreshLocalButton;
     ButtonWithImage refreshServerButton;
 
-    void refreshScrollbarButtonUtility(
-        Scrollbar<interface::RectangleButton> & levelsScrollbar,
+    static void refreshScrollbarButtonUtility(
+        Scrollbar<interface::SwitchRectangleButton> & levelsScrollbar,
         const std::string & scrollbarType,
         const std::vector<std::string> & filenames,
         const sf::Font &font,

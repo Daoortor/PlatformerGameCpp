@@ -222,6 +222,7 @@ void ServerPerformer::deleteSelectedFromServer() {
             std::cout << levelFilePath << " successfully deleted from server\n";
         }
         chosen_global_levels.clear();
+        // TODO: clear visual selection
     } catch (const support::file_handling_exception & exception) {
         std::cerr << exception.what();
     }

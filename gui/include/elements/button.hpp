@@ -41,6 +41,8 @@ public:
     [[maybe_unused]] virtual void setPosition(sf::Vector2f newPosition);
 
     void bind(std::function<void()> func);
+
+    virtual void act();
 };
 
 class RectangleButton : public Button {
@@ -88,6 +90,39 @@ public:
     virtual void drawInWindow(sf::RenderWindow &window);
     void update(sf::RenderWindow &window, sf::Event &event);
 };
+
+class SwitchRectangleButton : public RectangleButton {
+private:
+    void switchColors();
+public:
+    SwitchRectangleButton(
+        sf::RectangleShape newShape,
+        sf::Color newColorUnavailable,
+        sf::Color newColorAvailable,
+        sf::Color newColorChosen,
+        sf::Color newColorClicked,
+        sf::Text newLabel,
+        sf::Vector2f newIndent,
+        sf::Vector2f newPosition,
+        std::function<void()> newAction = []() {},
+        int capacity_ = INT32_MAX
+    )
+        : RectangleButton(
+              std::move(newShape),
+              newColorUnavailable,
+              newColorAvailable,
+              newColorChosen,
+              newColorClicked,
+              std::move(newLabel),
+              newIndent,
+              newPosition,
+              std::move(newAction),
+              capacity_
+              ) {}
+
+    void act() override;
+};
+
 
 class ButtonWithImage : public RectangleButton {
 private:
