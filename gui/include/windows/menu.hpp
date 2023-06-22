@@ -16,14 +16,14 @@ namespace interface {
 struct Menu {
 protected:
     std::vector<std::unique_ptr<RectangleButton>> rectangleButtons;
-    // TODO: do we even need unique_ptr here?
     sf::Texture backgroundTexture;
     sf::Sprite backgroundSprite;
     std::map<std::string, int> buttonLabelToNum;
 
 public:
+    template<typename RectangleButtonDerivedClass>
     std::unique_ptr<RectangleButton> &addRectangleButton(
-        RectangleButton buttonSample
+        RectangleButtonDerivedClass & buttonSample
     );
     void loadBackgroundSpriteFromTextureFile(
         const std::string &texturePath,

@@ -5,18 +5,21 @@
 #include "gui-constants.hpp"
 
 namespace interface {
-std::unique_ptr<RectangleButton> &interface::Menu::addRectangleButton(
-    interface::RectangleButton buttonSample
+template<typename RectangleButtonDerivedClass>
+std::unique_ptr<RectangleButton> &Menu::addRectangleButton(
+    RectangleButtonDerivedClass & buttonSample
 ) {
-    rectangleButtons.emplace_back(
-        std::make_unique<RectangleButton>(std::move(buttonSample))
+    rectangleButtons.push_back(
+        std::make_unique<RectangleButtonDerivedClass>(buttonSample)
     );
-    buttonLabelToNum[rectangleButtons[rectangleButtons.size() - 1]
-                         ->getLabel()
-                         .getString()] =
+    buttonLabelToNum[rectangleButtons.back()->getLabel().getString()] =
         static_cast<int>(rectangleButtons.size() - 1);
-    return rectangleButtons[rectangleButtons.size() - 1];
-} // TODO: rewrite method to take different child classes of RectangleButton!!!
+    return rectangleButtons.back();
+}
+// TODO: rewrite method to take different child classes of RectangleButton!!!
+// TODO: take buttonSample as rvalue
+// TODO: resolve 'exit code 11' issue
+// TODO: buttonLabelToNum change from int to size_t?
 
 void Menu::loadBackgroundSpriteFromTextureFile(
     const std::string &texturePath,
