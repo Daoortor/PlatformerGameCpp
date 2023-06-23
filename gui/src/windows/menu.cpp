@@ -5,7 +5,7 @@
 #include "gui-constants.hpp"
 
 namespace interface {
-std::unique_ptr<RectangleButton> &interface::Menu::addRectangleButton(
+std::unique_ptr<RectangleButton> &Menu::addRectangleButton(
     interface::RectangleButton buttonSample
 ) {
     rectangleButtons.emplace_back(

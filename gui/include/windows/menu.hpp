@@ -21,9 +21,8 @@ protected:
     std::map<std::string, int> buttonLabelToNum;
 
 public:
-    template<typename RectangleButtonDerivedClass>
     std::unique_ptr<RectangleButton> &addRectangleButton(
-        RectangleButtonDerivedClass & buttonSample
+        RectangleButton buttonSample
     );
     void loadBackgroundSpriteFromTextureFile(
         const std::string &texturePath,
