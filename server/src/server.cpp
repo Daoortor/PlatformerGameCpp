@@ -132,8 +132,6 @@ public:
         Levels.try_emplace(
             level_file_path, level_file_path, level_in_json, authorID
         );
-        // TODO: confirmation checkbox "Such file already exists. Do you wish to
-        //  overwrite it?" is needed?
     }
 
     void

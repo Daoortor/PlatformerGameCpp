@@ -95,8 +95,6 @@ public:
         items.push_back(std::make_unique<ItemType>(item));
     };
 
-    // TODO: unfortunately does not take derived classes
-
     virtual void scrollUp() {
         if (offset == 0) {
             return;

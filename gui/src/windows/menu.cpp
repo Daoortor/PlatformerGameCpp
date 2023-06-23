@@ -18,7 +18,7 @@ std::unique_ptr<RectangleButton> &Menu::addCreatedRectangleDescendantButton(
     buttonLabelToNum[rectangleButtons.back()->getLabel().getString()] =
         static_cast<int>(rectangleButtons.size() - 1);
     return rectangleButtons.back();
-}  // TODO: rewrite method to take different child classes of RectangleButton!!!
+}
 
 void Menu::loadBackgroundSpriteFromTextureFile(
     const std::string &texturePath,
@@ -150,7 +150,6 @@ MainMenu::MainMenu(
             "../gui/assets/textures/player", "../gui/assets/textures/misc/",
             menuPerformer.getLevelFilePath(0), &levelPerformer
         );
-        // TODO: big rewrite of levelPerformer-levelWindow relationship
     });
     bindButton("Level editor", [&]() {
         menuPerformer.setState(control::MenuState::Empty);
@@ -257,7 +256,6 @@ void LevelSelectionMenu::update(
                     "../gui/assets/textures/player",
                     "../gui/assets/textures/misc/", levelPath, &levelPerformer
                 );
-                // TODO: implementation above is due to rewrite
             },
             18
         );
@@ -438,7 +436,6 @@ void ServerMenu::refreshScrollbarButtonUtility(
     control::ServerPerformer &serverPerformer
 ) {
     levelsScrollbar.clear();
-    // TODO: clear selection?
     auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
     for (auto &levelName : filenames) {
         interface::SwitchRectangleButton newButton(

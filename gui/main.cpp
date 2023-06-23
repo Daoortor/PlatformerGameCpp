@@ -80,7 +80,6 @@ int main() {
             }
         }
         window.clear();
-        // TODO: some kind of global currentState?
         switch (levelPerformer.getState()) {
             case control::LevelState::Empty:
                 break;
@@ -88,10 +87,6 @@ int main() {
                 levelGameplayWindow.loadInWindow(window);
                 break;
             case control::LevelState::Paused:
-                // TODO: resolve flickering when using line below
-                // LevelGameplayWindow.loadInWindow(window);
-                // TODO: line below is very ugly, but RN no way to get
-                //  signal from inside level-renderer to mainMenu
                 menuPerformer.openPauseMenu();
                 break;
             case control::LevelState::Won:

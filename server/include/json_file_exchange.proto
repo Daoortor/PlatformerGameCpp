@@ -31,7 +31,7 @@ message ActionRequest {
 
 // Action reply: contains action result and possible content of received level
 message ActionReply {
-    bool is_successful = 1; // TODO: is is_successful needed given we have sendRequest Status?
+    bool is_successful = 1;
     bool result = 2;
     LevelContent level_content = 3;
     string additional_info = 4;

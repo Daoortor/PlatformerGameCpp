@@ -12,8 +12,7 @@ using json_file_exchange::ActionRequest;
 using json_file_exchange::LevelContent;
 
 using google::protobuf::util::JsonStringToMessage;
-using google::protobuf::util::MessageToJsonString;  // TODO: move out of
-                                                    // namespace?
+using google::protobuf::util::MessageToJsonString;
 
 namespace client {
 void create_key_file(const std::string &directory) {
@@ -64,7 +63,6 @@ ActionReply LevelClient::send_request_util_and_get_reply(
         request.mutable_level_content()->Swap(&level_content);
     }
     return sendRequest(request);
-    // TODO: ".json" extension is hardcoded
 }
 
 ActionReply LevelClient::sendRequest(const ActionRequest &request) {
@@ -105,7 +103,6 @@ ActionReply LevelClient::sendRequestAddOrReplaceLevel(
 }
 
 // TODO: rewrite level_dir_path usage
-// TODO: ".json" is hardcoded, is it bad?
 
 ActionReply LevelClient::sendRequestCheckLevelExistence(
     const std::string &level_name
@@ -159,7 +156,6 @@ void RunClient() {
             std::string level_in_json;
             MessageToJsonString(reply.level_content(), &level_in_json);
             std::cout << level_in_json;
-            // TODO: TODO (:
         } else {
             std::cout << "Request failed"
                       << ", additional_info=" << reply.additional_info()

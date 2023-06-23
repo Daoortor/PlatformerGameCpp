@@ -79,7 +79,7 @@ public:
 class ServerPerformer : Performer {
 private:
     client::LevelClient client;
-    std::string level_dir_path; // TODO: resolve inconsistency with MenuPerformer
+    std::string level_dir_path;
     std::set<std::string> chosen_local_levels;
     std::set<std::string> chosen_global_levels;
 

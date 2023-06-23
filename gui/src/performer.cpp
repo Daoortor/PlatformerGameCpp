@@ -139,7 +139,6 @@ bool ServerPerformer::deleteLevel(const std::string &level_name) {
 bool ServerPerformer::checkLevel(const std::string &level_name) {
     client::ActionReply reply = client.sendRequestCheckLevelExistence(level_name);
     return reply.is_successful();
-    // TODO: catch wrappings - where to put?
 }
 
 // use inside try ... catch block
@@ -211,7 +210,6 @@ void ServerPerformer::getSelectedFromServer() {
     } catch (const support::file_handling_exception & exception) {
         std::cerr << exception.what();
     }
-    // TODO: write catch block: into game log? & on-screen message
 }
 
 void ServerPerformer::deleteSelectedFromServer() {
@@ -222,11 +220,9 @@ void ServerPerformer::deleteSelectedFromServer() {
             std::cout << levelFilePath << " successfully deleted from server\n";
         }
         chosen_global_levels.clear();
-        // TODO: clear visual selection
     } catch (const support::file_handling_exception & exception) {
         std::cerr << exception.what();
     }
-    // TODO: write catch block: into game log? & on-screen message
 }
 
 void ServerPerformer::clear_local_levels_selection() {
@@ -238,7 +234,5 @@ void ServerPerformer::clear_global_levels_selection() {
 }
 
 // TODO: declaration & definition orders are not the same with many files; is OK?
-
-// TODO: is repeated code OK here?
 
 }  // namespace control

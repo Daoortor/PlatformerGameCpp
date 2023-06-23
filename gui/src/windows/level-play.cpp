@@ -74,14 +74,7 @@ void LevelGameplayWindow::loadInWindow(sf::RenderWindow &window) {
             levelPerformerPtr->reset();
         }
     } else if (levelPerformerPtr->getState() == control::LevelState::Paused) {
-        /*
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
-            levelPerformerPtr.resume();
-            std::cout << "Game resumed\n" << '\n';
-        } // dubs as 'Resume' button in Pause menu
-         */
-        // TODO: some kind of timer to check there is no loop pause-resume,
-        //  as is right now; or should actually rewrite button to isKeyReleased
+        // do nothing
     }
     levelPerformerPtr->getLevel()->update();
     sf::Vector2f playerCoordinates =
@@ -91,8 +84,8 @@ void LevelGameplayWindow::loadInWindow(sf::RenderWindow &window) {
         playerTextures[levelPerformerPtr->getLevel()->getPlayer()->getPose()]
     );
     levelEndSprite.setTexture(levelEndTexture);
+    // no texture loss
     window.draw(levelEndSprite);
-    // TODO: resolve texture loss that occurs after removing line above
     window.draw(playerSprite);
     window.display();
 }
