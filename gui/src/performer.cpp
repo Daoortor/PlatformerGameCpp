@@ -229,6 +229,14 @@ void ServerPerformer::deleteSelectedFromServer() {
     // TODO: write catch block: into game log? & on-screen message
 }
 
+void ServerPerformer::clear_local_levels_selection() {
+    chosen_local_levels.clear();
+}
+
+void ServerPerformer::clear_global_levels_selection() {
+    chosen_global_levels.clear();
+}
+
 // TODO: declaration & definition orders are not the same with many files; is OK?
 
 // TODO: is repeated code OK here?

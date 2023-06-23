@@ -124,6 +124,23 @@ private:
         int fontSize,
         control::ServerPerformer &serverPerformer
     );
+    void refreshLocalLevels(
+        const std::string &levelFilePath,
+        const sf::Font &font,
+        int fontSize,
+        control::ServerPerformer &serverPerformer
+    );
+    void refreshGlobalLevels(
+        const sf::Font &font,
+        int fontSize,
+        control::ServerPerformer &serverPerformer
+    );
+    void refreshUI(
+        const std::string &levelFilePath,
+        const sf::Font &font,
+        int fontSize,
+        control::ServerPerformer &serverPerformer
+    );
 
 public:
     ServerMenu(

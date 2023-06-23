@@ -96,6 +96,8 @@ public:
 
     void switch_in_local_set(const std::string & name);
     void switch_in_global_set(const std::string & name);
+    void clear_local_levels_selection();
+    void clear_global_levels_selection();
 
     void sendSelectedToServer();
     void getSelectedFromServer();
