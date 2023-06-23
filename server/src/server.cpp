@@ -128,9 +128,7 @@ public:
         std::cout << "Adding/updating a level " << level_file_path
                   << " with content:\n-----\n"
                   << level_in_json << "\n-----\n";
-        if (!Levels.count(level_file_path)) {
-            support::add_or_replace_json_file(level_file_path, level_in_json);
-        }
+        support::add_or_replace_json_file(level_file_path, level_in_json);
         Levels.try_emplace(
             level_file_path, level_file_path, level_in_json, authorID
         );

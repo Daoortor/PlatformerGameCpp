@@ -11,11 +11,9 @@ std::unique_ptr<RectangleButton> &interface::Menu::addRectangleButton(
     rectangleButtons.emplace_back(
         std::make_unique<RectangleButton>(std::move(buttonSample))
     );
-    buttonLabelToNum[rectangleButtons[rectangleButtons.size() - 1]
-                         ->getLabel()
-                         .getString()] =
+    buttonLabelToNum[rectangleButtons.back()->getLabel().getString()] =
         static_cast<int>(rectangleButtons.size() - 1);
-    return rectangleButtons[rectangleButtons.size() - 1];
+    return rectangleButtons.back();
 } // TODO: rewrite method to take different child classes of RectangleButton!!!
 
 void Menu::loadBackgroundSpriteFromTextureFile(
