@@ -94,6 +94,7 @@ public:
 class SwitchRectangleButton : public RectangleButton {
 private:
     void switchColors();
+
 public:
     SwitchRectangleButton(
         sf::RectangleShape newShape,
@@ -118,11 +119,11 @@ public:
               newPosition,
               std::move(newAction),
               capacity_
-              ) {}
+          ) {
+    }
 
     void act() override;
 };
-
 
 class ButtonWithImage : public RectangleButton {
 private:

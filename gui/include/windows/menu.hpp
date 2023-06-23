@@ -13,7 +13,7 @@
 #include "performer.hpp"
 
 namespace interface {
-struct Menu {
+class Menu {
 protected:
     std::vector<std::unique_ptr<RectangleButton>> rectangleButtons;
     sf::Texture backgroundTexture;
@@ -21,8 +21,9 @@ protected:
     std::map<std::string, int> buttonLabelToNum;
 
 public:
-    std::unique_ptr<RectangleButton> &addRectangleButton(
-        RectangleButton buttonSample
+    template <typename RectangleButtonDerivedClass>
+    std::unique_ptr<RectangleButton> &addCreatedRectangleDescendantButton(
+        RectangleButtonDerivedClass &buttonSample
     );
     void loadBackgroundSpriteFromTextureFile(
         const std::string &texturePath,
@@ -39,7 +40,7 @@ public:
     virtual void loadInWindow(sf::RenderWindow &window, sf::Event event);
     void
     bindButton(const std::string &label_string, std::function<void()> func);
-    void addNewButton(
+    void createAndAddNewRectangleButton(
         const std::string &label_string,
         int number,
         const sf::Font &font,
@@ -51,7 +52,7 @@ public:
     );
 };
 
-struct MainMenu : Menu {
+class MainMenu final : public Menu {
 public:
     MainMenu(
         unsigned int windowWidth,
@@ -66,9 +67,9 @@ public:
     );
 };
 
-struct LevelSelectionMenu : Menu {
+class LevelSelectionMenu final : public Menu {
+private:
     Scrollbar<interface::RectangleButton> buttonScrollbar;
-    ButtonWithImage refreshButton;
 
 public:
     LevelSelectionMenu(
@@ -96,7 +97,7 @@ public:
     );
 };
 
-struct PauseMenu : Menu {
+class PauseMenu final : public Menu {
 public:
     PauseMenu(
         unsigned int windowWidth,
@@ -110,21 +111,20 @@ public:
     );
 };
 
-struct ServerMenu : Menu {
+class ServerMenu final : Menu {
 private:
     Scrollbar<interface::SwitchRectangleButton> localLevelsScrollbar;
     Scrollbar<interface::SwitchRectangleButton> serverLevelsScrollbar;
-    ButtonWithImage refreshLocalButton;
-    ButtonWithImage refreshServerButton;
 
     static void refreshScrollbarButtonUtility(
-        Scrollbar<interface::SwitchRectangleButton> & levelsScrollbar,
-        const std::string & scrollbarType,
-        const std::vector<std::string> & filenames,
+        Scrollbar<interface::SwitchRectangleButton> &levelsScrollbar,
+        const std::string &scrollbarType,
+        const std::vector<std::string> &filenames,
         const sf::Font &font,
         int fontSize,
         control::ServerPerformer &serverPerformer
-        );
+    );
+
 public:
     ServerMenu(
         unsigned int windowWidth,

@@ -5,16 +5,20 @@
 #include "gui-constants.hpp"
 
 namespace interface {
-std::unique_ptr<RectangleButton> &Menu::addRectangleButton(
-    interface::RectangleButton buttonSample
+template <typename RectangleButtonDerivedClass>
+std::unique_ptr<RectangleButton> &Menu::addCreatedRectangleDescendantButton(
+    RectangleButtonDerivedClass &buttonSample
 ) {
     rectangleButtons.emplace_back(
-        std::make_unique<RectangleButton>(std::move(buttonSample))
+        std::make_unique<RectangleButtonDerivedClass>(buttonSample)
     );
+    // TODO: the problem is RectangleButton cannot be passed by rvalue and
+    // cannot be copied,
+    //  yet make_unique requires copying here: can't pass args
     buttonLabelToNum[rectangleButtons.back()->getLabel().getString()] =
         static_cast<int>(rectangleButtons.size() - 1);
     return rectangleButtons.back();
-} // TODO: rewrite method to take different child classes of RectangleButton!!!
+}  // TODO: rewrite method to take different child classes of RectangleButton!!!
 
 void Menu::loadBackgroundSpriteFromTextureFile(
     const std::string &texturePath,
@@ -78,7 +82,7 @@ void Menu::bindButton(
     }
 }
 
-void Menu::addNewButton(
+void Menu::createAndAddNewRectangleButton(
     const std::string &label_string,
     int number,
     const sf::Font &font,
@@ -95,15 +99,27 @@ void Menu::addNewButton(
     sf::RectangleShape buttonShape({buttonWidth, buttonHeight});
     std::function<void()> action = [label_string]() {
         std::cout << "<" << label_string << "> was pressed\n";
-    };  // Placeholders for still not implemented buttonScrollbar
-    interface::RectangleButton button(
+    };
+
+    RectangleButton button(
         buttonShape, buttonColorsList[0], buttonColorsList[1],
         buttonColorsList[2], buttonColorsList[3], buttonText, buttonIndent,
         startingButtonPosition +
             sf::Vector2f(0, static_cast<float>(number * buttonDistance)),
         action
     );
-    addRectangleButton(button);
+    std::cout << std::is_copy_constructible<RectangleButton>::value << '\n';
+    RectangleButton other_button = (button);
+    addCreatedRectangleDescendantButton(button);
+    /*
+    addRectangleButton(interface::RectangleButton(
+        buttonShape, buttonColorsList[0], buttonColorsList[1],
+        buttonColorsList[2], buttonColorsList[3], buttonText, buttonIndent,
+        startingButtonPosition +
+            sf::Vector2f(0, static_cast<float>(number * buttonDistance)),
+        action
+    ));
+    */
 }
 
 MainMenu::MainMenu(
@@ -131,7 +147,7 @@ MainMenu::MainMenu(
         sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
         sf::Color(0, 209, 255, 192), sf::Color(255, 95, 0, 192)};
     for (int i = 0; i < buttonStringLabels.size(); i++) {
-        addNewButton(
+        createAndAddNewRectangleButton(
             buttonStringLabels[i], i, font, fontSize, colorsList,
             buttonDistance, startingButtonPosition, buttonIndent
         );
@@ -181,27 +197,6 @@ LevelSelectionMenu::LevelSelectionMenu(
           Platformer::gui::colors::BUTTON_COLORS_LIST,
           Platformer::gui::colors::ITEM_CHOSEN_COLOR,
           miscFilepath
-      ),
-      refreshButton(
-          miscFilepath + "refresh.png",
-          sf::RectangleShape({40, 40}),
-          {10, 10},
-          {470, 150},
-          Platformer::gui::colors::BUTTON_COLORS_LIST,
-          [this,
-           levelFilePath,
-           &font,
-           fontSize,
-           &menuPerformer,
-           &levelPerformer,
-           &levelWindow,
-           windowHeight] {
-              update(
-                  levelFilePath, font, fontSize, menuPerformer, levelPerformer,
-                  levelWindow, windowHeight
-              );
-          },
-          false
       ) {
     auto colorsList = std::vector{
         sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
@@ -209,7 +204,7 @@ LevelSelectionMenu::LevelSelectionMenu(
     loadBackgroundSpriteFromTextureFile(
         BackgroundTextureFilepath, 255, 255, 255, 128, windowWidth, windowHeight
     );
-    addNewButton(
+    createAndAddNewRectangleButton(
         "Return", 0, font, fontSize, colorsList, buttonDistance, {340, 150},
         {10, 10}
     );
@@ -217,6 +212,21 @@ LevelSelectionMenu::LevelSelectionMenu(
         buttonScrollbar.reset();
         menuPerformer.openMainMenu();
     });
+
+    ButtonWithImage refreshButton(
+        miscFilepath + "refresh.png", sf::RectangleShape({40, 40}), {10, 10},
+        {470, 150}, Platformer::gui::colors::BUTTON_COLORS_LIST,
+        [this, levelFilePath, &font, fontSize, &menuPerformer, &levelPerformer,
+         &levelWindow, windowHeight] {
+            update(
+                levelFilePath, font, fontSize, menuPerformer, levelPerformer,
+                levelWindow, windowHeight
+            );
+        },
+        false
+    );
+    addCreatedRectangleDescendantButton(refreshButton);
+
     update(
         levelFilePath, font, fontSize, menuPerformer, levelPerformer,
         levelWindow, windowHeight
@@ -229,8 +239,6 @@ void LevelSelectionMenu::loadInWindow(
 ) {
     Menu::loadInWindow(window, event);
     buttonScrollbar.loadInWindow(window, event);
-    refreshButton.drawInWindow(window);
-    refreshButton.update(window, event);
 }
 
 void LevelSelectionMenu::update(
@@ -285,7 +293,7 @@ PauseMenu::PauseMenu(
     std::vector<std::string> buttonStringLabels = {
         "Resume", "Back to title screen"};
     for (int number = 0; number < buttonStringLabels.size(); number++) {
-        addNewButton(
+        createAndAddNewRectangleButton(
             buttonStringLabels[number], number, font, fontSize,
             Platformer::gui::colors::BUTTON_COLORS_LIST, buttonDistance,
             startingButtonPosition, buttonIndent
@@ -314,17 +322,18 @@ ServerMenu::ServerMenu(
     control::LevelPerformer &levelPerformer,
     control::ServerPerformer &serverPerformer,
     Platformer::gui::LevelGameplayWindow &levelWindow
-) : localLevelsScrollbar(
-    {40, static_cast<float>(10 + buttonDistance)},
-    {150, 40},
-    {10, 20},
-    20,
-    40,
-    6,
-    Platformer::gui::colors::BUTTON_COLORS_LIST,
-    Platformer::gui::colors::ITEM_CHOSEN_COLOR,
-    miscFilepath
-    ),
+)
+    : localLevelsScrollbar(
+          {40, static_cast<float>(10 + buttonDistance)},
+          {150, 40},
+          {10, 20},
+          20,
+          40,
+          6,
+          Platformer::gui::colors::BUTTON_COLORS_LIST,
+          Platformer::gui::colors::ITEM_CHOSEN_COLOR,
+          miscFilepath
+      ),
       serverLevelsScrollbar(
           {590, static_cast<float>(10 + buttonDistance)},
           {150, 40},
@@ -335,59 +344,17 @@ ServerMenu::ServerMenu(
           Platformer::gui::colors::BUTTON_COLORS_LIST,
           Platformer::gui::colors::ITEM_CHOSEN_COLOR,
           miscFilepath
-      ),
-    refreshLocalButton(
-        miscFilepath + "refresh.png",
-        sf::RectangleShape({40, 40}),
-        {10, 10},
-        {215, static_cast<float>(10 + buttonDistance)},
-        Platformer::gui::colors::BUTTON_COLORS_LIST,
-        [this,
-         levelFilePath,
-         &font,
-         fontSize, &serverPerformer] {
-              refreshScrollbarButtonUtility(localLevelsScrollbar,
-                                            "local",
-                                            Platformer::utilities::getLevelNames(levelFilePath),
-                                            font,
-                                            fontSize,
-                                            serverPerformer);
-        },
-        false
-    ),
-      refreshServerButton(
-          miscFilepath + "refresh.png",
-          sf::RectangleShape({40, 40}),
-          {10, 10},
-          {545, static_cast<float>(10 + buttonDistance)},
-          Platformer::gui::colors::BUTTON_COLORS_LIST,
-          [this,
-           levelFilePath,
-           &font,
-           fontSize, &serverPerformer] {
-              refreshScrollbarButtonUtility(serverLevelsScrollbar,
-                                            "global",
-                                            serverPerformer.loadAllAvailableLevelNames(),
-                                            font,
-                                            fontSize,
-                                            serverPerformer);
-          },
-          false
-      )
-{
+      ) {
     loadBackgroundSpriteFromTextureFile(
         BackgroundTextureFilepath, 255, 255, 255, 0, windowWidth, windowHeight
     );
-    // TODO: too much code repetition & intersection with LevelSelectionMenu; REDO!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     auto colorsList = std::vector{
         sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192),
-        sf::Color(178, 160, 53, 192), sf::Color(255, 95, 0, 192)
-    };
+        sf::Color(178, 160, 53, 192), sf::Color(255, 95, 0, 192)};
     auto labelColorsList = std::vector{
         sf::Color(255, 0, 48, 192), sf::Color(255, 0, 48, 192),
-        sf::Color(255, 0, 48, 192), sf::Color(255, 0, 48, 192)
-    };
-    addNewButton(
+        sf::Color(255, 0, 48, 192), sf::Color(255, 0, 48, 192)};
+    createAndAddNewRectangleButton(
         "Return", 0, font, fontSize, colorsList, buttonDistance, {360, 150},
         {10, 10}
     );
@@ -396,51 +363,74 @@ ServerMenu::ServerMenu(
         menuPerformer.openMainMenu();
     });
 
-    addNewButton(
-        "--->", 1, font, fontSize, colorsList, buttonDistance, {360, 150},
-        {10, 10}
+    ButtonWithImage refreshServerButton(
+        miscFilepath + "refresh.png", sf::RectangleShape({40, 40}), {10, 10},
+        {545, static_cast<float>(10 + buttonDistance)},
+        Platformer::gui::colors::BUTTON_COLORS_LIST,
+        [this, levelFilePath, &font, fontSize, &serverPerformer] {
+            refreshScrollbarButtonUtility(
+                serverLevelsScrollbar, "global",
+                serverPerformer.loadAllAvailableLevelNames(), font, fontSize,
+                serverPerformer
+            );
+        },
+        false
     );
-    bindButton("--->", [&]() {
-        serverPerformer.sendSelectedToServer();
-    });
+    addCreatedRectangleDescendantButton(refreshServerButton);
 
-    addNewButton(
-        "<---", 2, font, fontSize, colorsList, buttonDistance, {360, 150},
-        {10, 10}
+    ButtonWithImage refreshLocalButton(
+        miscFilepath + "refresh.png", sf::RectangleShape({40, 40}), {10, 10},
+        {215, static_cast<float>(10 + buttonDistance)},
+        Platformer::gui::colors::BUTTON_COLORS_LIST,
+        [this, levelFilePath, &font, fontSize, &serverPerformer] {
+            refreshScrollbarButtonUtility(
+                localLevelsScrollbar, "local",
+                Platformer::utilities::getLevelNames(levelFilePath), font,
+                fontSize, serverPerformer
+            );
+        },
+        false
     );
-    bindButton("<---", [&]() {
-        serverPerformer.getSelectedFromServer();
-    });
+    addCreatedRectangleDescendantButton(refreshLocalButton);
 
-    addNewButton(
-        "<delete>", 3, font, fontSize, colorsList, buttonDistance, {360, 150},
-        {10, 10}
+    ButtonWithImage sendButton(
+        miscFilepath + "right-arrow.png", sf::RectangleShape({40, 40}),
+        {10, 10}, {375, static_cast<float>(150 + 1 * buttonDistance)},
+        Platformer::gui::colors::BUTTON_COLORS_LIST,
+        [&serverPerformer] { serverPerformer.sendSelectedToServer(); }, false
     );
-    bindButton("<delete>", [&]() {
-        serverPerformer.deleteSelectedFromServer();
-    });
+    addCreatedRectangleDescendantButton(sendButton);
+    ButtonWithImage receiveButton(
+        miscFilepath + "left-arrow.png", sf::RectangleShape({40, 40}), {10, 10},
+        {375, static_cast<float>(150 + 2 * buttonDistance)},
+        Platformer::gui::colors::BUTTON_COLORS_LIST,
+        [&serverPerformer] { serverPerformer.getSelectedFromServer(); }, false
+    );
+    addCreatedRectangleDescendantButton(receiveButton);
 
-    addNewButton(
-        "Local Levels", 0, font, fontSize, labelColorsList, buttonDistance, {40, 10},
-        {10, 10}
+    ButtonWithImage binButton(
+        miscFilepath + "bin.png", sf::RectangleShape({40, 40}), {10, 10},
+        {375, static_cast<float>(150 + 3 * buttonDistance)},
+        Platformer::gui::colors::BUTTON_COLORS_LIST,
+        [&serverPerformer] { serverPerformer.deleteSelectedFromServer(); },
+        false
     );
-    addNewButton(
-        "Available Levels", 0, font, fontSize, labelColorsList, buttonDistance, {590, 10},
-        {10, 10}
+    addCreatedRectangleDescendantButton(binButton);
+
+    createAndAddNewRectangleButton(
+        "Local Levels", 0, font, fontSize, labelColorsList, buttonDistance,
+        {40, 10}, {10, 10}
+    );
+    createAndAddNewRectangleButton(
+        "Available Levels", 0, font, fontSize, labelColorsList, buttonDistance,
+        {590, 10}, {10, 10}
     );
 }
 
-void ServerMenu::loadInWindow(
-    sf::RenderWindow &window,
-    sf::Event event
-) {
+void ServerMenu::loadInWindow(sf::RenderWindow &window, sf::Event event) {
     Menu::loadInWindow(window, event);
     localLevelsScrollbar.loadInWindow(window, event);
     serverLevelsScrollbar.loadInWindow(window, event);
-    refreshLocalButton.drawInWindow(window);
-    refreshLocalButton.update(window, event);
-    refreshServerButton.drawInWindow(window);
-    refreshServerButton.update(window, event);
 }
 
 void ServerMenu::refreshScrollbarButtonUtility(
@@ -450,7 +440,7 @@ void ServerMenu::refreshScrollbarButtonUtility(
     const sf::Font &font,
     int fontSize,
     control::ServerPerformer &serverPerformer
-)  {
+) {
     levelsScrollbar.clear();
     // TODO: clear selection?
     auto &colorsList = Platformer::gui::colors::BUTTON_COLORS_LIST;
