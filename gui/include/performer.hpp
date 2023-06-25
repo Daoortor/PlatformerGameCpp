@@ -27,6 +27,7 @@ class MenuPerformer : Performer {
 private:
     std::vector<std::string> level_paths;
     MenuState state = MenuState::MainMenu;
+    bool isGameIsEnded = false;
 
 public:
     MenuPerformer(
@@ -51,6 +52,7 @@ public:
     void closeWindow();
     void setState(MenuState newState);
     std::string getLevelFilePath(int num);
+    [[nodiscard]] bool getIsGameIsEnded() const;
 };
 
 class LevelPerformer : Performer {
@@ -58,7 +60,7 @@ private:
     std::unique_ptr<Platformer::Game> game = nullptr;
     LevelState state = LevelState::Empty;
     std::unique_ptr<Platformer::Statistics> statistics =
-        std::make_unique<Platformer::Statistics>(Platformer::Statistics());
+        nullptr;
 
 public:
     explicit LevelPerformer(sf::RenderWindow &window_);
@@ -71,6 +73,9 @@ public:
     void jump();
     [[maybe_unused]] void exit();
     void setLevel(std::unique_ptr<Platformer::Game> game_);
+    void setStatistics(std::unique_ptr<Platformer::Statistics> statistics_) {
+        statistics = std::move(statistics_);
+    }
 
     std::unique_ptr<Platformer::Game> &getLevel();
     std::unique_ptr<Platformer::Statistics> &getStatistics();

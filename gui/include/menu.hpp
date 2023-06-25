@@ -105,7 +105,6 @@ public:
         int fontSize,
         int buttonDistance,
         const std::string &BackgroundTextureFilepath,
-        const std::string &LevelFilePath,
         control::MenuPerformer &menuPerformer,
         control::LevelPerformer &levelPerformer,
         Platformer::gui::LevelWindow &levelWindow

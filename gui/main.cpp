@@ -57,9 +57,10 @@ int main() {
 
     auto wonMenu = interface::WonMenu(
         windowWidth, windowHeight, fontMario, 20, 50,
-        "../gui/assets/textures/interface/transparent.jpg",
-        "../model/levels/", menuPerformer, levelPerformer, levelWindow
+        "../gui/assets/textures/interface/level-background.png",
+        menuPerformer, levelPerformer, levelWindow
     );
+
 
     while (window.isOpen()) {
         sf::Event event{};
@@ -84,6 +85,13 @@ int main() {
                 menuPerformer.openPauseMenu();
                 break;
             case control::LevelState::Won:
+                if (!menuPerformer.getIsGameIsEnded()) { // TODO
+                    wonMenu = interface::WonMenu(
+                        windowWidth, windowHeight, fontMario, 20, 50,
+                        "../gui/assets/textures/interface/level-background.png",
+                        menuPerformer, levelPerformer, levelWindow
+                    );
+                }
                 menuPerformer.openWonMenu();
                 levelPerformer.setState(control::LevelState::Won);
                 levelPerformer.reset();

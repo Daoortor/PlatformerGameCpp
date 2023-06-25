@@ -116,6 +116,8 @@ LevelWindow::LevelWindow(
 )
     : levelPerformerPtr(levelPerformer) {
     levelPerformerPtr->setLevel(std::make_unique<Game>(levelFilepath));
+    levelPerformerPtr->setStatistics(std::make_unique<Statistics>(levelFilepath));
+    levelPerformerPtr->getStatistics()->changeLevelFilepath(levelFilepath);
     backgroundTexture.loadFromFile(backgroundTextureFilepath);
     sf::Vector2u textureSize = backgroundTexture.getSize();
     float backgroundScale =
@@ -170,11 +172,15 @@ void LevelWindow::loadInWindow(sf::RenderWindow &window) {
             levelPerformerPtr->getLevel()->getEndPos()
         )) {
         levelPerformerPtr->setState(control::LevelState::Won);
+        if (!levelPerformerPtr->getStatistics()->checkForExistingLevelStatistics()) {
+            levelPerformerPtr->getStatistics()->initializeLevelStatistics();
+        }
+        levelPerformerPtr->getStatistics()->updateLocalStatistics();
         //std::cout << levelPerformerPtr->getStatistics()->getTextTimer() << '\n';
         return;
     }
     if (levelPerformerPtr->getState() == control::LevelState::Running) {
-        levelPerformerPtr->getStatistics()->update();
+        levelPerformerPtr->getStatistics()->updateTimer();
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) ||
             sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
             levelPerformerPtr->jump();
@@ -193,7 +199,6 @@ void LevelWindow::loadInWindow(sf::RenderWindow &window) {
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5)) {
             levelPerformerPtr->reset();
-            levelPerformerPtr->getStatistics()->resetLastRespawnTime();
             levelPerformerPtr->getStatistics()->updateDeathCount();
         }
     } else if (levelPerformerPtr->getState() == control::LevelState::Paused) {
