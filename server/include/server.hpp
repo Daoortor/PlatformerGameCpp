@@ -57,7 +57,7 @@ private:
 
     // safer to perform 1 operation of this kind at a time
 
-    void printDebug();
+    [[maybe_unused]] void printDebug();
 
     static Status
     return_failure(ActionReply *reply, const std::string &error_what);

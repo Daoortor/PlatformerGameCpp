@@ -33,7 +33,7 @@ LevelFile::LevelFile(
     }
 }
 
-void LevelManagementServer::printDebug() {
+[[maybe_unused]] void LevelManagementServer::printDebug() {
     std::cout << "Current Levels map looks like: \n";
     for (auto &Level : Levels) {
         std::cout << Level.first << " - level with creator "
@@ -190,13 +190,14 @@ Status LevelManagementServer::sendRequest(
             level_dir_path + request->level_name() + ".json";
         auto &level_content = request->level_content();
         auto author_id = request->signature();
-
+        /*
         std::cout << "=========================\n"
                      "New request:\n"
                   << "Requested action: " << action << '\n'
                   << "Level name: " << level_file_path << '\n'
                   << "Request signature: " << author_id << '\n';
         printDebug();
+         */
         std::string additional_info;
 
         if (action == "add") {
@@ -244,7 +245,7 @@ void RunServer() {
 
 }  // namespace server
 
-int main(int argc, char **argv) {
+int main() {
     server::RunServer();
     return 0;
 }
