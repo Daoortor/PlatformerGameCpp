@@ -108,7 +108,7 @@ public:
     bool getLevel(const std::string &level_name);
     bool sendLevel(const std::string &level_name);
     bool deleteLevel(const std::string &level_name);
-    bool checkLevel(const std::string &level_name);  // TODO: do I even need it?
+    [[maybe_unused]] bool checkLevel(const std::string &level_name);
     std::vector<std::string> loadAllAvailableLevelNames();
 
     void switch_in_local_set(const std::string &name);

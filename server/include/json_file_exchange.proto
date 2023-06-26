@@ -17,7 +17,7 @@ message LevelContent {
     repeated BlockRow blockMap = 4;
     repeated int32 playerStartPos = 5; // TODO: better than custom {x, y} struct, but need to assert "size=2"
     repeated int32 endPos = 6;
-}// TODO: field naming convention? Coordinate with current .json level file
+}
 
 message ActionRequest {
     string action = 1; // add, check, get, delete
@@ -27,7 +27,6 @@ message ActionRequest {
     int32 signature = 4;
 }
 
-// TODO: big TODO: protobuf message string field shenanigans - figure out
 
 // Action reply: contains action result and possible content of received level
 message ActionReply {

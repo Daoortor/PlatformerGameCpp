@@ -6,9 +6,6 @@
 #include <random>
 #include <string>
 
-// TODO: big TODO: naming
-// TODO: enum class for actions - full implementation (how to use in message
-// fields?)
 namespace support {
 class file_handling_exception : public std::runtime_error {
 public:
@@ -28,7 +25,7 @@ public:
 class incomplete_level_file : public file_handling_exception {
 public:
     explicit incomplete_level_file(const std::string &level_name);
-};  // TODO: is needed at all? Of course, but how to implement
+};  // TODO: is needed at all? Of course, but how to implement?
 
 class leading_dots_in_file_name : public file_handling_exception {
 public:

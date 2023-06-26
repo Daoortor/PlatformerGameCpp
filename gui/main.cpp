@@ -29,7 +29,7 @@ int main() {
     control::ServerPerformer serverPerformer(
         window, "0.0.0.0:50051", "../server/client_test_directory/",
         "../model/levels/"
-    );  // TODO: redo
+    );
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/lofi.ttf");
 
