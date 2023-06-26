@@ -23,12 +23,14 @@ using google::protobuf::util::JsonStringToMessage;
 using google::protobuf::util::MessageToJsonString;
 
 LevelFile::LevelFile(
+    int32_t creatorID,
     const std::string &fileName,
-    const std::string &fileContent,
-    int32_t creatorID
+    const std::string &fileContent
 )
     : m_Creator(creatorID) {
-    support::add_or_replace_json_file(fileName, fileContent);
+    if (!fileContent.empty()) {
+        support::add_or_replace_json_file(fileName, fileContent);
+    }
 }
 
 void LevelManagementServer::printDebug() {
@@ -70,11 +72,7 @@ std::vector<std::string> LevelManagementServer::collect_present_levels() {
         // 1. file was added, it is not in map. So I should add it to map
         // 2. file was changed, but is already in map. Do I even need to do
         // anything with it? Of course not!
-        Levels.try_emplace(
-            levelPath, levelPath, support::file_content_string(levelPath),
-            server::AdminID
-        );
-        // TODO: check correctness
+        Levels.try_emplace(levelPath, server::AdminID, levelPath);
         auto levelName = std::filesystem::path(level_file).stem();
         filenames.emplace_back(levelName);
     }
@@ -108,22 +106,19 @@ void LevelManagementServer::handleRequestAddOrReplace(
               << " with content:\n-----\n"
               << level_in_json << "\n-----\n";
     support::add_or_replace_json_file(level_file_path, level_in_json);
-    Levels.try_emplace(
-        level_file_path, level_file_path, level_in_json, authorID
-    );
+    Levels.try_emplace(level_file_path, authorID, level_file_path);
 }
 
 void LevelManagementServer::handleRequestDelete(
     int32_t authorID,
     const std::string &level_file_path
 ) {
-    std::cout << "Attempting to delete a level " << level_file_path << '\n';
     if (!Levels.count(level_file_path)) {
         throw support::no_such_file(level_file_path);
     }
 
     std::unique_lock lock(Levels.at(level_file_path).m_mutex);
-    // TODO: check mutex correctness
+    std::cout << "Attempting to delete a level " << level_file_path << '\n';
 
     if (Levels.at(level_file_path).m_Creator != authorID) {
         throw action_not_allowed(level_file_path);
@@ -140,6 +135,8 @@ void LevelManagementServer::handleRequestGet(
     if (!Levels.count(level_file_path)) {
         throw support::no_such_file(level_file_path);
     }
+    std::unique_lock lock(Levels.at(level_file_path).m_mutex);
+
     std::cout << "Getting a level " << level_file_path
               << " with content:\n"
                  "-----\n"
@@ -158,6 +155,8 @@ void LevelManagementServer::handleRequestGet(
     // obsolete, but other variant is inconsistent
 }
 
+// this method is not used in the last version of the menu, so it is not even
+// mutex protected
 void LevelManagementServer::handleRequestCheck(
     ActionReply *reply,
     const std::string &level_file_path
@@ -169,9 +168,8 @@ void LevelManagementServer::handleRequestCheck(
 }
 
 void LevelManagementServer::handleRequestGetAllNames(ActionReply *reply) {
-    // TODO: is it OK to use this function without mutexes?
     //  If server sends a file which will no longer be there next second,
-    //  client will just get an error. Seems fair to me
+    //  client will just get an error, so no protection.
     std::cout << "Sending all available level names to client\n";
     auto presented_level_names = collect_present_levels();
     reply->mutable_possible_level_list()->Add(
@@ -222,10 +220,7 @@ Status LevelManagementServer::sendRequest(
     } catch (const std::runtime_error &error) {
         return return_failure(reply, error.what());
     }
-    // TODO: expand on error handling: at least return to client what's
-    //  going on
     // TODO: resolve additional info causing double free
-    // TODO: naming!!!!!!!!
     return Status::OK;
 }
 

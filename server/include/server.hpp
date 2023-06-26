@@ -43,9 +43,9 @@ private:
 
 public:
     LevelFile(
+        int32_t creatorID,
         const std::string &fileName,
-        const std::string &fileContent,
-        int32_t creatorID
+        const std::string &fileContent = ""
     );
 };
 
