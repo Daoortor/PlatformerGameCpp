@@ -493,4 +493,63 @@ void ServerMenu::refreshUI(
     refreshLocalLevels(levelFilePath, font, fontSize, serverPerformer);
     refreshGlobalLevels(font, fontSize, serverPerformer);
 }
+
+WonMenu::WonMenu(
+    unsigned int windowWidth,
+    unsigned int windowHeight,
+    const sf::Font &font,
+    int fontSize,
+    int buttonDistance,
+    const std::string &BackgroundTextureFilepath,
+    control::MenuPerformer &menuPerformer,
+    control::LevelPerformer &levelPerformer,
+    Platformer::gui::LevelGameplayWindow &levelGameplayWindow
+) {
+    sf::Vector2f startingButtonPosition = {270, 220};
+    sf::Vector2f buttonIndent = {10, 5};
+    auto colorsList =
+        std::vector{sf::Color(255, 0, 48, 192), sf::Color(118, 114, 111, 192)};
+    loadBackgroundSpriteFromTextureFile(
+        BackgroundTextureFilepath, 25, 150, 223, 120, windowWidth, windowHeight
+    );
+    std::vector<std::string> buttonStringLabels = {"Back to title screen"};
+    for (int number = 0; number < buttonStringLabels.size(); number++) {
+        createAndAddNewRectangleButton(
+            buttonStringLabels[number], 3 + number, font, fontSize, colorsList,
+            buttonDistance, startingButtonPosition, buttonIndent
+        );
+    }
+    bindButton("Back to title screen", [&]() {
+        levelPerformer.exit();
+        menuPerformer.openMainMenu();
+    });
+
+    std::string textLastTimer = "not defined";
+    if (!levelPerformer.getStatistics()->getIsFirstTime()) {
+        textLastTimer = levelPerformer.getStatistics()->getTextLastTimer();
+    }
+    std::vector<std::string> statisticsStringText = {
+        "Time: " + levelPerformer.getStatistics()->getTextTimer(),
+        "Death count: " +
+            std::to_string(levelPerformer.getStatistics()->getDeathCount()),
+        "Last timer: " + textLastTimer};
+
+    if (levelPerformer.getStatistics()->getIsNewBestDeathCount()) {
+        statisticsStringText[1] += " - New record";
+    }
+    if (levelPerformer.getStatistics()->getIsNewBestTime()) {
+        statisticsStringText[0] += " - New record";
+    }
+
+    auto statisticsColorsList = std::vector{
+        sf::Color(118, 114, 111, 192), sf::Color(118, 114, 111, 192)};
+
+    for (int number = 0; number < statisticsStringText.size(); number++) {
+        createAndAddNewRectangleButton(
+            statisticsStringText[number], number, font, fontSize,
+            statisticsColorsList, buttonDistance, startingButtonPosition,
+            buttonIndent
+        );
+    }
+}
 }  // namespace interface

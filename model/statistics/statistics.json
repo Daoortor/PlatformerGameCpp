@@ -1,4 +1,22 @@
 {
+    "level 1": {
+        "best death count": 0,
+        "best time": 46,
+        "first time flag": false,
+        "last time": 142
+    },
+    "level 2": {
+        "best death count": 0,
+        "best time": 226,
+        "first time flag": false,
+        "last time": 334
+    },
+    "level 3": {
+        "best death count": 0,
+        "best time": 928,
+        "first time flag": false,
+        "last time": 928
+    },
     "t01-box-with-ladder": {
         "best death count": 0,
         "best time": 66,

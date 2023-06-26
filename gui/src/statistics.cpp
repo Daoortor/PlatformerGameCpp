@@ -1,4 +1,5 @@
 #include "statistics.hpp"
+#include <climits>
 #include <fstream>
 
 using json = nlohmann::json;
@@ -9,8 +10,8 @@ Statistics::Statistics(const std::string &levelFilepath) {
 }
 
 [[nodiscard]] std::string Statistics::utilityParsingLevelName(
-    const std::string &levelFilepath)
-{
+    const std::string &levelFilepath
+) {
     int filepathLength = static_cast<int>(levelFilepath.size());
     int secondDotPos = filepathLength - 1;
     for (int i = secondDotPos; levelFilepath[i] != '.' && i >= 0; i--) {
@@ -23,14 +24,15 @@ Statistics::Statistics(const std::string &levelFilepath) {
     }
 
     return levelFilepath.substr(
-        firstDotPos + 1, secondDotPos - firstDotPos - 1);
+        firstDotPos + 1, secondDotPos - firstDotPos - 1
+    );
 }
 
 std::string Statistics::utilityTimerToText(const int timer_) {
-    int frameRate = 60; //TODO need to bound with framerate const.
-    int milli = ((timer_ % frameRate) * 1000 ) / 60;
+    int frameRate = 30;  // TODO need to bound with framerate const.
+    int milli = ((timer_ % frameRate) * 1000) / 60;
     int sec = (timer_ % (60 * frameRate)) / frameRate;
-    int min = timer_ / (frameRate * frameRate);
+    int min = timer_ / (60 * frameRate);
 
     std::string milliToText = std::to_string(milli);
 
@@ -40,8 +42,7 @@ std::string Statistics::utilityTimerToText(const int timer_) {
         milliToText = "0" + milliToText;
     }
 
-    return std::to_string(min) + ":" + std::to_string(sec) + "." +
-           milliToText;
+    return std::to_string(min) + ":" + std::to_string(sec) + "." + milliToText;
 }
 
 void Statistics::updateTimer() {
@@ -51,7 +52,6 @@ void Statistics::updateTimer() {
 void Statistics::updateDeathCount() {
     deathCount++;
 }
-
 
 [[nodiscard]] int Statistics::getDeathCount() const {
     return deathCount;
@@ -145,4 +145,4 @@ bool Statistics::checkForExistingLevelStatistics() {
     i.close();
     return statistics.contains(levelName);
 }
-}
+}  // namespace Platformer

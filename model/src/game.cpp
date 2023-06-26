@@ -23,7 +23,6 @@ Game &Game::operator=(const Platformer::Game &other) {
     if (this == &other) {
         return *this;
     }
-    timer = other.timer;
     startPos = other.startPos;
     endPos = other.endPos;
     board = other.board;

@@ -59,12 +59,12 @@ add_executable(game
         gui/src/elements/textbox.cpp
         gui/src/windows/level-play.cpp
         gui/src/windows/level-editor.cpp
+        gui/src/statistics.cpp
 
         server/src/client.cpp
         server/src/source.cpp
         ${hw_proto_srcs}
-        ${hw_grpc_srcs}
-        )
+        ${hw_grpc_srcs})
 
 add_executable(test
         model/src/block.cpp

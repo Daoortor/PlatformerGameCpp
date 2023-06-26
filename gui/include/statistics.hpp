@@ -1,8 +1,9 @@
 #ifndef PLATFORMERGAMECPP_STATISTICS_HPP
 #define PLATFORMERGAMECPP_STATISTICS_HPP
 
-#include "game.hpp"
+#include <climits>
 #include "../../tools/json.hpp"
+#include "game.hpp"
 
 namespace Platformer {
 class Statistics {
@@ -13,13 +14,15 @@ class Statistics {
     bool isNewBestDeathCount = false;
     bool isFirstTime = true;
     std::string levelName;
-    const std::string statisticsFilepath = "../model/statistics/statistics.json";
+    const std::string statisticsFilepath =
+        "../model/statistics/statistics.json";
 
-    [[nodiscard]] static std::string utilityParsingLevelName(const std::string &levelFilepath) ;
-    [[nodiscard]] static std::string utilityTimerToText(int timer_) ;
+    [[nodiscard]] static std::string utilityParsingLevelName(
+        const std::string &levelFilepath
+    );
+    [[nodiscard]] static std::string utilityTimerToText(int timer_);
 
 public:
-
     explicit Statistics(const std::string &levelFilepath);
 
     void updateTimer();
@@ -38,6 +41,6 @@ public:
 
     [[nodiscard]] bool checkForExistingLevelStatistics();
 };
-}
+}  // namespace Platformer
 
 #endif  // PLATFORMERGAMECPP_STATISTICS_HPP

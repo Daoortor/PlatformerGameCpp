@@ -8,7 +8,8 @@ class LevelGameplayWindow : public LevelWindow {
     control::LevelPerformer *levelPerformerPtr;
     std::map<Platformer::Pose, sf::Texture> playerTextures;
     sf::Sprite playerSprite;
-
+    int DifTimer = 0;
+    
 public:
     explicit LevelGameplayWindow(
         unsigned int windowHeight,
