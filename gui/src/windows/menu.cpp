@@ -108,8 +108,6 @@ void Menu::createAndAddNewRectangleButton(
             sf::Vector2f(0, static_cast<float>(number * buttonDistance)),
         action
     );
-    std::cout << std::is_copy_constructible<RectangleButton>::value << '\n';
-    RectangleButton other_button = (button);
     addCreatedRectangleDescendantButton(button);
 }
 
