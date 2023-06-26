@@ -1,7 +1,9 @@
 #ifndef PLATFORMERGAMECPP_GAME_HPP_
 #define PLATFORMERGAMECPP_GAME_HPP_
 
+#include <chrono>
 #include <exception>
+#include <iostream>
 #include <memory>
 #include <vector>
 #include "../../tools/utilities.hpp"
@@ -23,7 +25,6 @@ public:
 class Game {
     Board board;
     std::unique_ptr<Player> player;
-    int timer = 0;
     sf::Vector2i startPos;
     sf::Vector2i endPos;
 

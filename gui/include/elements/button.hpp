@@ -3,6 +3,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <climits>
+#include <functional>
 #include <string>
 #include <utility>
 

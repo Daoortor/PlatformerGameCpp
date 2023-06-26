@@ -5,6 +5,7 @@
 namespace control {
 [[maybe_unused]] void MenuPerformer::openMainMenu() {
     state = MenuState::MainMenu;
+    isGameIsEnded = false;
 }
 
 [[maybe_unused]] void control::MenuPerformer::loadLevel(
@@ -12,11 +13,19 @@ namespace control {
 ) {
     setState(control::MenuState::Empty);
     levelPerformer.setState(control::LevelState::Running);
+    isGameIsEnded = false;
     // TODO: rewrite or rename, cross or underpants
 }
 
 [[maybe_unused]] void MenuPerformer::openLoadLevelMenu() {
     state = MenuState::LoadMenu;
+    isGameIsEnded = false;
+}
+
+[[maybe_unused]] void MenuPerformer::openWonMenu() {
+    // TODO updateTimer WonMenu
+    state = MenuState::WonMenu;
+    isGameIsEnded = true;
 }
 
 void MenuPerformer::openPauseMenu() {
@@ -37,6 +46,10 @@ void MenuPerformer::closeCurrentMenu() {
 
 void MenuPerformer::closeWindow() {
     window.close();
+}
+
+[[nodiscard]] bool MenuPerformer::getIsGameIsEnded() const {
+    return isGameIsEnded;
 }
 
 [[maybe_unused]] void LevelPerformer::pause() {
@@ -95,6 +108,10 @@ void LevelPerformer::setState(LevelState newState) {
 
 std::unique_ptr<Platformer::Game> &LevelPerformer::getLevel() {
     return game;
+}
+
+std::unique_ptr<Platformer::Statistics> &LevelPerformer::getStatistics() {
+    return statistics;
 }
 
 std::string MenuPerformer::getLevelFilePath(int num) {

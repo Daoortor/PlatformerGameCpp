@@ -17,6 +17,9 @@ LevelGameplayWindow::LevelGameplayWindow(
           levelFilepath
       ) {
     levelPerformerPtr->setLevel(std::make_unique<Game>(levelFilepath));
+    levelPerformerPtr->setStatistics(std::make_unique<Statistics>(levelFilepath)
+    );
+    levelPerformerPtr->getStatistics()->changeLevelFilepath(levelFilepath);
     playerTextures[Platformer::Pose::LOOKING_LEFT] = sf::Texture();
     playerTextures[Platformer::Pose::LOOKING_LEFT].loadFromFile(
         playerFilepath + "/player-left.png"
@@ -44,9 +47,15 @@ void LevelGameplayWindow::loadInWindow(sf::RenderWindow &window) {
             levelPerformerPtr->getLevel()->getEndPos()
         )) {
         levelPerformerPtr->setState(control::LevelState::Won);
+        if (!levelPerformerPtr->getStatistics()
+                 ->checkForExistingLevelStatistics()) {
+            levelPerformerPtr->getStatistics()->initializeLevelStatistics();
+        }
+        levelPerformerPtr->getStatistics()->updateLocalStatistics();
         return;
     }
     if (levelPerformerPtr->getState() == control::LevelState::Running) {
+        levelPerformerPtr->getStatistics()->updateTimer();
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) ||
             sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
             levelPerformerPtr->jump();
@@ -72,6 +81,7 @@ void LevelGameplayWindow::loadInWindow(sf::RenderWindow &window) {
         }
         if (sf::Keyboard::isKeyPressed(sf::Keyboard::F5)) {
             levelPerformerPtr->reset();
+            levelPerformerPtr->getStatistics()->updateDeathCount();
         }
     } else if (levelPerformerPtr->getState() == control::LevelState::Paused) {
         // do nothing

@@ -4,16 +4,23 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
 #include <filesystem>
-#include <string>
 #include <set>
+#include <string>
+#include "../../tools/utilities.hpp"
+#include "client.hpp"
 #include "game.hpp"
 #include "player.hpp"
-#include "../../tools/utilities.hpp"
-
-#include "client.hpp"
+#include "statistics.hpp"
 
 namespace control {
-enum class MenuState { MainMenu, LoadMenu, PauseMenu, ServerMenu, Empty };
+enum class MenuState {
+    MainMenu,
+    LoadMenu,
+    PauseMenu,
+    ServerMenu,
+    WonMenu,
+    Empty
+};
 enum class LevelState { Empty, Running, Paused, Won, Editor };
 
 struct Performer {
@@ -30,6 +37,7 @@ class MenuPerformer : Performer {
 private:
     std::vector<std::string> level_paths;
     MenuState state = MenuState::MainMenu;
+    bool isGameIsEnded = false;
 
 public:
     MenuPerformer(
@@ -46,16 +54,19 @@ public:
     [[maybe_unused]] void loadLevel(LevelPerformer &levelPerformer);
     [[maybe_unused]] void openLoadLevelMenu();
     [[maybe_unused]] void openPauseMenu();
+    [[maybe_unused]] void openWonMenu();
     void closeCurrentMenu();
     void closeWindow();
     void setState(MenuState newState);
     std::string getLevelFilePath(int num);
+    [[nodiscard]] bool getIsGameIsEnded() const;
 };
 
 class LevelPerformer : Performer {
 private:
     std::unique_ptr<Platformer::Game> game = nullptr;
     LevelState state = LevelState::Empty;
+    std::unique_ptr<Platformer::Statistics> statistics = nullptr;
 
 public:
     explicit LevelPerformer(sf::RenderWindow &window_);
@@ -70,8 +81,12 @@ public:
     [[maybe_unused]] void exit();
     void setLevel(std::unique_ptr<Platformer::Game> game_);
 
-    std::unique_ptr<Platformer::Game> &getLevel();
+    void setStatistics(std::unique_ptr<Platformer::Statistics> statistics_) {
+        statistics = std::move(statistics_);
+    }
 
+    std::unique_ptr<Platformer::Game> &getLevel();
+    std::unique_ptr<Platformer::Statistics> &getStatistics();
     LevelState getState();
     void setState(LevelState newState);
 };
@@ -84,18 +99,20 @@ private:
     std::set<std::string> chosen_global_levels;
 
 public:
-    explicit ServerPerformer(sf::RenderWindow &window_,
-                             const std::string &address,
-                             const std::string &key_directory,
-                             std::string  level_dir_path_);
-    bool getLevel(const std::string & level_name);
-    bool sendLevel(const std::string & level_name);
-    bool deleteLevel(const std::string & level_name);
-    bool checkLevel(const std::string & level_name); // TODO: do I even need it?
+    explicit ServerPerformer(
+        sf::RenderWindow &window_,
+        const std::string &address,
+        const std::string &key_directory,
+        std::string level_dir_path_
+    );
+    bool getLevel(const std::string &level_name);
+    bool sendLevel(const std::string &level_name);
+    bool deleteLevel(const std::string &level_name);
+    bool checkLevel(const std::string &level_name);  // TODO: do I even need it?
     std::vector<std::string> loadAllAvailableLevelNames();
 
-    void switch_in_local_set(const std::string & name);
-    void switch_in_global_set(const std::string & name);
+    void switch_in_local_set(const std::string &name);
+    void switch_in_global_set(const std::string &name);
     void clear_local_levels_selection();
     void clear_global_levels_selection();
 

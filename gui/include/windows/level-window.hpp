@@ -14,6 +14,7 @@
 #include "model-constants.hpp"
 #include "performer.hpp"
 #include "player.hpp"
+#include "statistics.hpp"
 
 namespace Platformer::gui {
 

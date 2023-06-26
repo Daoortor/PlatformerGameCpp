@@ -159,6 +159,21 @@ public:
     );
     void loadInWindow(sf::RenderWindow &window, sf::Event event) override;
 };
+
+struct WonMenu : Menu {
+public:
+    WonMenu(
+        unsigned int windowWidth,
+        unsigned int windowHeight,
+        const sf::Font &font,
+        int fontSize,
+        int buttonDistance,
+        const std::string &BackgroundTextureFilepath,
+        control::MenuPerformer &menuPerformer,
+        control::LevelPerformer &levelPerformer,
+        Platformer::gui::LevelGameplayWindow &levelGameplayWindow
+    );
+};
 }  // namespace interface
 
 #endif  // PLATFORMERGAMECPP_MENU_HPP
