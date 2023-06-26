@@ -64,7 +64,7 @@ add_executable(game
         server/src/source.cpp
         ${hw_proto_srcs}
         ${hw_grpc_srcs}
-        )
+        server/include/server.hpp)
 
 add_executable(test
         model/src/block.cpp
