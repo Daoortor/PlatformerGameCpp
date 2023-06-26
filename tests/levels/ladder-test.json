@@ -1,0 +1,92 @@
+{
+    "blockMap": [
+        [
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "air",
+            "air",
+            "ladder",
+            "air",
+            "ladder",
+            "air",
+            "ladder",
+            "air",
+            "air"
+        ],
+        [
+            "air",
+            "air",
+            "ladder",
+            "air",
+            "ladder",
+            "air",
+            "ladder",
+            "air",
+            "air"
+        ],
+        [
+            "air",
+            "air",
+            "ladder",
+            "air",
+            "ladder",
+            "air",
+            "ladder",
+            "air",
+            "air"
+        ],
+        [
+            "air",
+            "air",
+            "ladder",
+            "air",
+            "ladder",
+            "air",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "air",
+            "air",
+            "air",
+            "air",
+            "ladder",
+            "air",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "ladder",
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone"
+        ]
+    ],
+    "endPos": [
+        0,
+        -3000
+    ],
+    "height": 7,
+    "levelName": "ladder-test",
+    "playerStartPos": [
+        4500,
+        5250
+    ],
+    "width": 9
+}

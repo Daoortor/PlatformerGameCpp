@@ -1,5 +1,4 @@
-#include "../include/button.hpp"
-#include <iostream>
+#include "elements/button.hpp"
 #include <utility>
 
 namespace interface {
@@ -39,6 +38,10 @@ void Button::bind(std::function<void()> func) {
     action = std::move(func);
 }
 
+void Button::act() {
+    action();
+}
+
 void RectangleButton::update(sf::RenderWindow &window, sf::Event &event) {
     bool mouseInsideButton = this->shape.getGlobalBounds().contains(
         window.mapPixelToCoords(sf::Mouse::getPosition(window))
@@ -55,8 +58,7 @@ void RectangleButton::update(sf::RenderWindow &window, sf::Event &event) {
     if (event.type == sf::Event::MouseButtonPressed) {
         if (mouseInsideButton && currentState == ButtonState::Chosen) {
             currentState = ButtonState::Clicked;
-            // TODO: remove next line & redo properly!!!!!!!!!!!!!!
-            action();
+            act();
         } else {
             currentState = ButtonState::Available;
         }
@@ -103,4 +105,85 @@ sf::RectangleShape *RectangleButton::getCurrentShape() {
     return &shape;
 }
 
+void SwitchRectangleButton::switchColors() {
+    std::swap(colorChosen, colorAvailable);
+}
+
+void SwitchRectangleButton::act() {
+    action();
+    switchColors();
+}
+
+ButtonWithImage::ButtonWithImage(
+    const std::string &imageFilename,
+    sf::RectangleShape newShape,
+    sf::Vector2f newIndent,
+    sf::Vector2f newPosition,
+    const std::vector<sf::Color> &buttonColorsList,
+    std::function<void()> newAction,
+    bool hasBorder,
+    float borderMargin_,
+    sf::Color colorActive_
+)
+    : RectangleButton(
+          std::move(newShape),
+          buttonColorsList[0],
+          buttonColorsList[1],
+          buttonColorsList[2],
+          buttonColorsList[3],
+          sf::Text(),
+          newIndent,
+          newPosition,
+          std::move(newAction)
+      ),
+      borderMargin(borderMargin_),
+      colorActive(colorActive_) {
+    if (hasBorder) {
+        border = sf::RectangleShape(
+            shape.getSize() + 2.f * sf::Vector2f(borderMargin, borderMargin)
+        );
+        border.setPosition(
+            newPosition - sf::Vector2f(borderMargin, borderMargin)
+        );
+        border.setFillColor(sf::Color::Transparent);
+        border.setOutlineThickness(1.f);
+        border.setOutlineColor(sf::Color(255, 255, 255));
+    }
+    imageTexture.loadFromFile(imageFilename);
+    float imageScaleX =
+        static_cast<float>(shape.getSize().x - 2 * newIndent.x) /
+        static_cast<float>(imageTexture.getSize().x);
+    float imageScaleY =
+        static_cast<float>(shape.getSize().y - 2 * newIndent.y) /
+        static_cast<float>(imageTexture.getSize().y);
+    float imageScale = std::min(imageScaleX, imageScaleY);
+    imageSprite.setTexture(imageTexture);
+    imageSprite.setScale(imageScale, imageScale);
+    imageSprite.setPosition(newPosition + newIndent);
+}
+
+void ButtonWithImage::drawInWindow(sf::RenderWindow &window) {
+    RectangleButton::drawInWindow(window);
+    imageSprite.setTexture(imageTexture);
+    window.draw(border);
+    window.draw(imageSprite);
+}
+
+void ButtonWithImage::setPosition(sf::Vector2f newPosition) {
+    Button::setPosition(newPosition);
+    imageSprite.setPosition(newPosition);
+    border.setPosition(newPosition - sf::Vector2f(borderMargin, borderMargin));
+}
+
+void ButtonWithImage::setBackgroundColor(sf::Color color) {
+    border.setFillColor(color);
+}
+
+void ButtonWithImage::activate() {
+    setBackgroundColor(colorActive);
+}
+
+void ButtonWithImage::deactivate() {
+    setBackgroundColor(sf::Color::Transparent);
+}
 }  // namespace interface

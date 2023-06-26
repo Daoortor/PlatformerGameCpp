@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+package json_file_exchange;
+
+service Act {
+    rpc sendRequest(ActionRequest) returns (ActionReply) {}
+}
+
+message LevelContent {
+    message BlockRow {
+        repeated string row = 1;
+    }
+
+    string levelName = 1; // naming conventions for messages are strange
+    int32 width = 2;
+    int32 height = 3;
+    repeated BlockRow blockMap = 4;
+    repeated int32 playerStartPos = 5; // TODO: better than custom {x, y} struct, but need to assert "size=2"
+    repeated int32 endPos = 6;
+}// TODO: field naming convention? Coordinate with current .json level file
+
+message ActionRequest {
+    string action = 1; // add, check, get, delete
+    string level_name = 2; // LevelContent contains the same info,
+    // but I want to be able to pass empty LevelContent for check/delete requests
+    LevelContent level_content = 3;
+    int32 signature = 4;
+}
+
+// TODO: big TODO: protobuf message string field shenanigans - figure out
+
+// Action reply: contains action result and possible content of received level
+message ActionReply {
+    bool is_successful = 1;
+    bool result = 2;
+    LevelContent level_content = 3;
+    string additional_info = 4;
+    repeated string possible_level_list = 5; // optional as all other fields
+}

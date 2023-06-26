@@ -1,0 +1,60 @@
+{
+    "blockMap": [
+        [
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "air",
+            "air",
+            "air",
+            "trampoline",
+            "air",
+            "air",
+            "air"
+        ],
+        [
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone",
+            "stone"
+        ]
+    ],
+    "endPos": [
+        0,
+        -3000
+    ],
+    "height": 5,
+    "levelName": "tramp-test",
+    "playerStartPos": [
+        3500,
+        0
+    ],
+    "width": 7
+}

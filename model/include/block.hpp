@@ -15,13 +15,23 @@ protected:
     const std::string name_;
     const bool isSolid_ = false;
     const bool isHangableOn_ = false;
+    const bool isDeadly_ = false;
+    const float fallBounceCoefficient_ = 0;
 
 public:
     Block() = default;
-    Block(std::string name, bool isSolid, bool isHangableOn)
+    explicit Block(
+        std::string name,
+        bool isSolid = false,
+        bool isHangableOn = false,
+        bool isDeadly = false,
+        float fallBounceCoefficient = 0
+    )
         : name_(std::move(name)),
           isSolid_(isSolid),
-          isHangableOn_(isHangableOn){};
+          isHangableOn_(isHangableOn),
+          isDeadly_(isDeadly),
+          fallBounceCoefficient_(fallBounceCoefficient){};
 
     [[nodiscard]] std::string name() const {
         return name_;
@@ -34,23 +44,43 @@ public:
     [[nodiscard]] bool isHangableOn() const {
         return isHangableOn_;
     }
+
+    [[nodiscard]] bool isDeadly() const {
+        return isDeadly_;
+    }
+
+    [[nodiscard]] float getFallBounceCoefficient() const {
+        return fallBounceCoefficient_;
+    }
 };
 
 class Stone : public Block {
 public:
-    Stone() : Block("stone", true, false) {
+    Stone() : Block("stone", true) {
     }
 };
 
 class Air : public Block {
 public:
-    Air() : Block("air", false, false) {
+    Air() : Block("air") {
     }
 };
 
 class Ladder : public Block {
 public:
     Ladder() : Block("ladder", false, true) {
+    }
+};
+
+class Killer : public Block {
+public:
+    Killer() : Block("killer", true, false, true) {
+    }
+};
+
+class Trampoline : public Block {
+public:
+    Trampoline() : Block("trampoline", true, false, false, 0.9) {
     }
 };
 

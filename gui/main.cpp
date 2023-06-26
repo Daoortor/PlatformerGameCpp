@@ -1,11 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window.hpp>
-#include <iostream>
 #include "../tools/json.hpp"
 #include "include/gui-constants.hpp"
-#include "include/level-render.hpp"
-#include "include/menu.hpp"
-#include "include/overlord.hpp"
+#include "windows/menu.hpp"
 
 using json = nlohmann::json;
 
@@ -26,35 +23,61 @@ int main() {
     );
     window.setPosition(sf::Vector2i(200, 50));
     window.setFramerateLimit(60);
-    control::MainMenuOverlord mainMenuOverlord(window, "../model/levels/");
-    control::LevelOverlord levelOverlord(window);
+
+    control::MenuPerformer menuPerformer(window, "../model/levels/");
+    control::LevelPerformer levelPerformer(window);
+    control::ServerPerformer serverPerformer(
+        window, "0.0.0.0:50051", "../server/client_test_directory/",
+        "../model/levels/"
+    );  // TODO: redo
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/lofi.ttf");
+
+    auto levelGameplayWindow = Platformer::gui::LevelGameplayWindow(
+        windowHeight, "../gui/assets/textures/interface/level-background.png",
+        "../gui/assets/textures/player", "../gui/assets/textures/misc/",
+        "../model/levels/level 2.json", &levelPerformer
+    );
+
+    auto levelEditor = Platformer::gui::LevelEditor(
+        windowHeight, &levelPerformer, &menuPerformer,
+        "../gui/assets/textures/interface/level-background.png",
+        "../gui/assets/textures/blocks/", "../gui/assets/textures/misc/",
+        "../model/" + Platformer::gui::levels::EMPTY_LEVEL_NAME,
+        "../model/levels/", fontMario, {45, 0}
+    );
 
     auto mainMenu = interface::MainMenu(
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/main-menu-background.png",
-        mainMenuOverlord, {70, 290}
+        menuPerformer, levelPerformer, levelGameplayWindow
     );
 
     auto loadMenu = interface::LevelSelectionMenu(
         windowWidth, windowHeight, fontMario, 20, 50,
         "../gui/assets/textures/interface/level-selection-menu-background.png",
-        "../model/levels/"
+        "../model/levels/", "../gui/assets/textures/misc/", menuPerformer,
+        levelPerformer, levelGameplayWindow
     );
 
-    auto levelWindow = Platformer::gui::levelWindow(
-        windowHeight, "../gui/assets/textures/interface/level-background.png",
-        "../gui/assets/textures/player",
-        "../model/levels/t01-box-with-ladder.json", levelOverlord
+    auto pauseMenu = interface::PauseMenu(
+        windowWidth, windowHeight, fontMario, 20, 50,
+        "../gui/assets/textures/interface/transparent.jpg", menuPerformer,
+        levelPerformer
     );
 
-    mainMenu.bindButton("Load game", [&]() {
-        mainMenuOverlord.setState(control::CurrentProcess::LoadMenu);
-    });
-    loadMenu.bindButton("Return", [&]() {
-        mainMenuOverlord.setState(control::CurrentProcess::MainMenu);
-    });
+    auto serverMenu = interface::ServerMenu(
+        windowWidth, windowHeight, fontMario, 20, 50,
+        "../gui/assets/textures/interface/level-selection-menu-background.png",
+        "../model/levels/", "../gui/assets/textures/misc/", menuPerformer,
+        levelPerformer, serverPerformer, levelGameplayWindow
+    );
+
+    auto wonMenu = interface::WonMenu(
+        windowWidth, windowHeight, fontMario, 20, 50,
+        "../gui/assets/textures/interface/level-background.png", menuPerformer,
+        levelPerformer, levelGameplayWindow
+    );
 
     while (window.isOpen()) {
         sf::Event event{};
@@ -64,24 +87,48 @@ int main() {
             }
         }
         window.clear();
-        switch (mainMenuOverlord.getState()) {
-            case control::CurrentProcess::MainMenu:
+        switch (levelPerformer.getState()) {
+            case control::LevelState::Empty:
+                break;
+            case control::LevelState::Running:
+                levelGameplayWindow.loadInWindow(window);
+                break;
+            case control::LevelState::Paused:
+                menuPerformer.openPauseMenu();
+                break;
+            case control::LevelState::Won:
+                if (!menuPerformer.getIsGameIsEnded()) {  // TODO
+                    wonMenu = interface::WonMenu(
+                        windowWidth, windowHeight, fontMario, 20, 50,
+                        "../gui/assets/textures/interface/level-background.png",
+                        menuPerformer, levelPerformer, levelGameplayWindow
+                    );
+                }
+                menuPerformer.openWonMenu();
+                levelPerformer.setState(control::LevelState::Won);
+                levelPerformer.reset();
+                break;
+            case control::LevelState::Editor:
+                levelEditor.loadInWindow(window, event);
+        }
+        switch (menuPerformer.getState()) {
+            case control::MenuState::MainMenu:
                 mainMenu.loadInWindow(window, event);
                 break;
-            case control::CurrentProcess::LoadMenu:
+            case control::MenuState::LoadMenu:
                 loadMenu.loadInWindow(window, event);
                 break;
-            case control::CurrentProcess::LevelRunning:
-                // TODO: load game object to window
-                // TODO: game move assignment?
-                levelWindow.loadInWindow(window);
+            case control::MenuState::PauseMenu:
+                pauseMenu.loadInWindow(window, event);
                 break;
-            case control::CurrentProcess::LevelPaused:
-                // TODO: load game object to window anyway, but different
-                // controls
+            case control::MenuState::ServerMenu:
+                serverMenu.loadInWindow(window, event);
+                break;
+            case control::MenuState::WonMenu:
+                wonMenu.loadInWindow(window, event);
+            case control::MenuState::Empty:
                 break;
         }
-
         window.display();
     }
     return 0;

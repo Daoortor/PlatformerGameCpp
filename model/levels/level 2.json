@@ -1,0 +1,210 @@
+{
+    "blockMap": [
+        {
+            "row": [
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "stone",
+                "ladder",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "air",
+                "air",
+                "air",
+                "stone",
+                "air",
+                "air",
+                "air",
+                "air",
+                "ladder",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "ladder",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "ladder",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "stone",
+                "air",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "ladder",
+                "air",
+                "air",
+                "stone",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "ladder",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "ladder",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "ladder",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "ladder",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "ladder",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "air",
+                "stone"
+            ]
+        },
+        {
+            "row": [
+                "stone",
+                "stone",
+                "stone",
+                "air",
+                "air",
+                "stone",
+                "air",
+                "air",
+                "stone",
+                "stone",
+                "stone"
+            ]
+        }
+    ],
+    "endPos": [
+        9497,
+        1560
+    ],
+    "height": 13,
+    "levelName": "level 2",
+    "playerStartPos": [
+        9500,
+        11250
+    ],
+    "width": 11
+}
