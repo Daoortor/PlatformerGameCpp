@@ -59,6 +59,7 @@ add_executable(game
         gui/src/elements/textbox.cpp
         gui/src/windows/level-play.cpp
         gui/src/windows/level-editor.cpp
+        gui/src/statistics.cpp
 
         server/src/client.cpp
         server/src/source.cpp
