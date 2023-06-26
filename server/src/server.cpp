@@ -93,7 +93,6 @@ void LevelManagementServer::handleRequestAddOrReplace(
     } else {
         std::unique_lock lock(unknown_level_mutex);
     }
-    // TODO: check mutex correctness
 
     if (Levels.count(level_file_path) &&
         Levels.at(level_file_path).m_Creator != authorID) {
@@ -232,10 +231,6 @@ void RunServer() {
 
     ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-    // builder.AddListeningPort(server_address,
-    // grpc::SslServerCredentials(grpc::SslServerCredentialsOptions()));
-    // TODO: check gRPC version for line above; in 1.54 it should take 1 arg;
-    //  installed version is 1.54, but this function requests 2 args
     builder.RegisterService(&service);
 
     std::unique_ptr<Server> server(builder.BuildAndStart());

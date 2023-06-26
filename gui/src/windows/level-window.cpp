@@ -162,7 +162,7 @@ void LevelWindow::loadLevel(
     std::unique_ptr<Platformer::Game> &game
 ) {
     backgroundSprite.setTexture(backgroundTexture);
-    // TODO: resolve texture loss that occurs after removing line above
+    // line above ensures no texture loss
     window.draw(backgroundSprite);
     for (const auto &row : boardSprites) {
         for (const auto &sprite : row) {

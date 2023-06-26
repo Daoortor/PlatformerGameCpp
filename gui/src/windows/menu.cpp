@@ -12,9 +12,6 @@ std::unique_ptr<RectangleButton> &Menu::addCreatedRectangleDescendantButton(
     rectangleButtons.emplace_back(
         std::make_unique<RectangleButtonDerivedClass>(buttonSample)
     );
-    // TODO: the problem is RectangleButton cannot be passed by rvalue and
-    // cannot be copied,
-    //  yet make_unique requires copying here: can't pass args
     buttonLabelToNum[rectangleButtons.back()->getLabel().getString()] =
         static_cast<int>(rectangleButtons.size() - 1);
     return rectangleButtons.back();
@@ -156,7 +153,7 @@ MainMenu::MainMenu(
     bindButton("Select level", [&]() { menuPerformer.openLoadLevelMenu(); });
     bindButton("Connect to server", [&]() {
         menuPerformer.setState(control::MenuState::ServerMenu);
-        // TODO: add openServerMenu method, same as similar others
+        // TODO: add openServerMenu method for consistency
     });
     bindButton("Quit", [&]() { menuPerformer.closeWindow(); });
 }

@@ -77,7 +77,7 @@ ActionReply LevelClient::sendRequest(const ActionRequest &request) {
     if (status.ok()) {
         return reply;
     } else {
-        reply.set_result(false);  // TODO: what exactly is status? Read and use
+        reply.set_result(false);
         std::cerr << "Procedure call failed\n";
         std::cerr << status.error_code() << ": " << status.error_message()
                   << std::endl;

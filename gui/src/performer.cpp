@@ -14,7 +14,7 @@ namespace control {
     setState(control::MenuState::Empty);
     levelPerformer.setState(control::LevelState::Running);
     isGameIsEnded = false;
-    // TODO: rewrite or rename, cross or underpants
+    // TODO: rewrite or rename
 }
 
 [[maybe_unused]] void MenuPerformer::openLoadLevelMenu() {
@@ -85,13 +85,11 @@ void LevelPerformer::stop() {
 }
 
 [[maybe_unused]] void LevelPerformer::exit() {
-    // TODO: level reset
     state = LevelState::Empty;
 }
 
 LevelPerformer::LevelPerformer(sf::RenderWindow &window_) : Performer(window_) {
     state = LevelState::Empty;
-    // TODO: rewrite after solving LevelPerformer - Game dependencies
 }
 
 void LevelPerformer::setLevel(std::unique_ptr<Platformer::Game> game_) {
@@ -153,7 +151,7 @@ bool ServerPerformer::deleteLevel(const std::string &level_name) {
 }
 
 // use inside try ... catch block
-bool ServerPerformer::checkLevel(const std::string &level_name) {
+[[maybe_unused]] bool ServerPerformer::checkLevel(const std::string &level_name) {
     client::ActionReply reply = client.sendRequestCheckLevelExistence(level_name);
     return reply.is_successful();
 }

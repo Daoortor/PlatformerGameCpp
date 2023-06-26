@@ -35,7 +35,7 @@ void add_or_replace_json_file(
     const std::string &file_content
 ) {
     std::ofstream file(file_name, std::ios::trunc);
-    file << file_content;  // TODO: validity check?
+    file << file_content;  // TODO: validness check?
     file.close();
 }
 
@@ -46,7 +46,7 @@ std::string file_content_string(const std::string &file_name) {
         (std::istreambuf_iterator<char>())
     );
     return std::move(content);
-}  // TODO: effective reading
+}
 
 void delete_file(const std::string &file_name) {
     std::filesystem::remove(file_name);
