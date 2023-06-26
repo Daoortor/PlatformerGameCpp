@@ -1,0 +1,14 @@
+{
+    "t01-box-with-ladder": {
+        "best death count": 0,
+        "best time": 66,
+        "first time flag": false,
+        "last time": 78
+    },
+    "t02-hard-jumps": {
+        "best death count": 29,
+        "best time": 938,
+        "first time flag": false,
+        "last time": 938
+    }
+}

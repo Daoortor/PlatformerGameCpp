@@ -26,9 +26,10 @@ int main() {
 
     control::MenuPerformer menuPerformer(window, "../model/levels/");
     control::LevelPerformer levelPerformer(window);
-    control::ServerPerformer serverPerformer(window, "0.0.0.0:50051",
-                                             "../server/client_test_directory/",
-                                             "../model/levels/"); // TODO: redo
+    control::ServerPerformer serverPerformer(
+        window, "0.0.0.0:50051", "../server/client_test_directory/",
+        "../model/levels/"
+    );  // TODO: redo
 
     sf::Font fontMario = safeLoadFont("../gui/assets/interface/fonts/lofi.ttf");
 
@@ -72,6 +73,12 @@ int main() {
         levelPerformer, serverPerformer, levelGameplayWindow
     );
 
+    auto wonMenu = interface::WonMenu(
+        windowWidth, windowHeight, fontMario, 20, 50,
+        "../gui/assets/textures/interface/level-background.png", menuPerformer,
+        levelPerformer, levelGameplayWindow
+    );
+
     while (window.isOpen()) {
         sf::Event event{};
         while (window.pollEvent(event)) {
@@ -90,8 +97,15 @@ int main() {
                 menuPerformer.openPauseMenu();
                 break;
             case control::LevelState::Won:
-                menuPerformer.openMainMenu();
-                levelPerformer.setState(control::LevelState::Empty);
+                if (!menuPerformer.getIsGameIsEnded()) {  // TODO
+                    wonMenu = interface::WonMenu(
+                        windowWidth, windowHeight, fontMario, 20, 50,
+                        "../gui/assets/textures/interface/level-background.png",
+                        menuPerformer, levelPerformer, levelGameplayWindow
+                    );
+                }
+                menuPerformer.openWonMenu();
+                levelPerformer.setState(control::LevelState::Won);
                 levelPerformer.reset();
                 break;
             case control::LevelState::Editor:
@@ -110,6 +124,8 @@ int main() {
             case control::MenuState::ServerMenu:
                 serverMenu.loadInWindow(window, event);
                 break;
+            case control::MenuState::WonMenu:
+                wonMenu.loadInWindow(window, event);
             case control::MenuState::Empty:
                 break;
         }
